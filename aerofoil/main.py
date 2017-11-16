@@ -8,6 +8,9 @@ from typing import List
 import os
 
 class Surface():
+    """
+    Class that represents a Surface from a number of nodes and degree
+    """
 
     def __init__(self, nodes, degree: int = 2):
         self.nodes = nodes
@@ -21,8 +24,12 @@ class Surface():
 
 
 class Aerofoil():
+    """
+    Class that represents an Aerofoil
+    """
 
     def __init__(self, suction_surface: Surface, pressure_surface: Surface):
+
         self.suction_surface = suction_surface
         self.pressure_surface = pressure_surface
 
@@ -111,13 +118,21 @@ class Aerofoil():
 
 if __name__ == "__main__":
 
+    # create an array of nodes
     array = [[1,0], [0., 0.], [0.5, 1.], [1., 0.]]
 
+    # create an aerofoil class from the nodes
     aerofoil = Aerofoil.develop_aerofoil(0.1, -0.1, 0.2, 0.5, 0.)
 
+    # create a file path to write the coordinates of the aerofoil to
     dir_name = os.path.dirname(os.path.abspath(__file__))
     file_name = os.path.join(dir_name, "hey2.txt")
 
-
+    # write to coords to file
     with open(file_name, "w") as open_file:
         aerofoil.write(open_file)
+
+    # plot aerofoil
+    plot = aerofoil.plot()
+    plot.axis("equal")
+    plt.show()
