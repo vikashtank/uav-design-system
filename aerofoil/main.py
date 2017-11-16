@@ -46,7 +46,7 @@ class Aerofoil():
 
     @staticmethod
     def develop_aerofoil(le_top: float, le_bottom: float, thickness: float,
-                         camber_x: float, camber_y: float) -> Aerofoil:
+                         camber_x: float, camber_y: float) -> "Aerofoil":
         """
         generates an aerofoil from the parameters provided from 6 control points:
             1 control point at the leading edge
@@ -113,7 +113,7 @@ if __name__ == "__main__":
 
     array = [[1,0], [0., 0.], [0.5, 1.], [1., 0.]]
 
-    aerofoil = Aerofoil.develop_aerofoil(0.1, -0.1, 0.2, 0.5, 0.)
+    aerofoil = Aerofoil.develop_aerofoil(0.1, -0.1, 0.2, 0.5, 0.2)
 
     dir_name = os.path.dirname(os.path.abspath(__file__))
     file_name = os.path.join(dir_name, "hey2.txt")
