@@ -1,6 +1,7 @@
 
 
-
+class Wing():
+    pass
 
 
 
