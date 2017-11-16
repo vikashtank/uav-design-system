@@ -9,19 +9,31 @@ import shutil
 class Runner():
 
     def __init__(self, file_path):
+        """
+        Creates a runtime directory and process for an executable
+        inputs:
+
+            file_path (str): path to executable
+        """
+
         # make a temp folder to run analysis in
-        self.temp_folder = os.path.join(os.path.dirname(__file__), "run_time")
-        # copy the executable to the temp file
+        # temp folder located here because xfoil file path limit (64 chars)
+        home_directory = os.getenv("HOME")
+        self.temp_folder = os.path.join(home_directory, "temp")
+        os.makedirs(self.temp_folder)
+
+        # create a variable for the path to the location of the xfoil executable
+        self.executable = file_path
+
+
+    def _move_to_runtime(self, file_path):
+
         shutil.copy(file_path, self.temp_folder)
-        # create a variable for the path to the new location of the executable
-        self.executable = os.path.join(self.temp_folder, file_path)
 
+        return os.path.join(self.temp_folder, os.path.basename(file_path))
 
-    def _move_to_runtime(self, run_time_path, file_path):
-
-        shutil.copy(file_path, run_time_path)
-
-        return os.path.join(run_time_path, os.path.basename(file_path))
+    def __del__(self):
+        shutil.rmtree(self.temp_folder)
 
 
 class Process():

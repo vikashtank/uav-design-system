@@ -18,11 +18,11 @@ class AVLRunner(Runner):
         super().__init__(os.path.join(os.path.dirname(__file__), "avl3.35"))
 
     def setup_analysis(self, geom_file, mass_file, config_file, required_files):
-        self.geom_file = self._move_to_runtime(self.temp_folder, geom_file)
-        self.mass_file = self._move_to_runtime(self.temp_folder, mass_file)
-        self.config_file = self._move_to_runtime(self.temp_folder, config_file)
+        self.geom_file = self._move_to_runtime(geom_file)
+        self.mass_file = self._move_to_runtime(mass_file)
+        self.config_file = self._move_to_runtime(config_file)
         for required_file in required_files:
-            self._move_to_runtime(self.temp_folder, required_file)
+            self._move_to_runtime(required_file)
         self.process = Process.initialise_process(self.executable)
 
         self.process.command("LOAD " + self.geom_file)
@@ -31,10 +31,13 @@ class AVLRunner(Runner):
         self.process.command("OPER " + "f " + self.config_file)
 
 
-    def generate_results(self, keep_results = True, results_dir = ""):
+    def generate_results(self, results_dir = ""):
         """
         create a file for each result and return a dictionary with the files
         content
+
+        Inputs:
+
         """
         results_dict = {}
         self.process.command("X")
@@ -42,7 +45,7 @@ class AVLRunner(Runner):
         for analysis_name in AVLRunner.result_aliases.keys():
 
             temp_file = analysis_name + ".txt"
-            content = self._get_results(analysis_name, temp_file, keep_results)
+            content = self._get_results(analysis_name, temp_file)
             analysis_alias = AVLRunner.result_aliases[analysis_name]
             results_dict[analysis_alias] = content
             if os.path.exists(results_dir):
@@ -51,8 +54,7 @@ class AVLRunner(Runner):
         return results_dict
 
 
-    def _get_results(self, analysis_name, temp_file, keep_file = True):
-
+    def _get_results(self, analysis_name, temp_file):
 
         command = analysis_name + " {0}".format(temp_file)
         self.process.command(command)
@@ -62,9 +64,6 @@ class AVLRunner(Runner):
 
         with open(temp_file) as open_file:
             content = open_file.read()
-
-        if not keep_file:
-            os.remove(temp_file)
 
         return content
 

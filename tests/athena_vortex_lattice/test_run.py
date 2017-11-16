@@ -31,7 +31,7 @@ class Test(unittest.TestCase):
 
         avl_runner = AVLRunner()
         avl_runner.setup_analysis( geom_file, mass_file, config_file, [])
-        results_dict = avl_runner.generate_results( True, self.results_dir)
+        results_dict = avl_runner.generate_results(self.results_dir)
 
         self.assertTrue(exists(join(self.results_dir, "ft.txt")))
         self.assertTrue(exists(join(self.results_dir, "hm.txt")))
