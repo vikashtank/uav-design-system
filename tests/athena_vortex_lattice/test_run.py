@@ -30,7 +30,7 @@ class Test(unittest.TestCase):
         makedirs(self.results_dir)
 
         avl_runner = AVLRunner()
-        avl_runner.setup_analysis( geom_file, mass_file, config_file, [])
+        avl_runner.setup_analysis( geom_file, mass_file, config_file)
         results_dict = avl_runner.generate_results(self.results_dir)
 
         self.assertTrue(exists(join(self.results_dir, "ft.txt")))
