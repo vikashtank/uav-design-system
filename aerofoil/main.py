@@ -118,8 +118,6 @@ class Aerofoil():
 
 if __name__ == "__main__":
 
-    # create an array of nodes
-    array = [[1,0], [0., 0.], [0.5, 1.], [1., 0.]]
 
     # create an aerofoil class from the nodes
     aerofoil = Aerofoil.develop_aerofoil(0.1, -0.1, 0.2, 0.5, 0.)
