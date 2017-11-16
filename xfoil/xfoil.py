@@ -39,7 +39,7 @@ class XfoilRunner():
         shutil.rmtree(self.temp_folder)
 
 
-    def setup_analysis(self, aerofoil, Re):
+    def setup_analysis(self, aerofoil_file_path, Re):
         """
         runs commands to setup the aerofoil and reynolds number
         sets up polar plotting
@@ -50,10 +50,13 @@ class XfoilRunner():
         re (Int): reynolds number
         """
 
-        self.aerofoil = aerofoil
+        base_name = os.path.basename(aerofoil_file_path)
+        shutil.copy(aerofoil_file_path, self.temp_folder)
+        aerofoil_file_path = os.path.join(self.temp_folder, base_name)
+
         self.reynolds_number = Re
         self.process = Process.initialise_process(self.executable)
-        self.process.command("NACA {0}".format(self.aerofoil))
+        self.process.command("LOAD {0}".format(aerofoil_file_path))
         self.process.command("OPER")
         self.process.command("visc {0}".format(self.reynolds_number))
         self.process.command("SEQP")

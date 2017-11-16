@@ -19,6 +19,7 @@ class Test(unittest.TestCase):
 
         # read the results file that is expected to be produced
         comparison_file = os.path.join(this_directory, "resources", "aerofoil_results.txt")
+        self.aerofoil_file = os.path.join(this_directory, "resources", "test_aerofoil.txt")
 
         with open(comparison_file) as open_file:
             self.expected_content = open_file.read()
@@ -33,7 +34,7 @@ class Test(unittest.TestCase):
         os.makedirs(self.results_dir)
 
         xfoil_runner = XfoilRunner(file_path)
-        xfoil_runner.setup_analysis("0012", 1e6)
+        xfoil_runner.setup_analysis(self.aerofoil_file, 1e6)
         results_dict = xfoil_runner.generate_results(0, 5, 0.5, True, self.results_dir)
 
         results_file = os.path.join(self.results_dir, "aerofoil_results.txt")

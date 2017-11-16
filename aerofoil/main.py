@@ -113,7 +113,7 @@ if __name__ == "__main__":
 
     array = [[1,0], [0., 0.], [0.5, 1.], [1., 0.]]
 
-    aerofoil = Aerofoil.develop_aerofoil(0.1, -0.1, 0.2, 0.5, 0.2)
+    aerofoil = Aerofoil.develop_aerofoil(0.1, -0.1, 0.2, 0.5, 0.)
 
     dir_name = os.path.dirname(os.path.abspath(__file__))
     file_name = os.path.join(dir_name, "hey2.txt")
