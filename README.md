@@ -39,6 +39,8 @@ The `aerofoil` class takes two surface classes and has the capability of
 plotting and writing to a file for Xfoil importing. An additional static method
 `develop_aerofoil` provides inputs to design an aerofoil with control points constrained.
 
+`main.py` is a file that runs a simple plotting example
+
 #### Example
 
 ```python
@@ -46,7 +48,7 @@ import os
 
 import matplotlib.pyplot as plt
 
-from aerofoil.main import *
+from aerofoil import *
 
 
 # create an aerofoil class from the nodes
