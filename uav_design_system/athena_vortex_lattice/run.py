@@ -14,6 +14,8 @@ class AVLRunner(Runner):
                         "ft" : "forces",
                         "hm" : "hinge moments"}
 
+    def __init__(self):
+        super().__init__(os.path.join(os.path.dirname(__file__), "avl3.35"))
 
     def setup_analysis(self, geom_file, mass_file, config_file, required_files):
         self.geom_file = self._move_to_runtime(self.temp_folder, geom_file)

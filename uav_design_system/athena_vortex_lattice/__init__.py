@@ -1,2 +1,2 @@
 from .run import AVLRunner
-from .wing import 
+from .wing import Wing

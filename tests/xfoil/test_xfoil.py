@@ -1,9 +1,9 @@
 import os
 this_directory = os.path.dirname(os.path.abspath(__file__))
 import sys
-sys.path.append(this_directory + "/../")
+sys.path.append(this_directory + "/../../")
 import unittest
-from xfoil import XfoilRunner
+from uav_design_system.xfoil import XfoilRunner
 import shutil
 
 

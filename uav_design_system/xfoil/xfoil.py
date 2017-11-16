@@ -3,8 +3,7 @@ Xfoil API
 """
 import sys
 import os
-sys.path.append(os.path.dirname(__file__) + "/../common")
-from process import Process, Runner
+from ..common import Process, Runner
 import time
 import tempfile
 import shutil
@@ -138,14 +137,4 @@ class XfoilRunner():
 
 
 if __name__ == "__main__":
-
-    file_path = "/Applications/Xfoil.app/Contents/Resources/xfoil"
-
-    os.makedirs("results_dir")
-
-    xfoil_runner = XfoilRunner(file_path)
-    xfoil_runner.setup_analysis("25112", 1e6)
-    results_dict = xfoil_runner.generate_results(0, 10, 0.5, True, "results_dir")
-
-    for i in results_dict:
-        print(i,"", results_dict[i])
+    pass

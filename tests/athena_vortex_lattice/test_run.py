@@ -2,9 +2,9 @@ from os.path import join, exists, dirname, abspath
 from os import makedirs
 this_directory = dirname(abspath(__file__))
 import sys
-sys.path.append(this_directory + "/../")
+sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
 import unittest
-from run import AVLRunner
+from uav_design_system.athena_vortex_lattice import AVLRunner
 import shutil
 
 
@@ -23,14 +23,13 @@ class Test(unittest.TestCase):
 
     def test_run_success(self):
 
-        avl_file_path = join(this_directory, "../avl3.35")
         geom_file = join(this_directory, "resources", "allegro.avl")
         mass_file = join(this_directory, "resources", "allegro.mass")
         config_file = join(this_directory, "resources", "bd2.run")
 
         makedirs(self.results_dir)
 
-        avl_runner = AVLRunner(avl_file_path)
+        avl_runner = AVLRunner()
         avl_runner.setup_analysis( geom_file, mass_file, config_file, [])
         results_dict = avl_runner.generate_results( True, self.results_dir)
 
