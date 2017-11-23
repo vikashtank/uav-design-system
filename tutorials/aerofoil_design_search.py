@@ -38,13 +38,13 @@ if __name__ == "__main__":
     ax = fig.add_subplot(111)
     ax.axis("equal")
 
-    camber = [0, 0.1, 0.2, 0.3]
+    camber = [0, 0.1, 0.15, 0.2]
     colour = ["r", "g", "b", "y"]
     cm = []
     cd = []
     cl = []
 
-    for i in [0, 1, 2, 3]:
+    for i in range(len(camber)):
         results = run_aerofoil(0.1, -0.1, 0.2, 0.5, camber[i], ax, colour[i])
         cm.append(results[0]["cm"])
         cd.append(results[0]["cd"])
