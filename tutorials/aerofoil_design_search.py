@@ -50,6 +50,20 @@ if __name__ == "__main__":
         cd.append(results[0]["cd"])
         cl.append(results[0]["cl"])
 
+    fig = plt.figure(2)
+    ax = fig.add_subplot(111)
+    ax.axis("equal")
+    plt.xlabel("cm")
+    plt.ylabel("cd")
+    plt.plot(cm, cd)
+
+    fig = plt.figure(3)
+    ax = fig.add_subplot(111)
+    ax.axis("equal")
+    plt.xlabel("camber")
+    plt.ylabel("moment coefficient")
+    plt.plot(camber, cm)
+
     print(cm)
     print(cd)
     print(cl)
