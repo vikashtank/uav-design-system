@@ -1,23 +1,24 @@
 """
 """
 import numpy as np
-from surface import Surface
+import bezier
 
 class Aerofoil():
     """
     Class that represents an Aerofoil
     """
 
-    def __init__(self, suction_surface: Surface, pressure_surface: Surface):
+    def __init__(self, suction_surface: 'Surface', pressure_surface: 'Surface'):
 
         self.suction_surface = suction_surface
         self.pressure_surface = pressure_surface
 
-    def plot(self, num_points: int = 250):
+    def plot(self, plot = None,num_points: int = 250, colour = "g"):
         """
         Plots both the suction and pressure surface of this aerofoil
 
         Inputs:
+            ax: The axis to plot the coordinates on
             num_points: The resolution of the plot
 
         Returns:
@@ -26,8 +27,12 @@ class Aerofoil():
         suction_curve = self.suction_surface.generate_bezier()
         pressure_curve = self.pressure_surface.generate_bezier()
 
-        plot = suction_curve.plot(num_points)
-        pressure_curve.plot(num_points, ax = plot)
+        if plot:
+            pl = suction_curve.plot(num_points, ax = plot, color = colour)
+            pressure_curve.plot(num_points, ax = plot, color = colour)
+        else:
+            plot = suction_curve.plot(num_points, color = colour)
+            pressure_curve.plot(num_points, ax = plot, color = colour)
 
         return plot
 
@@ -93,3 +98,19 @@ class Aerofoil():
 
         for i in all_points:
             open_file.write("{0} {1}\n".format(i[0], i[1]))
+
+
+class Surface():
+    """
+    Class that represents a Surface from a number of nodes and degree
+    """
+
+    def __init__(self, nodes, degree: int = 2):
+        self.nodes = nodes
+        self.degree = degree
+
+    def generate_bezier(self):
+        """
+        create a bezier curve class from the nodes
+        """
+        return bezier.Curve(self.nodes, degree = self.degree)

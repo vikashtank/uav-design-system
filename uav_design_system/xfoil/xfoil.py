@@ -26,7 +26,6 @@ class XfoilRunner():
         home_directory = os.getenv("HOME")
         self.temp_folder = os.path.join(home_directory, "temp")
         os.makedirs(self.temp_folder)
-
         # create a variable for the path to the location of the xfoil executable
         self.executable = file_path
 
@@ -85,8 +84,6 @@ class XfoilRunner():
         if keep_results:
             shutil.copy(temp_file, results_dir)
 
-        shutil.rmtree(self.temp_folder)
-
         return self._format_content(content)
 
     def _format_content(self, content):
@@ -99,7 +96,7 @@ class XfoilRunner():
             dict["alpha"] = float(line[0])
             dict["cl"] = float(line[1])
             dict["cd"] = float(line[2])
-            dict["cm"] = float(line[3])
+            dict["cm"] = float(line[4])
             return dict
 
         lines = content.split("\n")

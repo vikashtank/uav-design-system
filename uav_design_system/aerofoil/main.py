@@ -8,7 +8,6 @@ from typing import List
 import os
 
 from aerofoil import Aerofoil
-from surface import Surface
 
 
 if __name__ == "__main__":
