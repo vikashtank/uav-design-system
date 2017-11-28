@@ -136,9 +136,9 @@ class Section():
     def __init__(self, aerofoil_file_path: str, cord: float):
         self.add_aerofoil(aerofoil_file_path)
         self.cord = cord
-        self.bias_x = 0
-        self.bias_y = 0
-        self.bias_z = 0
+        self.x = 0
+        self.y = 0
+        self.z = 0
         self.twist_angle = 0
 
     def add_aerofoil(self, aerofoil_file_path: str):
@@ -151,9 +151,9 @@ class Section():
         """
         The location of the top of the cord of this section
         """
-        self.bias_x = x
-        self.bias_y = y
-        self.bias_z = z
+        self.x = x
+        self.y = y
+        self.z = z
 
     def __str__(self):
 
@@ -174,9 +174,9 @@ SECTION
 {5}
 AFIL
 {6}
-""".format(self.bias_x,
-           self.bias_y,
-           self.bias_z,
+""".format(self.x,
+           self.y,
+           self.z,
            self.cord,
            self.twist_angle,
            str(control_surface),
