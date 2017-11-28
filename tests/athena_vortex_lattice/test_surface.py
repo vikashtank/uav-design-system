@@ -72,9 +72,7 @@ class Test(unittest.TestCase):
         section3 = avl.Section("", 2)
         section3.translation_bias(0, 20, 0)
 
-        surface.add_section(section1)
-        surface.add_section(section2)
-        surface.add_section(section3)
+        surface.add_section(section1, section2, section3)
 
         self.assertEqual(surface.area, 60 + 10*2)
 
