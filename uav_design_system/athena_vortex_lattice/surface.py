@@ -3,7 +3,7 @@ from enum import Enum
 from typing import List
 
 
-class Surface(collections.UserList):
+class Surface():
     """
     Class responsible for all aerodynamic surfaces, such as wings or rudders
     """
@@ -22,6 +22,17 @@ class Surface(collections.UserList):
         #default all values
         self.define_mesh()
         self.define_translation_bias()
+
+
+    @property
+    def area():
+        for i in range(len(self.sections) - 1):
+            section = self.sections[i]
+            next_section = self.sections[i + 1]
+
+            height = 0.5*(section.cord + next_section.cord)
+            length = next_section.y - next_section.y
+
 
     def define_mesh(self, number_cord: int = 20, number_span: int = 40,
                     cord_distribution: float = 1, span_distribution: float = 1):
@@ -87,13 +98,48 @@ class Surface(collections.UserList):
     def __getitem__(self, key):
         return self.sections[key]
 
+    @property
+    def _top_string(self):
+        string  = """
+all
+0.0                      Mach
+0     0     0.0          iYsym  iZsym  Zsym
+0.68 6.6  78.6          Sref   Cref   Bref   reference area, chord, span
+3.250 0.0   0.5          Xref   Yref   Zref   moment reference location (arb.)
+0.020                    CDoref
+#
+#==============================================================
+#
+SURFACE
+WINGly
+20  1.0  30  1.0  !  Nchord   Cspace   Nspan  Sspace
+#
+# reflect image wing about y=0 plane
+YDUPLICATE
+     0.00000
+#
+# twist angle bias for whole surface
+ANGLE
+     0.00000
+#
+# x,y,z bias for whole surface
+TRANSLATE
+    0.00000     0.00000     0.00000
+
     def __str__(self):
         pass
+"""
 
 class Section():
 
-    def __init__(self):
-        pass
+
+    def __init__(self, aerofoil_file_path: str, cord: float):
+        self.add_aerofoil(aerofoil_file_path)
+        self.cord = cord
+        self.bias_x = 0
+        self.bias_y = 0
+        self.bias_z = 0
+        self.twist_angle = 0
 
     def add_aerofoil(self, aerofoil_file_path: str):
         self.aerofoil = aerofoil_file_path
@@ -101,11 +147,42 @@ class Section():
     def _add_control_surface(self, control_surface: 'ControlSurface'):
         self.control_surface = control_surface
 
-    def translation_bias(self):
-        pass
+    def translation_bias(self, x, y, z):
+        """
+        The location of the top of the cord of this section
+        """
+        self.bias_x = x
+        self.bias_y = y
+        self.bias_z = z
 
     def __str__(self):
-        pass
+
+        try:
+            control_surface = "CONTROL\n" + str(self.control_surface)
+        except AttributeError:
+            control_surface = ""
+
+        try:
+            aerofoil = self.aerofoil
+        except AttributeError:
+            aerofoil = ""
+
+
+        string = """#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
+SECTION
+     {0}     {1}     {2}     {3}         {4}
+{5}
+AFIL
+{6}
+""".format(self.bias_x,
+           self.bias_y,
+           self.bias_z,
+           self.cord,
+           self.twist_angle,
+           str(control_surface),
+           aerofoil)
+
+        return string
 
 
 
@@ -125,7 +202,28 @@ class ControlSurface():
                        rotation_axis: List[float],
                        deflection_type: 'ControlDeflectionType',
                        gain: float = 1):
-        pass
+        self.name = name
+        self.xhinge = xhinge
+        self.rotation_axis = rotation_axis
+        self.deflection_type = deflection_type
+        self.gain = gain
+
+    def __str__(self):
+        """
+        represents class as a string type for AVL use in .avl file
+        """
+
+        string = "{0}  {1}  {2}   {3} {4} {5}   {6}".format(
+                                                        self.name,
+                                                        self.gain,
+                                                        self.xhinge,
+                                                        self.rotation_axis[0],
+                                                        self.rotation_axis[1],
+                                                        self.rotation_axis[2],
+                                                        self.deflection_type.value)
+
+        return string
+
 
 
 class ControlDeflectionType(Enum):

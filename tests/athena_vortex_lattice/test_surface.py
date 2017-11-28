@@ -19,7 +19,7 @@ class Test(unittest.TestCase):
                             avl.ControlDeflectionType.SYMMETRIC)
 
         for i in range(5):
-            section = avl.Section()
+            section = avl.Section("", 0)
             self.surface.add_section(section)
 
 
@@ -47,10 +47,53 @@ class Test(unittest.TestCase):
         self.assertTrue(self.surface[1].control_surface is self.control_surface)
         self.assertFalse(hasattr(self.surface[2], 'control_surface'))
 
-    def test_convert_to_avl_input(self):
+    def test_section_to_string(self):
         """
-        tests that the correct AVL string is produced to be written to a file
+        tests that the correct AVL string is produced by the surface
         """
+        section = avl.Section("hello", 5)
+        string = str(section)
+        expected_string = """#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
+SECTION
+     0     0     0     5         0
+
+AFIL
+hello
+"""
+
+        self.assertEqual(string, expected_string)
+
+
+    def test_section_to_string_control(self):
+        """
+        tests that the correct AVL string is produced by the surface
+        """
+        section = avl.Section("hello", 5)
+        control_surface = avl.ControlSurface("elevator", 0.8, [0, 1, 0], avl.ControlDeflectionType.SYMMETRIC)
+        section._add_control_surface(control_surface)
+
+        string = str(section)
+        expected_string = """#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
+SECTION
+     0     0     0     5         0
+CONTROL
+elevator  1  0.8   0 1 0   1
+AFIL
+hello
+"""
+
+        self.assertEqual(string, expected_string)
+
+    def test_control_surface_string(self):
+        """
+        tests that the control surface class str method creates the appropriate
+        string
+        """
+        control_surface = avl.ControlSurface("elevator", 0.8, [0,1,0], avl.ControlDeflectionType.SYMMETRIC)
+        string = str(control_surface)
+        expected_string = "elevator  1  0.8   0 1 0   1"
+        self.assertEqual(string, expected_string)
+
 
 
 
