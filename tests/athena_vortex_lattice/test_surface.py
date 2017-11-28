@@ -47,6 +47,40 @@ class Test(unittest.TestCase):
         self.assertTrue(self.surface[1].control_surface is self.control_surface)
         self.assertFalse(hasattr(self.surface[2], 'control_surface'))
 
+    def test_surface_area(self):
+        """
+        test the calculation of the wing area with 2 sections
+        """
+        surface = avl.Surface("surface1")
+        section1 = avl.Section("", 10)
+        section2 = avl.Section("", 2)
+        section2.translation_bias(0, 10, 0)
+
+        surface.add_section(section1)
+        surface.add_section(section2)
+
+        self.assertEqual(surface.area, 60)
+
+    def test_surface_area_multi(self):
+        """
+        calculations of the wing area with multiple sections
+        """
+        surface = avl.Surface("surface1")
+        section1 = avl.Section("", 10)
+        section2 = avl.Section("", 2)
+        section2.translation_bias(0, 10, 0)
+        section3 = avl.Section("", 2)
+        section3.translation_bias(0, 20, 0)
+
+        surface.add_section(section1)
+        surface.add_section(section2)
+        surface.add_section(section3)
+
+        self.assertEqual(surface.area, 60 + 10*2)
+
+
+
+
     def test_section_to_string(self):
         """
         tests that the correct AVL string is produced by the surface

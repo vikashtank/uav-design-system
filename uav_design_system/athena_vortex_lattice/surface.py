@@ -25,13 +25,22 @@ class Surface():
 
 
     @property
-    def area():
+    def area(self):
+        """
+        gives the 2D plan view area of the wing
+        """
+        total_area = 0
         for i in range(len(self.sections) - 1):
             section = self.sections[i]
             next_section = self.sections[i + 1]
 
             height = 0.5*(section.cord + next_section.cord)
-            length = next_section.y - next_section.y
+            length = next_section.y - section.y
+
+            area = height * length
+            total_area += area
+
+        return total_area
 
 
     def define_mesh(self, number_cord: int = 20, number_span: int = 40,
