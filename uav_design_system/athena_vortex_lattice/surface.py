@@ -22,6 +22,9 @@ class Surface():
         #default all values
         self.define_mesh()
         self.define_translation_bias()
+        self.x_ref = 0
+        self.y_ref = 0
+        self.z_ref = 0
 
 
     @property
@@ -67,7 +70,16 @@ class Surface():
 
         return span
 
+    @property
+    def x_reference_coordinate(self):
+        """
+        gets the location of the x reference coordinate from a percentage of the cord
+        """
+        return self.x_ref
 
+    @x_reference_coordinate.setter
+    def x_reference_coordinate(self, value):
+        self.x_ref =  value*self.cord
 
     def define_mesh(self, number_cord: int = 20, number_span: int = 40,
                     cord_distribution: float = 1, span_distribution: float = 1):
@@ -137,43 +149,60 @@ class Surface():
 
     @property
     def _ref_string(self):
-        string = """
-all
+        string = """all
 0.0                      Mach
 0     0     0.0          iYsym  iZsym  Zsym
-0.68 6.6  78.6          Sref   Cref   Bref   reference area, chord, span
-3.250 0.0   0.5          Xref   Yref   Zref   moment reference location (arb.)
+{0} {1}  {2}          Sref   Cref   Bref   reference area, chord, span
+{3} {4}   {5}          Xref   Yref   Zref   moment reference location (arb.)
 0.020                    CDoref
 #
-#==============================================================
-"""
+#==============================================================""".format(
+           self.area, self.cord, self.span, self.x_reference_coordinate,
+           self.y_ref, self.z_ref)
 
         return string
 
 
     @property
     def _top_string(self):
+
+
         string  = """
 #
 SURFACE
-WINGly
-20  1.0  30  1.0  !  Nchord   Cspace   Nspan  Sspace
+{0}
+{1}  {2}  {3}  {4}  !  Nchord   Cspace   Nspan  Sspace
 #
 # reflect image wing about y=0 plane
 YDUPLICATE
-     0.00000
+     {5}
 #
 # twist angle bias for whole surface
 ANGLE
-     0.00000
+     {6}
 #
 # x,y,z bias for whole surface
 TRANSLATE
-    0.00000     0.00000     0.00000
-"""
+    {7}     {8}     {9}
+#--------------------------------------------------------------""".format(
+           self.name, self.number_cord, self.cord_distribution,
+           self.number_span, self.span_distribution,
+           int(self.reflect_surface), self.angle_bias,
+           self.x, self.y, self.z)
+        return string
 
     def __str__(self):
-        pass
+        surface_string = self._ref_string + self._top_string
+
+        for section in self.sections:
+            section_string = str(section) + "\n#-----------------------"
+            surface_string += ("\n" + section_string)
+
+
+
+
+
+        return surface_string
 
 
 class Section():
@@ -219,8 +248,7 @@ SECTION
      {0}     {1}     {2}     {3}         {4}
 {5}
 AFIL
-{6}
-""".format(self.x,
+{6}""".format(self.x,
            self.y,
            self.z,
            self.cord,

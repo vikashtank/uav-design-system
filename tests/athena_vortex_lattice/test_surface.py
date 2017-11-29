@@ -86,8 +86,7 @@ SECTION
      0     0     0     5         0
 
 AFIL
-hello
-"""
+hello"""
 
         self.assertEqual(string, expected_string)
 
@@ -107,8 +106,7 @@ SECTION
 CONTROL
 elevator  1  0.8   0 1 0   1
 AFIL
-hello
-"""
+hello"""
 
         self.assertEqual(string, expected_string)
 
@@ -147,8 +145,116 @@ hello
         self.assertEqual(surface.span, 12)
 
     def test_avl_write(self):
-        pass
+        """
+        tests the avl file is correctl written from the surface class
+        """
+        surface = avl.Surface("surface1")
+        surface.define_mesh(20, 30, 1.0, 1.0)
+        section1 = avl.Section("aerofoil_file", 10)
+        section2 = avl.Section("aerofoil_file", 2)
+        section2.translation_bias(0, 10, 0)
+        surface.add_section(section1, section2)
 
+
+        expected_string = """all
+0.0                      Mach
+0     0     0.0          iYsym  iZsym  Zsym
+60.0 10  10          Sref   Cref   Bref   reference area, chord, span
+0 0   0          Xref   Yref   Zref   moment reference location (arb.)
+0.020                    CDoref
+#
+#==============================================================
+#
+SURFACE
+surface1
+20  1.0  30  1.0  !  Nchord   Cspace   Nspan  Sspace
+#
+# reflect image wing about y=0 plane
+YDUPLICATE
+     0
+#
+# twist angle bias for whole surface
+ANGLE
+     0
+#
+# x,y,z bias for whole surface
+TRANSLATE
+    0     0     0
+#--------------------------------------------------------------
+#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
+SECTION
+     0     0     0     10         0
+
+AFIL
+aerofoil_file
+#-----------------------
+#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
+SECTION
+     0     10     0     2         0
+
+AFIL
+aerofoil_file
+#-----------------------"""
+
+        self.assertEqual(str(surface).strip(), expected_string.strip())
+
+
+def test_avl_write_with_controls(self):
+    """
+    tests the avl file is correctl written from the surface class
+    """
+    surface = avl.Surface("surface1")
+    surface.define_mesh(20, 30, 1.0, 1.0)
+    section1 = avl.Section("aerofoil_file", 10)
+    section2 = avl.Section("aerofoil_file", 2)
+    control_surface = avl.ControlSurface("elevator", 0.8, [0, 1, 0], avl.ControlDeflectionType.SYMMETRIC)
+    section2.translation_bias(0, 10, 0)
+    surface.add_control_surface(control_surface, 0, 0)
+    surface.add_section(section1, section2)
+
+
+    expected_string = """all
+0.0                      Mach
+0     0     0.0          iYsym  iZsym  Zsym
+60.0 10  10          Sref   Cref   Bref   reference area, chord, span
+0 0   0          Xref   Yref   Zref   moment reference location (arb.)
+0.020                    CDoref
+#
+#==============================================================
+#
+SURFACE
+surface1
+20  1.0  30  1.0  !  Nchord   Cspace   Nspan  Sspace
+#
+# reflect image wing about y=0 plane
+YDUPLICATE
+ 0
+#
+# twist angle bias for whole surface
+ANGLE
+ 0
+#
+# x,y,z bias for whole surface
+TRANSLATE
+0     0     0
+#--------------------------------------------------------------
+#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
+SECTION
+ 0     0     0     10         0
+CONTROL
+elevator  1.0  0.8   0. 1. 0.   1.0
+AFIL
+aerofoil_file
+#-----------------------
+#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
+SECTION
+ 0     10     0     2         0
+
+AFIL
+aerofoil_file
+#-----------------------"""
+
+    self.assertEqual(str(surface).strip(), expected_string.strip())
 
 if __name__ == "__main__":
     unittest.main()
