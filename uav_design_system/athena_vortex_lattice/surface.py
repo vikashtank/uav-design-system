@@ -42,6 +42,32 @@ class Surface():
 
         return total_area
 
+    @property
+    def cord(self):
+        """
+        returns the maximum cord of the sections in this surface
+        """
+        cord = 0
+        for section in self.sections:
+            if section.cord > cord:
+                cord = section.cord
+
+        return cord
+
+    @property
+    def span(self):
+        """
+        returns the maximum y distance from wing center of the sections in this surface
+        """
+        span = 0
+
+        for section in self:
+            if section.y > span:
+                span = section.y
+
+        return span
+
+
 
     def define_mesh(self, number_cord: int = 20, number_span: int = 40,
                     cord_distribution: float = 1, span_distribution: float = 1):
@@ -108,9 +134,10 @@ class Surface():
     def __getitem__(self, key):
         return self.sections[key]
 
+
     @property
-    def _top_string(self):
-        string  = """
+    def _ref_string(self):
+        string = """
 all
 0.0                      Mach
 0     0     0.0          iYsym  iZsym  Zsym
@@ -119,6 +146,14 @@ all
 0.020                    CDoref
 #
 #==============================================================
+"""
+
+        return string
+
+
+    @property
+    def _top_string(self):
+        string  = """
 #
 SURFACE
 WINGly
@@ -135,10 +170,11 @@ ANGLE
 # x,y,z bias for whole surface
 TRANSLATE
     0.00000     0.00000     0.00000
+"""
 
     def __str__(self):
         pass
-"""
+
 
 class Section():
 

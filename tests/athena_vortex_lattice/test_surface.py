@@ -23,7 +23,6 @@ class Test(unittest.TestCase):
             self.surface.add_section(section)
 
 
-
     def tearDown(self):
         pass
 
@@ -76,9 +75,6 @@ class Test(unittest.TestCase):
 
         self.assertEqual(surface.area, 60 + 10*2)
 
-
-
-
     def test_section_to_string(self):
         """
         tests that the correct AVL string is produced by the surface
@@ -126,7 +122,32 @@ hello
         expected_string = "elevator  1  0.8   0 1 0   1"
         self.assertEqual(string, expected_string)
 
+    def test_cord(self):
+        """
+        test surface cord property
+        """
+        surface = avl.Surface("surface1")
+        section1 = avl.Section("", 10)
+        section2 = avl.Section("", 2)
+        section2.translation_bias(0, 10, 0)
+        surface.add_section(section1, section2)
 
+        self.assertEqual(surface.cord, 10)
+
+    def test_span(self):
+        """
+        test surface span property
+        """
+        surface = avl.Surface("surface1")
+        section1 = avl.Section("", 10)
+        section2 = avl.Section("", 2)
+        section2.translation_bias(0, 12, 0)
+        surface.add_section(section1, section2)
+
+        self.assertEqual(surface.span, 12)
+
+    def test_avl_write(self):
+        pass
 
 
 if __name__ == "__main__":
