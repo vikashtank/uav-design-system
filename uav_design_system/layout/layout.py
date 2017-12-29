@@ -1,8 +1,11 @@
-
+from os.path import dirname, abspath
+this_directory = dirname(abspath(__file__))
+import sys
+sys.path.append(this_directory)# so uggo thanks to atom runner
+from geometry import Point
 
 class IsArrangeable:
     pass
-
 
 class Arrangement(IsArrangeable):
     """
@@ -11,6 +14,36 @@ class Arrangement(IsArrangeable):
     def __init__(self, name: str = "", *objects: IsArrangeable):
         self.name = name
         self.objects = objects
+
+    @property
+    def all_mass_objects(self):
+
+        def _all_mass_objects(objects):
+            """
+            generator of all mass objects contained within objects and all masses
+            within objects
+            """
+            mass_list = []
+            for object in objects:
+                if isinstance(object, Arrangement):
+                    mass_list += _all_mass_objects(object.objects)
+                else:
+                    mass_list.append(object)
+            return mass_list
+
+        return _all_mass_objects(self.objects)
+
+    @property
+    def avl_mass_list(self):
+        string_list = []
+        for mass_object in self.all_mass_objects:
+            string_list.append(mass_object.avl_mass_string)
+        return string_list
+
+
+
+
+
 
 class MassObject(IsArrangeable):
     """
@@ -47,6 +80,33 @@ class MassObject(IsArrangeable):
     def location(self, value: 'Point'):
         self._location = value
 
+    @property
+    def inertia_xx(self):
+        return self.geometry.inertia_xx * self.mass
+
+    @property
+    def inertia_yy(self):
+        return self.geometry.inertia_yy * self.mass
+
+    @property
+    def inertia_zz(self):
+        return self.geometry.inertia_zz * self.mass
+
+    @property
+    def avl_mass_string(self):
+        """
+        creates athena vortex lattice mass data string for .mass file
+        """
+        x,y,z = self.center_of_gravity.as_tuple()
+        ixx, iyy, izz = self.inertia_xx, self.inertia_yy, self.inertia_zz
+        template = "{0}   {1}   {2}   {3}    {4}   {5}   {6}".format(self.mass,
+                                                                     x,
+                                                                     y,
+                                                                     z,
+                                                                     ixx,
+                                                                     iyy,
+                                                                     izz)
+        return template
 
 
 
