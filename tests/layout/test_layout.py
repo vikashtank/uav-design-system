@@ -6,7 +6,7 @@ sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
 import unittest
 import uav_design_system.layout as layout
 
-class dummyMass(layout.IsArrangeable):
+class DummyMass(layout.IsArrangeable):
     pass
 
 class TestArrangement(unittest.TestCase):
@@ -24,8 +24,8 @@ class TestArrangement(unittest.TestCase):
 
     def test_creation(self):
 
-        component1 = dummyMass()
-        component2 = dummyMass()
+        component1 = DummyMass()
+        component2 = DummyMass()
 
         arrangement = layout.Arrangement("arrangement1", component1, component2)
         self.assertEquals(arrangement.objects[0], component1)
@@ -79,7 +79,8 @@ class TestComponent(unittest.TestCase):
         test the center of gravity is initially the centroid
         """
         mass_object = layout.MassObject(self.geometry, 1, "name")
-        self.assertEquals(mass_object.center_of_gravity, layout.Point(0.5, 1, 1.5))
+        self.assertEquals(mass_object.center_of_gravity,
+                          layout.Point(0.5, 1, 1.5))
 
     def test_set_cog(self):
         """
@@ -88,6 +89,8 @@ class TestComponent(unittest.TestCase):
         mass_object = layout.MassObject(self.geometry, 1, "name")
         mass_object.center_of_gravity = layout.Point(1,2,3)
         self.assertEquals(mass_object.center_of_gravity, layout.Point(1,2,3))
+        self.assertEquals(mass_object.center_of_gravity_global,
+                          layout.Point(1,2,3))
 
     def test_default_location(self):
         """
@@ -98,14 +101,18 @@ class TestComponent(unittest.TestCase):
 
     def test_location_setting(self):
         """
-        test the mass_object can be given a location
+        test the mass_object can be given a location and cog change
         """
         mass_object = layout.MassObject(self.geometry, 1, "name")
         mass_object.location = layout.Point(1,2,3)
         self.assertEquals(mass_object.location, layout.Point(1,2,3))
+        self.assertEquals(mass_object.center_of_gravity_global,
+                          layout.Point(1.5, 3, 4.5))
 
     def test_create_mass_string(self):
-
+        """
+        test the create mass string method works
+        """
         mass_object = layout.MassObject(self.geometry, 1, "name")
 
         expected_string = "6   0.5   1.0   1.5    6.5   5.0   2.5"

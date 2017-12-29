@@ -40,8 +40,19 @@ class Arrangement(IsArrangeable):
             string_list.append(mass_object.avl_mass_string)
         return string_list
 
+    @property
+    def total_mass(self):
+        total_mass = 0
+        for mass in self.all_mass_objects:
+            total_mass += mass.mass
 
+        return total_mass
 
+    @property
+    def center_of_gravity(self):
+        total_moment = 0
+        for mass in self.all_mass_objects:
+            total_moment += mass.mass*mass
 
 
 
@@ -68,16 +79,26 @@ class MassObject(IsArrangeable):
     def center_of_gravity(self):
         return self._center_of_gravity
 
+    @property
+    def center_of_gravity_global(self):
+        return self._center_of_gravity + self._location
+
     @center_of_gravity.setter
     def center_of_gravity(self, value: 'Point'):
         self._center_of_gravity = value
 
     @property
     def location(self):
+        """
+        location of cog relative to the object origin not the location origin
+        """
         return self._location
 
     @location.setter
     def location(self, value: 'Point'):
+        """
+        location of cog relative to the object origin not the location origin
+        """
         self._location = value
 
     @property
