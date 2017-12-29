@@ -43,6 +43,25 @@ class TestCylinder(unittest.TestCase):
         self.assertAlmostEquals(self.cylinder.inertia_yy, 103/12)
         self.assertAlmostEquals(self.cylinder.inertia_zz, 0.5)
 
+class TestPoint(unittest.TestCase):
+
+    def test_equals(self):
+
+        point1 = geometry.Point(1,2,3)
+        point2 = geometry.Point(1,2,3)
+        self.assertEquals(point1, point2)
+
+    def test_add(self):
+
+        point1 = geometry.Point(1,2,3)
+        point2 = geometry.Point(1,2,3)
+        point3 = point1 + point2
+        self.assertEquals(point3.x, 2)
+        self.assertEquals(point3.y, 4)
+        self.assertEquals(point3.z, 6)
+
+
+
 
 
 if __name__ == "__main__":

@@ -100,3 +100,11 @@ class Point():
             is_equal = False
 
         return is_equal
+
+    def __add__(self, value: 'Point'):
+
+        x = self.x + value.x
+        y = self.y + value.y
+        z = self.z + value.z
+
+        return Point(x, y, z)
