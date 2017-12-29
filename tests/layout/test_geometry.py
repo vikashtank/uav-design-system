@@ -24,19 +24,24 @@ class TestCuboid(unittest.TestCase):
         self.assertEquals(self.cuboid.inertia_zz, 13/12)
 
 
-class Test(unittest.TestCase):
+class TestCylinder(unittest.TestCase):
 
     def setUp(self):
-        pass
+        self.cylinder = geometry.Cylinder(1, 10)
 
     def tearDown(self):
         pass
 
-    def test_cog(self):
+    def test_volume(self):
         pass
 
-    def test_location(self):
-        pass
+    def test_centroid(self):
+        self.assertEquals(self.cylinder.centroid, geometry.Point(0, 0, 5))
+
+    def test_interias(self):
+        self.assertAlmostEquals(self.cylinder.inertia_xx, 103/12)
+        self.assertAlmostEquals(self.cylinder.inertia_yy, 103/12)
+        self.assertAlmostEquals(self.cylinder.inertia_zz, 0.5)
 
 
 
