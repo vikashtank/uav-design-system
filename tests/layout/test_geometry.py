@@ -18,7 +18,7 @@ class TestCuboid(unittest.TestCase):
     def test_centroid(self):
         self.assertEquals(self.cuboid.centroid, geometry.Point(1, 1.5, 2))
 
-    def test_interias(self):
+    def test_inertias(self):
         self.assertEquals(self.cuboid.inertia_xx, 25/12)
         self.assertEquals(self.cuboid.inertia_yy, 20/12)
         self.assertEquals(self.cuboid.inertia_zz, 13/12)
@@ -38,7 +38,7 @@ class TestCylinder(unittest.TestCase):
     def test_centroid(self):
         self.assertEquals(self.cylinder.centroid, geometry.Point(0, 0, 5))
 
-    def test_interias(self):
+    def test_inertias(self):
         self.assertAlmostEquals(self.cylinder.inertia_xx, 103/12)
         self.assertAlmostEquals(self.cylinder.inertia_yy, 103/12)
         self.assertAlmostEquals(self.cylinder.inertia_zz, 0.5)
