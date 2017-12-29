@@ -56,6 +56,9 @@ class TestRun(unittest.TestCase, CustomAssertions):
         self.assertTrue(exists(join(self.results_dir, "ft.txt")))
         self.assertTrue(exists(join(self.results_dir, "hm.txt")))
         self.assertTrue(exists(join(self.results_dir, "st.txt")))
+        self.assertTrue(exists(join(self.results_dir, "fn.txt")))
+        self.assertTrue(exists(join(self.results_dir, "fs.txt")))
+        self.assertTrue(exists(join(self.results_dir, "vm.txt")))
 
     def test_run_correct_file_content(self):
         """
@@ -67,7 +70,6 @@ class TestRun(unittest.TestCase, CustomAssertions):
                                   self.mass_file,
                                   self.config_file)
         avl_runner.generate_results(self.results_dir)
-        results_dict = avl_runner.generate_results("/Users/VikashTank/Desktop")
 
         # get expected files
         expected_ft = join(self.resources_folder, "ft.txt")

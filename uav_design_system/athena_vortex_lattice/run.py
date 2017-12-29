@@ -11,9 +11,12 @@ from process import Process, Runner
 
 class AVLRunner(Runner):
 
-    result_aliases = {"st": "stability derivatives",
-                      "ft" : "forces",
-                      "hm" : "hinge moments"}
+    result_aliases = {"st" : "stability_derivatives",
+                      "ft" : "total_forces",
+                      "hm" : "hinge_moments",
+                      "fn" : "surface_forces",
+                      "fs" : "strip_forces",
+                      "vm" : "structural_forces"}
 
     def __init__(self):
         super().__init__(os.path.join(os.path.dirname(__file__), "avl3.35"))
