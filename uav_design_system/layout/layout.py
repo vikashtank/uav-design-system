@@ -52,7 +52,9 @@ class Arrangement(IsArrangeable):
     def center_of_gravity(self):
         total_moment = 0
         for mass in self.all_mass_objects:
-            total_moment += mass.mass*mass
+            total_moment += mass.mass * mass.center_of_gravity_global.x
+
+        return total_moment/self.total_mass
 
 
 
@@ -118,7 +120,7 @@ class MassObject(IsArrangeable):
         """
         creates athena vortex lattice mass data string for .mass file
         """
-        x,y,z = self.center_of_gravity.as_tuple()
+        x,y,z = self.center_of_gravity_global.as_tuple()
         ixx, iyy, izz = self.inertia_xx, self.inertia_yy, self.inertia_zz
         template = "{0}   {1}   {2}   {3}    {4}   {5}   {6}".format(self.mass,
                                                                      x,

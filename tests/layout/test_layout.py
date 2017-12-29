@@ -65,6 +65,13 @@ class TestArrangement(unittest.TestCase):
                          "24   0.5   1.0   1.5    26.0   20.0   10.0"]
         self.assertEquals(arrangement.avl_mass_list, expected_list)
 
+    def test_center_of_gravity(self):
+        """
+        tests the calculation of the center of gravity
+        """
+        arrangement = layout.Arrangement("arrangement1", *self.mass_list)
+        self.assertEquals(arrangement.center_of_gravity, 0.5)
+
 
 class TestComponent(unittest.TestCase):
 
@@ -111,11 +118,12 @@ class TestComponent(unittest.TestCase):
 
     def test_create_mass_string(self):
         """
-        test the create mass string method works
+        test the create mass string method works with a shifted mass
         """
         mass_object = layout.MassObject(self.geometry, 1, "name")
+        mass_object.location = layout.Point(1,1,1) # apply shift
 
-        expected_string = "6   0.5   1.0   1.5    6.5   5.0   2.5"
+        expected_string = "6   1.5   2.0   2.5    6.5   5.0   2.5"
         self.assertEquals(mass_object.avl_mass_string, expected_string)
 
 
