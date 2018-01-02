@@ -6,8 +6,6 @@ from math import pi
 class ThreeDimentional:
     pass
 
-
-
 class Cuboid(ThreeDimentional):
 
     def __init__(self, x_size: float, y_size: float, z_size: float):
@@ -53,32 +51,93 @@ class Cuboid(ThreeDimentional):
 
 class Cylinder(ThreeDimentional):
 
-    def __init__(self, radius: float, z_size: float):
+    def __init__(self, radius: float, y_size: float):
         self.radius = radius
-        self.z_size = z_size
+        self.y_size = y_size
 
     @property
     def volume(self):
-        return pi * self.radius * self.radius * self.z_size
+        return pi * self.radius * self.radius * self.y_size
 
     @property
     def centroid(self):
-        return Point(0, 0, 0.5 * self.z_size)
+        return Point(0, 0, 0.5 * self.y_size)
 
     def calc_x_y_interias(self, radius, length):
         return (1/12)*(3*r*r + h*h)
 
     @property
     def inertia_xx(self):
-        return (1/12)*(3*self.radius*self.radius + self.z_size*self.z_size)
-
-    @property
-    def inertia_yy(self):
-        return self.inertia_xx
+        return (1/12)*(3*self.radius*self.radius + self.y_size*self.y_size)
 
     @property
     def inertia_zz(self):
+        return self.inertia_xx
+
+    @property
+    def inertia_yy(self):
         return 0.5*self.radius*self.radius
+
+
+class TrapeziumPlate(ThreeDimentional):
+
+    def __init__(self, x1_size, x2_size, x_shift, y_size, z_size):
+        """
+        trapezium with base x1, length y, thickness z and other base length x2
+        """
+        self.x1_size = x1_size
+        self.x2_size = x2_size
+        self.x_shift = x_shift
+        self.y_size = y_size
+        self.z_size = z_size #thickness size
+
+    @property
+    def volume(self):
+        return 0.5*(self.x1_size + self.x2_size)*self.y_size*self.z_size
+
+    @property
+    def centroid(self):
+        """
+        """
+        # get the difference between the two x lengths
+        # calculation assuming a is the smallest length
+        c = self.x_shift
+        a = self.x2_size
+        b = self.x1_size
+        h = self.y_size
+
+        x = (2 * a * c+ a * a + c * b + a * b + b * b)/(3 * (a + b))
+        y = (h * ((2 * a) + b))/(3 * (a + b))
+        z = 0.5 * self.z_size
+
+        return Point(x, y, z)
+
+    def _calc_interia(self, length, width):
+        return ((length * length) + (width * width))/12
+
+    @property
+    def inertia_xx(self):
+        """
+        calculate the interial moment per unit mass about the objects centroid
+        """
+        return self._calc_interia(self.y_size, self.z_size)
+
+    @property
+    def inertia_yy(self):
+        """
+        calculate the interial moment per unit mass about the objects centroid
+        """
+        x_approx = 0.5 * (self.x1_size + self.x2_size)
+        return self._calc_interia(x_approx, self.z_size)
+
+    @property
+    def inertia_zz(self):
+        """
+        calculate the interial moment per unit mass about the objects centroid
+        """
+        x_approx = 0.5 * (self.x1_size + self.x2_size)
+        return self._calc_interia(self.y_size, x_approx)
+
 
 class Point():
 
