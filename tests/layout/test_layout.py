@@ -28,8 +28,8 @@ class TestArrangement(unittest.TestCase):
         component2 = DummyMass()
 
         arrangement = layout.Arrangement("arrangement1", component1, component2)
-        self.assertEquals(arrangement.objects[0], component1)
-        self.assertEquals(arrangement.objects[1], component2)
+        self.assertEqual(arrangement.objects[0], component1)
+        self.assertEqual(arrangement.objects[1], component2)
 
     def test_all_mass_objects(self):
         """
@@ -39,9 +39,9 @@ class TestArrangement(unittest.TestCase):
         arrangement = layout.Arrangement("arrangement1", *self.mass_list)
         mass_list = arrangement.all_mass_objects
 
-        self.assertEquals(len(mass_list), len(self.mass_list))
+        self.assertEqual(len(mass_list), len(self.mass_list))
         for i in range(len(self.mass_list)):
-            self.assertEquals(mass_list[i], self.mass_list[i])
+            self.assertEqual(mass_list[i], self.mass_list[i])
 
     def test_all_mass_objects_nested(self):
         """
@@ -52,9 +52,9 @@ class TestArrangement(unittest.TestCase):
         arrangement = layout.Arrangement("arrangement2", sub_arrangement)
         mass_list = arrangement.all_mass_objects
 
-        self.assertEquals(len(mass_list), len(self.mass_list))
+        self.assertEqual(len(mass_list), len(self.mass_list))
         for i in range(len(self.mass_list)):
-            self.assertEquals(mass_list[i], self.mass_list[i])
+            self.assertEqual(mass_list[i], self.mass_list[i])
 
 
     def test_create_mass_list(self):
@@ -63,14 +63,14 @@ class TestArrangement(unittest.TestCase):
                          "12   0.5   1.0   1.5    13.0   10.0   5.0",
                          "18   0.5   1.0   1.5    19.5   15.0   7.5",
                          "24   0.5   1.0   1.5    26.0   20.0   10.0"]
-        self.assertEquals(arrangement.avl_mass_list, expected_list)
+        self.assertEqual(arrangement.avl_mass_list, expected_list)
 
     def test_center_of_gravity(self):
         """
         tests the calculation of the center of gravity
         """
         arrangement = layout.Arrangement("arrangement1", *self.mass_list)
-        self.assertEquals(arrangement.center_of_gravity, 0.5)
+        self.assertEqual(arrangement.center_of_gravity, 0.5)
 
 
 class TestComponent(unittest.TestCase):
@@ -86,7 +86,7 @@ class TestComponent(unittest.TestCase):
         test the center of gravity is initially the centroid
         """
         mass_object = layout.MassObject(self.geometry, 1, "name")
-        self.assertEquals(mass_object.center_of_gravity,
+        self.assertEqual(mass_object.center_of_gravity,
                           layout.Point(0.5, 1, 1.5))
 
     def test_set_cog(self):
@@ -95,8 +95,8 @@ class TestComponent(unittest.TestCase):
         """
         mass_object = layout.MassObject(self.geometry, 1, "name")
         mass_object.center_of_gravity = layout.Point(1,2,3)
-        self.assertEquals(mass_object.center_of_gravity, layout.Point(1,2,3))
-        self.assertEquals(mass_object.center_of_gravity_global,
+        self.assertEqual(mass_object.center_of_gravity, layout.Point(1,2,3))
+        self.assertEqual(mass_object.center_of_gravity_global,
                           layout.Point(1,2,3))
 
     def test_default_location(self):
@@ -104,7 +104,7 @@ class TestComponent(unittest.TestCase):
         test the mass_object can be given a location
         """
         mass_object = layout.MassObject(self.geometry, 1, "name")
-        self.assertEquals(mass_object.location, layout.Point(0,0,0))
+        self.assertEqual(mass_object.location, layout.Point(0,0,0))
 
     def test_location_setting(self):
         """
@@ -112,8 +112,8 @@ class TestComponent(unittest.TestCase):
         """
         mass_object = layout.MassObject(self.geometry, 1, "name")
         mass_object.location = layout.Point(1,2,3)
-        self.assertEquals(mass_object.location, layout.Point(1,2,3))
-        self.assertEquals(mass_object.center_of_gravity_global,
+        self.assertEqual(mass_object.location, layout.Point(1,2,3))
+        self.assertEqual(mass_object.center_of_gravity_global,
                           layout.Point(1.5, 3, 4.5))
 
     def test_create_mass_string(self):
@@ -124,7 +124,7 @@ class TestComponent(unittest.TestCase):
         mass_object.location = layout.Point(1,1,1) # apply shift
 
         expected_string = "6   1.5   2.0   2.5    6.5   5.0   2.5"
-        self.assertEquals(mass_object.avl_mass_string, expected_string)
+        self.assertEqual(mass_object.avl_mass_string, expected_string)
 
 
 if __name__ == "__main__":

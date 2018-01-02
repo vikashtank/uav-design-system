@@ -13,7 +13,18 @@ class Arrangement(IsArrangeable):
     """
     def __init__(self, name: str = "", *objects: IsArrangeable):
         self.name = name
-        self.objects = objects
+
+        # if no objects are provided create an empty list
+        if objects:
+            self.objects = objects
+        else:
+            self.objects = []
+
+
+        self.location = Point(0, 0, 0)
+
+    def append(self, value: IsArrangeable):
+        self.objects.append(value)
 
     @property
     def all_mass_objects(self):
@@ -57,7 +68,6 @@ class Arrangement(IsArrangeable):
         return total_moment/self.total_mass
 
 
-
 class MassObject(IsArrangeable):
     """
     represents a component
@@ -92,14 +102,14 @@ class MassObject(IsArrangeable):
     @property
     def location(self):
         """
-        location of cog relative to the object origin not the location origin
+        get the global position of the origin of this object
         """
         return self._location
 
     @location.setter
     def location(self, value: 'Point'):
         """
-        location of cog relative to the object origin not the location origin
+        set the global position of the origin of this object
         """
         self._location = value
 
