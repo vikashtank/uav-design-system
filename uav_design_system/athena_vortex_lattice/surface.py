@@ -200,11 +200,10 @@ TRANSLATE
             section_string = str(section) + "\n#-----------------------"
             surface_string += ("\n" + section_string)
 
-
-
-
-
         return surface_string
+
+    def __len__(self):
+        return len(self.sections)
 
 
 class Section():

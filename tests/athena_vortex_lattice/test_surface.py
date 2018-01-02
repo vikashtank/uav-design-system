@@ -26,6 +26,9 @@ class Test(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_len(self):
+        self.assertEqual(len(self.surface), 5)
+
     def test_add_control_surface_all(self):
         """
         tests that the control surfaces can be applies to sections
