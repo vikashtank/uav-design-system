@@ -13,7 +13,6 @@ class Surface():
     bias_angle: float
 
     def __init__(self, name):
-        super().__init__()
         self.name = name
         self.reflect_surface = False
         self.angle_bias = 0
@@ -79,6 +78,9 @@ class Surface():
 
     @x_reference_coordinate.setter
     def x_reference_coordinate(self, value):
+        """
+        input value as percentage of the cord
+        """
         self.x_ref =  value*self.cord
 
     def define_mesh(self, number_cord: int = 20, number_span: int = 40,
@@ -310,6 +312,61 @@ class ControlDeflectionType(Enum):
     """
     SYMMETRIC = 1
     ANTISYMETRIC = -1
+
+def create_run_file(mass, velocity, x_center_of_gravity, cl_trim):
+
+    string = """---------------------------------------------
+ Run case  1:   case_1
+
+ alpha        ->  alpha          =  0.0
+ beta         ->  beta        =   0.00000
+ pb/2V        ->  pb/2V       =   0.00000
+ qc/2V        ->  qc/2V       =   0.00000
+ rb/2V        ->  rb/2V       =   0.00000
+ aileron      ->  Cl roll mom =   0.00000
+ elevator     ->  Cm pitchmom =   0.00000
+ rudder       ->  Cn yaw  mom =   0.00000
+
+ alpha     = -0.145500     deg
+ beta      =   0.00000     deg
+ pb/2V     =   0.00000
+ qc/2V     =   0.00000
+ rb/2V     = -0.282696E-35
+ CL        =  {3}
+ CDo       =  0.835000E-02
+ bank      =   0.00000     deg
+ elevation =   0.00000     deg
+ heading   =   0.00000     deg
+ Mach      =   0.00000
+ velocity  =   {0}     m/s
+ density   =  1.225 kg/m^3
+ grav.acc. =   9.81     m/s^2
+ turn_rad. =   0.00000     ft
+ load_fac. =   1.00000
+ X_cg      =  {1}
+ Y_cg      =   0.00000
+ Z_cg      =  0
+ mass      =  {2}     kg
+ Ixx       =   1.35000     slug-ft^2
+ Iyy       =  0.750900     slug-ft^2
+ Izz       =   2.09500     slug-ft^2
+ Ixy       =   0.00000     slug-ft^2
+ Iyz       =   0.00000     slug-ft^2
+ Izx       =   0.00000     slug-ft^2
+ visc CL_a =   0.00000
+ visc CL_u =   0.00000
+ visc CM_a =   0.00000
+ visc CM_u =   0.00000
+""".format(velocity, x_center_of_gravity, mass, cl_trim)
+    return string
+
+
+
+
+
+
+
+
 
 
 
