@@ -2,7 +2,7 @@
 file for athena vortext lattice interface
 """
 
-def create_mass_file(file_name: str, structural_model: "StructuralModel",
+def create_mass_file(file_name: str, arrangement: "Arrangement",
                                      properties):
 
     title_string = """# Plane Name: {0}
@@ -12,11 +12,11 @@ Tunit = 1.0 s
 
 g   = {1}
 rho = {2}
-""".format(structural_model.name,
+""".format(arrangement.name,
            properties["gravity"],
            properties["density"])
 
-    mass_string = "\n".join(structural_model.avl_mass_list)
+    mass_string = "\n".join(arrangement.avl_mass_list)
     with open(file_name, "w") as open_file:
         open_file.write(title_string + mass_string)
 
