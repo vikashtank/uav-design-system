@@ -56,9 +56,31 @@ class TestTrapeziumPlate(unittest.TestCase):
         self.assertEqual(self.trapezium.volume, 25)
 
     def test_centroid(self):
+        """
+        test if the correct centroid is calculated
+        """
         self.assertAlmostEqual(self.trapezium.centroid.x, 38/15)
         self.assertAlmostEqual(self.trapezium.centroid.y, 7/3)
         self.assertAlmostEqual(self.trapezium.centroid.z, 0.5)
+
+    def test_centroid_square(self):
+        """
+        test method still works if the trapezium is a square
+        """
+        self.trapezium = geometry.TrapeziumPlate(5,5, 0, 5, 1)
+        self.assertAlmostEqual(self.trapezium.centroid.x, 2.5)
+        self.assertAlmostEqual(self.trapezium.centroid.y, 2.5)
+        self.assertAlmostEqual(self.trapezium.centroid.z, 0.5)
+
+    def test_centroid_flipped(self):
+        """
+        test if the correct centroid is calculated when the first side is
+        smaller than the second
+        """
+        self.trapezium = geometry.TrapeziumPlate(4, 6, 0, 5, 1)
+        self.assertAlmostEqual(self.trapezium.centroid.z, 0.5)
+        self.assertAlmostEqual(self.trapezium.centroid.x, 38/15)
+        self.assertAlmostEqual(self.trapezium.centroid.y, 5 - 7/3)
 
     def test_inertias(self):
         """
