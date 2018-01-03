@@ -15,6 +15,7 @@ class TrimCase():
         "beta": 0,
         "pb/2v": 0,
         "qc/2v": 0,
+        "rb/2v": 0,
         "cdo": 0,
         "bank": 0,
         "elevation": 0,
@@ -39,6 +40,39 @@ class TrimCase():
         "visc cl u": 0,
         "visc cm a": 0,
         "visc cm u": 0,
+    }
+
+    ALIASDICT = {
+        "cl": "CL",
+        "alpha": "alpha",
+        "beta": "beta",
+        "pb/2v": "pb/2V",
+        "qc/2v": "qc/2V",
+        "rb/2v": "rb/2V",
+        "cdo": "CDo",
+        "bank": "bank",
+        "elevation": "elevation",
+        "heading": "heading",
+        "mach": "Mach",
+        "velocity": "velocity",
+        "density": "density",
+        "gravity": "grav.acc.",
+        "turn_radius": "turn_rad.",
+        "load factor": "load_fac.",
+        "x cg": "X_cg",
+        "y cg": "Y_cg",
+        "z cg": "Z_cg",
+        "mass": "mass",
+        "ixx": "Ixx",
+        "iyy": "Iyy",
+        "izz": "Izz",
+        "ixy": "Ixy",
+        "iyz": "Iyz",
+        "izx": "Izx",
+        "visc cl a": "visc CL_a",
+        "visc cl u": "visc CL_u",
+        "visc cm a": "visc CM_a",
+        "visc cm u": "visc CM_u",
     }
 
 
@@ -100,7 +134,7 @@ class TrimCase():
         bottom_string = ""
 
         for key, value in self._case_parameters.items():
-            line = "{0} = {1}".format(key, value)
+            line = "{0} = {1}".format(TrimCase.ALIASDICT[key], value)
             bottom_string += (line + "\n")
 
         with open(file_name, "w") as open_file:
