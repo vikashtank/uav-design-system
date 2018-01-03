@@ -14,16 +14,30 @@
     - plotting
     - writing Xfoil aerofoil input files
 - Automating Xfoil with aerofoil files
+    - various angle of attack simulations
+    - varying Reynolds number simulations
 - Automated Running of Athena Vortex Lattice solver with input files
+    - building single wing surfaces
+    - Adding flaps and/or elevators
+    - running analysis at trim conditions with various outputs:
+        - stability derivatives
+        - total forces
+        - hinge moments
+        - force distributions
+        - shear and moment distributions
+    - varying mesh density and distribution functions as allowed in AVL
+    - use of aerofoil files
 
 ## Future work
 - Writing aerofoil files for SOLIDWORKS input
 - Athena Vortex lattice link to Xfoil
-- Mesh/Panel inputs
+- Mesh/Panel inputs for Xfloil
 - Aerofoil Blending
 - Aerofoil Reshaping
-- 3D wing design code
-- Viscous Drag Interpolation
+- XFoil flap design
+- Viscous Drag Interpolation from XFoil results
+- Designing multiple surfaces for use in AVL
+- Use of NACA aerofoil inputs to AVL, without the use of input files
 
 ## How To Guide
 
