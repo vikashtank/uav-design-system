@@ -23,6 +23,10 @@ class TestCuboid(unittest.TestCase):
         self.assertEqual(self.cuboid.inertia_yy, 20/12)
         self.assertEqual(self.cuboid.inertia_zz, 13/12)
 
+    def test_reflect_y(self):
+        self.assertEqual(self.cuboid.reflect_y().centroid,
+                         geometry.Point(1, -1.5, 2))
+
 
 class TestCylinder(unittest.TestCase):
 
@@ -36,12 +40,17 @@ class TestCylinder(unittest.TestCase):
         pass
 
     def test_centroid(self):
-        self.assertEqual(self.cylinder.centroid, geometry.Point(0, 0, 5))
+        self.assertEqual(self.cylinder.centroid, geometry.Point(0, 5, 0))
 
     def test_inertias(self):
         self.assertAlmostEqual(self.cylinder.inertia_xx, 103/12)
         self.assertAlmostEqual(self.cylinder.inertia_yy, 0.5)
         self.assertAlmostEqual(self.cylinder.inertia_zz, 103/12)
+
+    def test_reflect_y(self):
+        self.assertEqual(self.cylinder.reflect_y().centroid,
+                         geometry.Point(0, -5, 0))
+
 
 class TestTrapeziumPlate(unittest.TestCase):
 
@@ -90,22 +99,32 @@ class TestTrapeziumPlate(unittest.TestCase):
         self.assertAlmostEqual(self.trapezium.inertia_yy, self.cuboid.inertia_yy)
         self.assertAlmostEqual(self.trapezium.inertia_zz, self.cuboid.inertia_zz)
 
+    def test_reflect_y(self):
+
+        self.assertEqual(self.trapezium.reflect_y().centroid,
+                         geometry.Point(38/15, -7/3, 0.5))
+
 class TestPoint(unittest.TestCase):
 
     def test_equals(self):
 
-        point1 = geometry.Point(1,2,3)
-        point2 = geometry.Point(1,2,3)
+        point1 = geometry.Point(1, 2, 3)
+        point2 = geometry.Point(1, 2, 3)
         self.assertEqual(point1, point2)
 
     def test_add(self):
 
-        point1 = geometry.Point(1,2,3)
-        point2 = geometry.Point(1,2,3)
+        point1 = geometry.Point(1, 2, 3)
+        point2 = geometry.Point(1, 2, 3)
         point3 = point1 + point2
         self.assertEqual(point3.x, 2)
         self.assertEqual(point3.y, 4)
         self.assertEqual(point3.z, 6)
+
+    def test_reflect_y(self):
+        point1 = geometry.Point(1, 2, 3)
+        self.assertEqual(point1.reflect_y(),
+                         geometry.Point(1, -2, 3))
 
 
 

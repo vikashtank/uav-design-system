@@ -49,6 +49,12 @@ class Cuboid(ThreeDimentional):
         """
         return self._calc_interia(self.y_size, self.x_size)
 
+    def reflect_y(self):
+        """
+        create a new object of this class but reflected in the y axis
+        """
+        return Cuboid(self.x_size, -1 * self.y_size, self.z_size)
+
 class Cylinder(ThreeDimentional):
 
     def __init__(self, radius: float, y_size: float):
@@ -61,7 +67,7 @@ class Cylinder(ThreeDimentional):
 
     @property
     def centroid(self):
-        return Point(0, 0, 0.5 * self.y_size)
+        return Point(0, 0.5 * self.y_size, 0)
 
     def calc_x_y_interias(self, radius, length):
         return (1/12)*(3*r*r + h*h)
@@ -77,6 +83,12 @@ class Cylinder(ThreeDimentional):
     @property
     def inertia_yy(self):
         return 0.5*self.radius*self.radius
+
+    def reflect_y(self):
+        """
+        create a new object of this class but reflected in the y axis
+        """
+        return Cylinder(self.radius, -1 * self.y_size)
 
 
 class TrapeziumPlate(ThreeDimentional):
@@ -138,6 +150,13 @@ class TrapeziumPlate(ThreeDimentional):
         x_approx = 0.5 * (self.x1_size + self.x2_size)
         return self._calc_interia(self.y_size, x_approx)
 
+    def reflect_y(self):
+        return TrapeziumPlate(self.x1_size,
+                              self.x2_size,
+                              self.x_shift,
+                              -1 * self.y_size,
+                              self.z_size,)
+
 
 class Point():
 
@@ -167,3 +186,6 @@ class Point():
         z = self.z + value.z
 
         return Point(x, y, z)
+
+    def reflect_y(self):
+        return Point(self.x, -1 * self.y, self.z)
