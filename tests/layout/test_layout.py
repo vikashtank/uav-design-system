@@ -72,6 +72,19 @@ class TestArrangement(unittest.TestCase):
         arrangement = layout.Arrangement("arrangement1", *self.mass_list)
         self.assertEqual(arrangement.center_of_gravity, 0.5)
 
+    def test_total_mass(self):
+        arrangement = layout.Arrangement("arrangement1", *self.mass_list)
+        self.assertEqual(arrangement.total_mass, 60)
+
+    def test_total_mass_nested(self):
+        arrangement = layout.Arrangement("arrangement1", *self.mass_list[0:2])
+        arrangement2 = layout.Arrangement("arrangement2", *self.mass_list[2:])
+        arrangement3 = layout.Arrangement("arrangement3", arrangement,
+                                                          arrangement2,
+                                                          self.mass_list[0])
+
+        self.assertEqual(arrangement3.total_mass, 66)
+
 
 class TestComponent(unittest.TestCase):
 
