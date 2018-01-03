@@ -15,6 +15,7 @@ class TestCreateFoamWing(unittest.TestCase):
     def setUp(self):
         surface = avl.Surface(name = "test_surface")
 
+        # add five square sections side by side to form a rectangular surface
         for i in range(5):
             section = avl.Section("", 1)
             section.translation_bias(0, i, 0)
@@ -25,7 +26,6 @@ class TestCreateFoamWing(unittest.TestCase):
 
     def tearDown(self):
         pass
-
 
     def test_structural_factory_foam(self):
         """
@@ -40,6 +40,7 @@ class TestCreateFoamWing(unittest.TestCase):
             self.assertEqual(section.center_of_gravity_global.x, point.x)
             self.assertEqual(section.center_of_gravity_global.y, point.y)
             self.assertEqual(section.center_of_gravity_global.z, point.z)
+
 
     def test_total_mass(self):
         density = 5

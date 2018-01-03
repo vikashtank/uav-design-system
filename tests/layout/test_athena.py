@@ -6,8 +6,8 @@ this_directory = dirname(abspath(__file__))
 import sys
 sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
 import unittest
-import uav_design_system.layout as layout
-import uav_design_system.athena_vortex_lattice as avl
+from uav_design_system import layout
+from uav_design_system import athena_vortex_lattice as avl
 
 
 

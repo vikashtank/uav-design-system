@@ -7,8 +7,8 @@ from os.path import dirname, abspath
 this_directory = dirname(abspath(__file__))
 import sys
 sys.path.append(this_directory)# so uggo thanks to atom runner
-import layout
-import geometry
+from . import masses
+from . import geometry
 
 
 class StructuralModelType(Enum):
@@ -17,14 +17,13 @@ class StructuralModelType(Enum):
     """
     HOLLOWFOAM = 1
 
-class StructuralModel(layout.Arrangement):
+class StructuralModel(masses.Arrangement):
 
     def __init__(self, name = "", *objects):
         super().__init__(name, *objects)
 
 
-
-class FoamSection(layout.MassObject):
+class FoamSection(masses.MassObject):
 
     FOAMDENSITY = 5
 
@@ -70,8 +69,8 @@ class StructureFactory():
 
             section = FoamSection(x1, x2, x_shift, y, thickness, name)
             section.location = geometry.Point(section1.x,
-                                                section1.y,
-                                                section1.z)
+                                              section1.y,
+                                              section1.z)
 
             foam_model.append(section)
 

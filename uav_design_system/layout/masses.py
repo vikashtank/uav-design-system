@@ -2,7 +2,7 @@ from os.path import dirname, abspath
 this_directory = dirname(abspath(__file__))
 import sys
 sys.path.append(this_directory)# so uggo thanks to atom runner
-from geometry import Point
+from .geometry import Point
 
 class IsArrangeable:
     pass

@@ -9,8 +9,7 @@ this_directory = dirname(abspath(__file__))
 import sys
 sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
 import unittest
-import uav_design_system.athena_vortex_lattice as avl
-import uav_design_system.layout as layout
+from uav_design_system import layout, athena_vortex_lattice as avl
 
 
 class Test(unittest.TestCase):
@@ -61,26 +60,16 @@ class Test(unittest.TestCase):
         mass_object = layout.MassObject(layout.Cuboid(1, 1, 1), 1)
         mass_object.location = layout.Point(-0.5, -0.5, -0.5)
 
-        arrangement = layout.Arrangement("plane arrangement", mass_object, structural_model)
-
-        # bug begins here...
-        """
-        # arrangement should contain 2 objects, one of type StructuralModel and one of type MassObject
-        # please see Arrangement class in layout.py for the method all_mass_objects, which should collect all masses but fails to
-        # obtain masses from the StructuralModel class which Inherits that method from Arrangement
-        # this breaks the total_mass method (added test for that, in test_component.py which works, so inheritance only broken here)
-
-        print(len(arrangement.all_mass_objects))
-        for ob in arrangement.all_mass_objects:
-            print(ob.avl_mass_string)
-
+        arrangement = layout.Arrangement("plane arrangement", mass_object, structural_model, structural_model)
 
         # create case file -----------------------------------------------------
         case = avl.TrimCase(surface.area * 2, velocity = 22,
                             mass = arrangement.total_mass)
         case.to_file(self.run_file)
         layout.create_mass_file(self.mass_file, arrangement, case)
-        """
+
+
+
 
 if __name__ == "__main__":
     unittest.main()

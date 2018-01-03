@@ -16,20 +16,20 @@ def run_aerofoil(t_x, t_y, thick, camb_x, camb_y, plot, colour):
 
     # create a file path to write the coordinates of the aerofoil to
     dir_name = dirname(abspath(__file__))
-    file_name = join(dir_name, "aerofoil.txt")
+    aerofoil_file_name = join(dir_name, "aerofoil.txt")
 
     # write to coords to file
-    with open(file_name, "w") as open_file:
+    with open(aerofoil_file_name, "w") as open_file:
         aero_geom.write(open_file)
 
     file_path = "/Applications/Xfoil.app/Contents/Resources/xfoil"
 
     xfoil_runner = xfoil.XfoilRunner(file_path)
-    xfoil_runner.setup_analysis(file_name, 1e6)
+    xfoil_runner.setup_analysis(aerofoil_file_name, 1e6)
     results = xfoil_runner.generate_results(0, 5, 0.5, False)
 
     aero_geom.plot(plot = plot, colour = colour)
-
+    
     return results["xfoil"]["analysis"]["results"]
 
 if __name__ == "__main__":
@@ -63,9 +63,5 @@ if __name__ == "__main__":
     plt.xlabel("camber")
     plt.ylabel("moment coefficient")
     plt.plot(camber, cm)
-
-    print(cm)
-    print(cd)
-    print(cl)
 
     plt.show()
