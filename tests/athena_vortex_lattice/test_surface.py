@@ -43,7 +43,7 @@ class Test(unittest.TestCase):
         """
         tests that the control surfaces can be applies to sections
         """
-        self.surface.add_control_surface(self.control_surface, 0, 5)
+        self.surface.add_control_surface(self.control_surface, 0, 4)
 
         for section in self.surface:
             self.assertTrue(section.control_surface is self.control_surface)
@@ -60,6 +60,19 @@ class Test(unittest.TestCase):
 
         with self.assertRaises(avl.NoControlSurfaceError):
             hasattr(self.surface[2], 'control_surface')
+
+    def test_add_control_surface_failure(self):
+        """
+        tests failure when a contrl surfaces is added to a section that doesnt
+        exist
+        """
+
+        with self.assertRaises(avl.NoSectionError):
+            self.surface.add_control_surface(self.control_surface, 5, 5)
+
+        with self.assertRaises(avl.NoSectionError):
+            self.surface.add_control_surface(self.control_surface, 0, 5)
+
 
     def test_surface_area(self):
         """

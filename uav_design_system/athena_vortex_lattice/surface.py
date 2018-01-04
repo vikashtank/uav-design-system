@@ -6,6 +6,9 @@ from typing import List
 class NoControlSurfaceError(Exception):
     pass
 
+class NoSectionError(Exception):
+    pass
+
 
 
 class Surface():
@@ -135,9 +138,13 @@ class Surface():
         Returns:
             None
         """
-        for index, section in enumerate(self.sections):
-            if start_section <= index <= end_section:
-                section.control_surface = control_surface
+        try:
+            for index in range(start_section, end_section + 1):
+                    self.sections[index].control_surface = control_surface
+        except IndexError:
+            raise NoSectionError(f"invalid index range {start_section} "
+                                 "to {end_section} : sections within "
+                                 "range do not exist")
 
     def __getitem__(self, key):
         return self.sections[key]
