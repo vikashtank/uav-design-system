@@ -33,7 +33,6 @@ class Surface():
         self.y_ref = 0
         self.z_ref = 0
 
-
     @property
     def area(self):
         """
@@ -157,6 +156,7 @@ class Surface():
 
     @property
     def _ref_string(self):
+
         list = ["all",
                 "0.0                      Mach",
                 "0     0     0.0          iYsym  iZsym  Zsym",
@@ -174,6 +174,10 @@ class Surface():
     @property
     def _top_string(self):
 
+        if self.reflect_surface:
+            y_duplicate_string = f"YDUPLICATE\n     0"
+        else:
+            y_duplicate_string = ""
 
         list  = ["#",
                  "SURFACE",
@@ -183,8 +187,7 @@ class Surface():
                  "  !  Nchord   Cspace   Nspan  Sspace",
                  "#",
                  "# reflect image wing about y=0 plane",
-                 "YDUPLICATE",
-                 f"     {int(self.reflect_surface)}",
+                 y_duplicate_string,
                  "#",
                  "# twist angle bias for whole surface",
                  "ANGLE",
@@ -198,12 +201,12 @@ class Surface():
 
         return "\n".join(list)
 
-    def __str__(self):
+    def to_avl_string(self):
         surface_string = "\n".join([self._ref_string, self._top_string])
 
         for section in self.sections:
             list = [section.to_avl_string(),
-                    "#-----------------------",
+                    "#" + "-" * 23,
                     ]
             surface_string += ("\n" + "\n".join(list))
 

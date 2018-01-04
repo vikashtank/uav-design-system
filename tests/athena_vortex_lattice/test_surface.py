@@ -143,11 +143,23 @@ class Test(unittest.TestCase):
         section2 = avl.Section("aerofoil_file", 2)
         section2.translation_bias(0, 10, 0)
         surface.add_section(section1, section2)
-
+        surface.reflect_surface = True
         expected_string = get_resource_content("surface.txt")
+        self.assertEqual(surface.to_avl_string().strip(), expected_string.strip())
 
-        self.assertEqual(str(surface).strip(), expected_string.strip())
-
+    def test_avl_write_no_duplicate(self):
+        """
+        tests the avl file is correctl written from the surface class
+        """
+        surface = avl.Surface("surface1")
+        surface.define_mesh(20, 30, 1.0, 1.0)
+        section1 = avl.Section("aerofoil_file", 10)
+        section2 = avl.Section("aerofoil_file", 2)
+        section2.translation_bias(0, 10, 0)
+        surface.add_section(section1, section2)
+        expected_string = get_resource_content("surface_no_dup.txt")
+        self.maxDiff = None
+        self.assertEqual(surface.to_avl_string().strip(), expected_string.strip())
 
     def test_avl_write_with_controls(self):
         """
@@ -162,7 +174,9 @@ class Test(unittest.TestCase):
         surface.add_section(section1, section2)
         surface.add_control_surface(control_surface, 0, 0)
         expected_string = get_resource_content("surface_control.txt")
-        self.assertEqual(str(surface).strip(), expected_string.strip())
+        surface.reflect_surface = True
+        self.maxDiff = None
+        self.assertEqual(surface.to_avl_string().strip(), expected_string.strip())
 
 
 class TestSection(unittest.TestCase):
