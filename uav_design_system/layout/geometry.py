@@ -15,7 +15,7 @@ class Cuboid(ThreeDimentional):
 
     @property
     def volume(self):
-        return self.x_size * self.y_size * self.z_size
+        return abs(self.x_size * self.y_size * self.z_size)
 
     @property
     def project_xy(self):
@@ -63,7 +63,7 @@ class Cylinder(ThreeDimentional):
 
     @property
     def volume(self):
-        return pi * self.radius * self.radius * self.y_size
+        return abs(pi * self.radius * self.radius * self.y_size)
 
     @property
     def centroid(self):
@@ -105,7 +105,7 @@ class TrapeziumPlate(ThreeDimentional):
 
     @property
     def volume(self):
-        return 0.5*(self.x1_size + self.x2_size)*self.y_size*self.z_size
+        return abs(0.5*(self.x1_size + self.x2_size)*self.y_size*self.z_size)
 
     @property
     def centroid(self):

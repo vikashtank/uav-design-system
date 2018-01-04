@@ -70,7 +70,8 @@ class TestArrangement(unittest.TestCase):
         tests the calculation of the center of gravity
         """
         arrangement = layout.Arrangement("arrangement1", *self.mass_list)
-        self.assertEqual(arrangement.center_of_gravity, 0.5)
+        self.assertEqual(arrangement.center_of_gravity,
+                         layout.Point(0.5, 1, 1.5))
 
     def test_total_mass(self):
         arrangement = layout.Arrangement("arrangement1", *self.mass_list)
@@ -85,8 +86,39 @@ class TestArrangement(unittest.TestCase):
 
         self.assertEqual(arrangement3.total_mass, 66)
 
+    def test_clone(self):
+        """
+        test clone method
+        """
+        arrangement = layout.Arrangement("arrangement1", *self.mass_list)
 
-class TestComponent(unittest.TestCase):
+        arrangement_clone = arrangement.clone()
+
+        self.assertEqual(arrangement.center_of_gravity,
+                        arrangement_clone.center_of_gravity)
+
+
+    def test_reflect_y(self):
+        """
+        tests that the y refelection method creates a new arrangement reflected
+        in the y axis
+        """
+        arrangement = layout.Arrangement("arrangement1", *self.mass_list)
+
+        # create expected reflected coordinates for center of gravity
+        x = arrangement.center_of_gravity.x
+        y = -1 * arrangement.center_of_gravity.y
+        z = arrangement.center_of_gravity.z
+        reflected_cog = layout.Point(x, y, z)
+
+        arrangement_reflect = arrangement.clone(reflect_y = True)
+
+        self.assertEqual(arrangement_reflect.center_of_gravity.x, reflected_cog.x)
+        self.assertEqual(arrangement_reflect.center_of_gravity.y, reflected_cog.y)
+        self.assertEqual(arrangement_reflect.center_of_gravity.z, reflected_cog.z)
+
+
+class TestMassObject(unittest.TestCase):
 
     def setUp(self):
         self.geometry = layout.Cuboid(1,2,3)
@@ -102,15 +134,6 @@ class TestComponent(unittest.TestCase):
         self.assertEqual(mass_object.center_of_gravity,
                           layout.Point(0.5, 1, 1.5))
 
-    def test_set_cog(self):
-        """
-        test that the cog can be modified
-        """
-        mass_object = layout.MassObject(self.geometry, 1, "name")
-        mass_object.center_of_gravity = layout.Point(1,2,3)
-        self.assertEqual(mass_object.center_of_gravity, layout.Point(1,2,3))
-        self.assertEqual(mass_object.center_of_gravity_global,
-                          layout.Point(1,2,3))
 
     def test_default_location(self):
         """

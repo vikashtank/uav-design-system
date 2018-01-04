@@ -5,6 +5,7 @@ import sys
 sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
 import unittest
 import uav_design_system.layout as geometry
+from math import pi
 
 
 class TestCuboid(unittest.TestCase):
@@ -18,7 +19,30 @@ class TestCuboid(unittest.TestCase):
     def test_centroid(self):
         self.assertEqual(self.cuboid.centroid, geometry.Point(1, 1.5, 2))
 
+    def test_volume(self):
+        self.assertEqual(self.cuboid.volume, 24)
+
+    def test_volume_negative(self):
+        self.cuboid = geometry.Cuboid(2, -3, 4)
+        self.assertEqual(self.cuboid.volume, 24)
+
     def test_inertias(self):
+        self.assertEqual(self.cuboid.inertia_xx, 25/12)
+        self.assertEqual(self.cuboid.inertia_yy, 20/12)
+        self.assertEqual(self.cuboid.inertia_zz, 13/12)
+
+    def test_inertias_negative(self):
+        self.cuboid = geometry.Cuboid(-2, 3, 4)
+        self.assertEqual(self.cuboid.inertia_xx, 25/12)
+        self.assertEqual(self.cuboid.inertia_yy, 20/12)
+        self.assertEqual(self.cuboid.inertia_zz, 13/12)
+
+        self.cuboid = geometry.Cuboid(2, -3, 4)
+        self.assertEqual(self.cuboid.inertia_xx, 25/12)
+        self.assertEqual(self.cuboid.inertia_yy, 20/12)
+        self.assertEqual(self.cuboid.inertia_zz, 13/12)
+
+        self.cuboid = geometry.Cuboid(2, 3, -4)
         self.assertEqual(self.cuboid.inertia_xx, 25/12)
         self.assertEqual(self.cuboid.inertia_yy, 20/12)
         self.assertEqual(self.cuboid.inertia_zz, 13/12)
@@ -37,12 +61,27 @@ class TestCylinder(unittest.TestCase):
         pass
 
     def test_volume(self):
-        pass
+        self.assertAlmostEqual(self.cylinder.volume, 10 * pi)
+
+    def test_volume_negative(self):
+        self.cylinder = geometry.Cylinder(1, -10)
+        self.assertAlmostEqual(self.cylinder.volume, 10 * pi)
 
     def test_centroid(self):
         self.assertEqual(self.cylinder.centroid, geometry.Point(0, 5, 0))
 
     def test_inertias(self):
+        self.assertAlmostEqual(self.cylinder.inertia_xx, 103/12)
+        self.assertAlmostEqual(self.cylinder.inertia_yy, 0.5)
+        self.assertAlmostEqual(self.cylinder.inertia_zz, 103/12)
+
+    def test_inertias_negative(self):
+        self.cylinder = geometry.Cylinder(1, -10)
+        self.assertAlmostEqual(self.cylinder.inertia_xx, 103/12)
+        self.assertAlmostEqual(self.cylinder.inertia_yy, 0.5)
+        self.assertAlmostEqual(self.cylinder.inertia_zz, 103/12)
+
+        self.cylinder = geometry.Cylinder(-1, 10)
         self.assertAlmostEqual(self.cylinder.inertia_xx, 103/12)
         self.assertAlmostEqual(self.cylinder.inertia_yy, 0.5)
         self.assertAlmostEqual(self.cylinder.inertia_zz, 103/12)
@@ -62,6 +101,10 @@ class TestTrapeziumPlate(unittest.TestCase):
         pass
 
     def test_volume(self):
+        self.assertEqual(self.trapezium.volume, 25)
+
+    def test_volume_negative(self):
+        self.trapezium = geometry.TrapeziumPlate(6, 4, 0 , -5, 1)
         self.assertEqual(self.trapezium.volume, 25)
 
     def test_centroid(self):
@@ -99,8 +142,17 @@ class TestTrapeziumPlate(unittest.TestCase):
         self.assertAlmostEqual(self.trapezium.inertia_yy, self.cuboid.inertia_yy)
         self.assertAlmostEqual(self.trapezium.inertia_zz, self.cuboid.inertia_zz)
 
-    def test_reflect_y(self):
+    def test_inertias_negative(self):
+        """
+        check the trapezium inertias are equivilent to a cuboid
+        """
+        self.trapezium = geometry.TrapeziumPlate(6, 4, 0, -5, 1)
+        self.assertAlmostEqual(self.trapezium.inertia_xx, self.cuboid.inertia_xx)
+        self.assertAlmostEqual(self.trapezium.inertia_yy, self.cuboid.inertia_yy)
+        self.assertAlmostEqual(self.trapezium.inertia_zz, self.cuboid.inertia_zz)
 
+    def test_reflect_y(self):
+        self.trapezium = geometry.TrapeziumPlate(6, 4, 0, 5, 1)
         self.assertEqual(self.trapezium.reflect_y().centroid,
                          geometry.Point(38/15, -7/3, 0.5))
 
@@ -125,7 +177,6 @@ class TestPoint(unittest.TestCase):
         point1 = geometry.Point(1, 2, 3)
         self.assertEqual(point1.reflect_y(),
                          geometry.Point(1, -2, 3))
-
 
 
 

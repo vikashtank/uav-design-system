@@ -3,6 +3,7 @@ this_directory = dirname(abspath(__file__))
 import sys
 sys.path.append(this_directory)# so uggo thanks to atom runner
 from .geometry import Point
+import copy
 
 class IsArrangeable:
     pass
@@ -53,19 +54,39 @@ class Arrangement(IsArrangeable):
 
     @property
     def total_mass(self):
-        total_mass = 0
-        for mass in self.all_mass_objects:
-            total_mass += mass.mass
+        return sum(mass.mass for mass in self.all_mass_objects)
 
-        return total_mass
 
     @property
     def center_of_gravity(self):
-        total_moment = 0
-        for mass in self.all_mass_objects:
-            total_moment += mass.mass * mass.center_of_gravity_global.x
 
-        return total_moment/self.total_mass
+        mom_x = sum(mass.mass * mass.center_of_gravity_global.x for mass in self.all_mass_objects)
+        mom_y = sum(mass.mass * mass.center_of_gravity_global.y for mass in self.all_mass_objects)
+        mom_z = sum(mass.mass * mass.center_of_gravity_global.z for mass in self.all_mass_objects)
+
+        return Point(mom_x/self.total_mass,
+                     mom_y/self.total_mass,
+                     mom_z/self.total_mass)
+
+    @property
+    def center_of_gravity_global(self):
+        return self.center_of_gravity + self.location
+
+    def clone(self, reflect_y = False):
+        """
+        clone and return this object
+        """
+        clone = copy.deepcopy(self)
+
+        if reflect_y:
+            # change the locations of all points in the test_clone
+
+            for mass in clone.all_mass_objects:
+
+                mass.location = mass.location.reflect_y()
+                mass.geometry = mass.geometry.reflect_y()
+
+        return clone
 
 
 class MassObject(IsArrangeable):
@@ -77,7 +98,6 @@ class MassObject(IsArrangeable):
         self.name = name
         self.geometry = geometry
         self.density = density
-        self._center_of_gravity = self.geometry.centroid
         self._location = Point(0, 0, 0)
 
     @property
@@ -89,15 +109,11 @@ class MassObject(IsArrangeable):
 
     @property
     def center_of_gravity(self):
-        return self._center_of_gravity
+        return self.geometry.centroid
 
     @property
     def center_of_gravity_global(self):
-        return self._center_of_gravity + self._location
-
-    @center_of_gravity.setter
-    def center_of_gravity(self, value: 'Point'):
-        self._center_of_gravity = value
+        return self.geometry.centroid + self._location
 
     @property
     def location(self):
@@ -141,7 +157,8 @@ class MassObject(IsArrangeable):
                                                                      izz)
         return template
 
-
+    def clone(self):
+        return copy.deepcopy(self)
 
 
 if __name__  == "__main__":
