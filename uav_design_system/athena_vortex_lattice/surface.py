@@ -50,7 +50,10 @@ class Surface():
             area = height * length
             total_area += area
 
-        return total_area
+        # if the wing is reflected take into account additional surface area
+        reflection_factor = int(self.reflect_surface) + 1
+
+        return total_area * reflection_factor
 
     @property
     def cord(self):
@@ -64,7 +67,10 @@ class Surface():
         """
         returns the maximum y distance from wing center of the sections in this surface
         """
-        return max(self, key = lambda x:x.y).y
+        # if the wing is reflected take into account additional span length
+        reflection_factor = int(self.reflect_surface) + 1
+
+        return max(self, key = lambda x:x.y).y * reflection_factor
 
     @property
     def x_reference_coordinate(self):

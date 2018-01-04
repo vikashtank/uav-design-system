@@ -73,12 +73,19 @@ class Test(unittest.TestCase):
         with self.assertRaises(avl.NoSectionError):
             self.surface.add_control_surface(self.control_surface, 0, 5)
 
-
     def test_surface_area(self):
         """
         test the calculation of the wing area with 2 sections
         """
         self.assertEqual(self.surface.area, 8)
+
+    def test_surface_area_reflect(self):
+        """
+        test the calculation of the wing area with 2 sections with a reflected
+        surface
+        """
+        self.surface.reflect_surface = True
+        self.assertEqual(self.surface.area, 16)
 
     def test_cord(self):
         """
@@ -91,6 +98,13 @@ class Test(unittest.TestCase):
         test surface span property
         """
         self.assertEqual(self.surface.span, 4)
+
+    def test_span_reflected(self):
+        """
+        test surface span property with a reflected surface
+        """
+        self.surface.reflect_surface = True
+        self.assertEqual(self.surface.span, 8)
 
     def _test_get_plot_coords(self):
 
