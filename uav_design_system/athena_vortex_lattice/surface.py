@@ -155,7 +155,6 @@ class Surface():
     def __getitem__(self, key):
         return self.sections[key]
 
-
     @property
     def _ref_string(self):
         list = ["all",
@@ -171,7 +170,6 @@ class Surface():
                 ]
 
         return "\n".join(list)
-
 
     @property
     def _top_string(self):
@@ -215,11 +213,35 @@ class Surface():
         return len(self.sections)
 
     def get_plot_coordinates(self):
-        pass
+        """
+        gets x and y coordinate lists for plotting
+        """
 
+        le_x, le_y, le_z = [], [], []
+        te_x, te_y, te_z = [], [], []
+
+        for section in self:
+            x, y, z = section.leading_edge_coordinates
+            le_x.append(x)
+            le_y.append(y)
+            le_z.append(z)
+            x, y, z = section.trailing_edge_coordinates
+            te_x.append(x)
+            te_y.append(y)
+            te_z.append(z)
+
+        x = le_x + te_x[::-1]
+        y = le_y + te_y[::-1]
+        z = le_z + te_z[::-1]
+
+        if self.reflect_surface:
+            x = x + x[::-1]
+            y = y + [ -1 * i for i in y[::-1]]
+            z = z + z[::-1]
+
+        return x, y, z
 
 class Section():
-
 
     def __init__(self, aerofoil_file_path: str, cord: float):
         self.add_aerofoil(aerofoil_file_path)
@@ -251,6 +273,14 @@ class Section():
         self.x = x
         self.y = y
         self.z = z
+
+    @property
+    def leading_edge_coordinates(self):
+        return self.x, self.y, self.z
+
+    @property
+    def trailing_edge_coordinates(self):
+        return self.x + self.cord, self.y, self.z
 
     def to_avl_string(self):
 

@@ -106,21 +106,32 @@ class Test(unittest.TestCase):
         self.surface.reflect_surface = True
         self.assertEqual(self.surface.span, 8)
 
-    def _test_get_plot_coords(self):
+    def test_get_plot_coords(self):
 
-        surface = avl.Surface("surface1")
-        section1 = avl.Section("", 10)
-        section2 = avl.Section("", 2)
-        section2.translation_bias(0, 10, 0)
+        expected_x_coords = [0, 0, 0, 0, 0, 2, 2, 2, 2, 2]
+        expected_y_coords = [0, 1, 2, 3, 4, 4, 3, 2, 1, 0]
+        expected_z_coords = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-        surface.add_section(section1)
-        surface.add_section(section2)
-
-        expected_x_coords = []
-        expected_y_coords = []
-        x, y = surface.get_plot_coordinates()
+        x, y, z = self.surface.get_plot_coordinates()
         self.assertEqual(x, expected_x_coords)
         self.assertEqual(y, expected_y_coords)
+        self.assertEqual(z, expected_z_coords)
+
+    def test_get_plot_coords_reflected(self):
+
+        self.surface.reflect_surface = True
+
+        expected_x_coords = [0, 0, 0, 0, 0, 2, 2, 2, 2, 2,
+                             2, 2, 2, 2, 2, 0, 0, 0, 0, 0]
+        expected_y_coords = [0, 1, 2, 3, 4, 4, 3, 2, 1, 0,
+                             0, -1, -2, -3, -4, -4, -3, -2, -1, 0]
+        expected_z_coords = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                             0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+        x, y, z = self.surface.get_plot_coordinates()
+        self.assertEqual(x, expected_x_coords)
+        self.assertEqual(y, expected_y_coords)
+        self.assertEqual(z, expected_z_coords)
 
     def test_avl_write(self):
         """
@@ -175,7 +186,6 @@ class TestSection(unittest.TestCase):
 
             self.assertEqual(string.strip(), expected_string.strip())
 
-
         def test_control_surface_missing(self):
             """
             test correct error is thrown when the control surface has not been set
@@ -190,7 +200,6 @@ class TestSection(unittest.TestCase):
             self.section.control_surface = self.control_surface
             self.assertEqual(self.section.control_surface, self.control_surface)
 
-
         def test_section_to_string_control(self):
             """
             tests that the correct AVL string is produced by the surface
@@ -201,6 +210,12 @@ class TestSection(unittest.TestCase):
 
 
             self.assertEqual(string.strip(), expected_string.strip())
+
+        def test_leading_edge_coordinates(self):
+            self.assertEqual((0, 0, 0), self.section.leading_edge_coordinates)
+
+        def test_trailing_edge_coordinates(self):
+            self.assertEqual((5, 0, 0), self.section.trailing_edge_coordinates)
 
 class TestControlSurface(unittest.TestCase):
 
