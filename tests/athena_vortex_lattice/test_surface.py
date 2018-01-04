@@ -6,6 +6,16 @@ sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
 import unittest
 import uav_design_system.athena_vortex_lattice as avl
 
+
+def get_resource_content(file_name):
+    """
+    function to retrieve data from files in the resource folder for these tests
+    """
+    resources_directory = join(this_directory, "resources", "surface_resources")
+    with open(join(resources_directory, file_name)) as open_file:
+        return open_file.read()
+
+
 class Test(unittest.TestCase):
 
     def setUp(self):
@@ -19,9 +29,9 @@ class Test(unittest.TestCase):
                             avl.ControlDeflectionType.SYMMETRIC)
 
         for i in range(5):
-            section = avl.Section("", 0)
+            section = avl.Section("", 2)
+            section.translation_bias(0, i, 0)
             self.surface.add_section(section)
-
 
     def tearDown(self):
         pass
@@ -47,12 +57,30 @@ class Test(unittest.TestCase):
 
         self.assertTrue(self.surface[0].control_surface is self.control_surface)
         self.assertTrue(self.surface[1].control_surface is self.control_surface)
-        self.assertFalse(hasattr(self.surface[2], 'control_surface'))
+
+        with self.assertRaises(avl.NoControlSurfaceError):
+            hasattr(self.surface[2], 'control_surface')
 
     def test_surface_area(self):
         """
         test the calculation of the wing area with 2 sections
         """
+        self.assertEqual(self.surface.area, 8)
+
+    def test_cord(self):
+        """
+        test surface cord property
+        """
+        self.assertEqual(self.surface.cord, 2)
+
+    def test_span(self):
+        """
+        test surface span property
+        """
+        self.assertEqual(self.surface.span, 4)
+
+    def _test_get_plot_coords(self):
+
         surface = avl.Surface("surface1")
         section1 = avl.Section("", 10)
         section2 = avl.Section("", 2)
@@ -61,91 +89,11 @@ class Test(unittest.TestCase):
         surface.add_section(section1)
         surface.add_section(section2)
 
-        self.assertEqual(surface.area, 60)
-
-    def test_surface_area_multi(self):
-        """
-        calculations of the wing area with multiple sections
-        """
-        surface = avl.Surface("surface1")
-        section1 = avl.Section("", 10)
-        section2 = avl.Section("", 2)
-        section2.translation_bias(0, 10, 0)
-        section3 = avl.Section("", 2)
-        section3.translation_bias(0, 20, 0)
-
-        surface.add_section(section1, section2, section3)
-
-        self.assertEqual(surface.area, 60 + 10*2)
-
-    def test_section_to_string(self):
-        """
-        tests that the correct AVL string is produced by the surface
-        """
-        section = avl.Section("hello", 5)
-        string = str(section)
-        expected_string = """#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
-SECTION
-     0     0     0     5         0
-
-AFIL
-hello"""
-
-        self.assertEqual(string, expected_string)
-
-
-    def test_section_to_string_control(self):
-        """
-        tests that the correct AVL string is produced by the surface
-        """
-        section = avl.Section("hello", 5)
-        control_surface = avl.ControlSurface("elevator", 0.8, [0, 1, 0], avl.ControlDeflectionType.SYMMETRIC)
-        section._add_control_surface(control_surface)
-
-        string = str(section)
-        expected_string = """#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
-SECTION
-     0     0     0     5         0
-CONTROL
-elevator  1  0.8   0 1 0   1
-AFIL
-hello"""
-
-        self.assertEqual(string, expected_string)
-
-    def test_control_surface_string(self):
-        """
-        tests that the control surface class str method creates the appropriate
-        string
-        """
-        control_surface = avl.ControlSurface("elevator", 0.8, [0,1,0], avl.ControlDeflectionType.SYMMETRIC)
-        string = str(control_surface)
-        expected_string = "elevator  1  0.8   0 1 0   1"
-        self.assertEqual(string, expected_string)
-
-    def test_cord(self):
-        """
-        test surface cord property
-        """
-        surface = avl.Surface("surface1")
-        section1 = avl.Section("", 10)
-        section2 = avl.Section("", 2)
-        section2.translation_bias(0, 10, 0)
-        surface.add_section(section1, section2)
-
-        self.assertEqual(surface.cord, 10)
-
-    def test_span(self):
-        """
-        test surface span property
-        """
-        surface = avl.Surface("surface1")
-        section1 = avl.Section("", 10)
-        section2 = avl.Section("", 2)
-        section2.translation_bias(0, 12, 0)
-        surface.add_section(section1, section2)
-
-        self.assertEqual(surface.span, 12)
+        expected_x_coords = []
+        expected_y_coords = []
+        x, y = surface.get_plot_coordinates()
+        self.assertEqual(x, expected_x_coords)
+        self.assertEqual(y, expected_y_coords)
 
     def test_avl_write(self):
         """
@@ -158,106 +106,95 @@ hello"""
         section2.translation_bias(0, 10, 0)
         surface.add_section(section1, section2)
 
-
-        expected_string = """all
-0.0                      Mach
-0     0     0.0          iYsym  iZsym  Zsym
-60.0 10  10          Sref   Cref   Bref   reference area, chord, span
-0 0   0          Xref   Yref   Zref   moment reference location (arb.)
-0.020                    CDoref
-#
-#==============================================================
-#
-SURFACE
-surface1
-20  1.0  30  1.0  !  Nchord   Cspace   Nspan  Sspace
-#
-# reflect image wing about y=0 plane
-YDUPLICATE
-     0
-#
-# twist angle bias for whole surface
-ANGLE
-     0
-#
-# x,y,z bias for whole surface
-TRANSLATE
-    0     0     0
-#--------------------------------------------------------------
-#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
-SECTION
-     0     0     0     10         0
-
-AFIL
-aerofoil_file
-#-----------------------
-#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
-SECTION
-     0     10     0     2         0
-
-AFIL
-aerofoil_file
-#-----------------------"""
+        expected_string = get_resource_content("surface.txt")
 
         self.assertEqual(str(surface).strip(), expected_string.strip())
 
 
-def test_avl_write_with_controls(self):
-    """
-    tests the avl file is correctl written from the surface class
-    """
-    surface = avl.Surface("surface1")
-    surface.define_mesh(20, 30, 1.0, 1.0)
-    section1 = avl.Section("aerofoil_file", 10)
-    section2 = avl.Section("aerofoil_file", 2)
-    control_surface = avl.ControlSurface("elevator", 0.8, [0, 1, 0], avl.ControlDeflectionType.SYMMETRIC)
-    section2.translation_bias(0, 10, 0)
-    surface.add_control_surface(control_surface, 0, 0)
-    surface.add_section(section1, section2)
+    def test_avl_write_with_controls(self):
+        """
+        tests the avl file is correctl written from the surface class
+        """
+        surface = avl.Surface("surface1")
+        surface.define_mesh(20, 30, 1.0, 1.0)
+        section1 = avl.Section("aerofoil_file", 10)
+        section2 = avl.Section("aerofoil_file", 2)
+        control_surface = avl.ControlSurface("elevator", 0.8, [0, 1, 0], avl.ControlDeflectionType.SYMMETRIC)
+        section2.translation_bias(0, 10, 0)
+        surface.add_section(section1, section2)
+        surface.add_control_surface(control_surface, 0, 0)
+        expected_string = get_resource_content("surface_control.txt")
+        self.assertEqual(str(surface).strip(), expected_string.strip())
 
 
-    expected_string = """all
-0.0                      Mach
-0     0     0.0          iYsym  iZsym  Zsym
-60.0 10  10          Sref   Cref   Bref   reference area, chord, span
-0 0   0          Xref   Yref   Zref   moment reference location (arb.)
-0.020                    CDoref
-#
-#==============================================================
-#
-SURFACE
-surface1
-20  1.0  30  1.0  !  Nchord   Cspace   Nspan  Sspace
-#
-# reflect image wing about y=0 plane
-YDUPLICATE
- 0
-#
-# twist angle bias for whole surface
-ANGLE
- 0
-#
-# x,y,z bias for whole surface
-TRANSLATE
-0     0     0
-#--------------------------------------------------------------
-#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
-SECTION
- 0     0     0     10         0
-CONTROL
-elevator  1.0  0.8   0. 1. 0.   1.0
-AFIL
-aerofoil_file
-#-----------------------
-#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
-SECTION
- 0     10     0     2         0
+class TestSection(unittest.TestCase):
 
-AFIL
-aerofoil_file
-#-----------------------"""
+        def setUp(self):
+            self.section = avl.Section("hello", 5)
+            self.control_surface = avl.ControlSurface("elevator",
+                                                       0.8,
+                                                       [0, 1, 0],
+                                                       avl.
+                                                       ControlDeflectionType.
+                                                       SYMMETRIC)
 
-    self.assertEqual(str(surface).strip(), expected_string.strip())
+        def test_section_to_string(self):
+            """
+            tests that the correct AVL string is produced by the surface
+            """
+            string = self.section.to_avl_string()
+
+            expected_string = get_resource_content("section_to_string.txt")
+
+            self.assertEqual(string.strip(), expected_string.strip())
+
+
+        def test_control_surface_missing(self):
+            """
+            test correct error is thrown when the control surface has not been set
+            """
+            with self.assertRaises(avl.NoControlSurfaceError):
+                self.section.control_surface
+
+        def test_control_surface(self):
+            """
+            test correct error is thrown when the control surface has not been set
+            """
+            self.section.control_surface = self.control_surface
+            self.assertEqual(self.section.control_surface, self.control_surface)
+
+
+        def test_section_to_string_control(self):
+            """
+            tests that the correct AVL string is produced by the surface
+            """
+            self.section.control_surface = self.control_surface
+            string = self.section.to_avl_string()
+            expected_string = get_resource_content("section_to_control.txt")
+
+
+            self.assertEqual(string.strip(), expected_string.strip())
+
+class TestControlSurface(unittest.TestCase):
+
+        def test_control_surface_string(self):
+            """
+            tests that the control surface class str method creates the appropriate
+            string
+            """
+            control_surface = avl.ControlSurface("elevator",
+                                                 0.8,
+                                                 [0,1,0],
+                                                 avl.ControlDeflectionType.
+                                                                    SYMMETRIC)
+            string = control_surface.to_avl_string()
+            expected_string = "elevator  1  0.8   0 1 0   1"
+            self.assertEqual(string, expected_string)
+
+
+
+
+
 
 if __name__ == "__main__":
     unittest.main()

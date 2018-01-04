@@ -1,0 +1,7 @@
+#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
+SECTION
+     0     0     0     5         0
+CONTROL
+elevator  1  0.8   0 1 0   1
+AFIL
+hello

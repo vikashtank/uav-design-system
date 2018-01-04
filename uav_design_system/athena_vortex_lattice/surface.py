@@ -3,6 +3,11 @@ from enum import Enum
 from typing import List
 
 
+class NoControlSurfaceError(Exception):
+    pass
+
+
+
 class Surface():
     """
     Class responsible for all aerodynamic surfaces, such as wings or rudders
@@ -49,25 +54,14 @@ class Surface():
         """
         returns the maximum cord of the sections in this surface
         """
-        cord = 0
-        for section in self.sections:
-            if section.cord > cord:
-                cord = section.cord
-
-        return cord
+        return max(self.sections, key = lambda x:x.cord).cord
 
     @property
     def span(self):
         """
         returns the maximum y distance from wing center of the sections in this surface
         """
-        span = 0
-
-        for section in self:
-            if section.y > span:
-                span = section.y
-
-        return span
+        return max(self, key = lambda x:x.y).y
 
     @property
     def x_reference_coordinate(self):
@@ -106,7 +100,7 @@ class Surface():
     def define_translation_bias(self, x: float = 0, y: float = 0, z: float = 0):
         """
         define the location of the origin of the wing compared to the global
-        origin. defaulted to the global origin
+        origin. defaulted to the global origin (0, 0, 0)
 
         inputs:
             x: location downstream, along velocity vector
@@ -143,7 +137,7 @@ class Surface():
         """
         for index, section in enumerate(self.sections):
             if start_section <= index <= end_section:
-                section._add_control_surface(control_surface)
+                section.control_surface = control_surface
 
     def __getitem__(self, key):
         return self.sections[key]
@@ -151,59 +145,64 @@ class Surface():
 
     @property
     def _ref_string(self):
-        string = """all
-0.0                      Mach
-0     0     0.0          iYsym  iZsym  Zsym
-{0} {1}  {2}          Sref   Cref   Bref   reference area, chord, span
-{3} {4}   {5}          Xref   Yref   Zref   moment reference location (arb.)
-0.020                    CDoref
-#
-#==============================================================""".format(
-           self.area, self.cord, self.span, self.x_reference_coordinate,
-           self.y_ref, self.z_ref)
+        list = ["all",
+                "0.0                      Mach",
+                "0     0     0.0          iYsym  iZsym  Zsym",
+                f"{self.area} {self.cord}  {self.span}          "
+                "Sref   Cref   Bref   reference area, chord, span",
+                f"{self.x_reference_coordinate} {self.y_ref}   {self.z_ref}"
+                "          Xref   Yref   Zref   moment reference location (arb.)",
+                "0.020                    CDoref",
+                "#",
+                "#" + "=" * 62,
+                ]
 
-        return string
+        return "\n".join(list)
 
 
     @property
     def _top_string(self):
 
 
-        string  = """
-#
-SURFACE
-{0}
-{1}  {2}  {3}  {4}  !  Nchord   Cspace   Nspan  Sspace
-#
-# reflect image wing about y=0 plane
-YDUPLICATE
-     {5}
-#
-# twist angle bias for whole surface
-ANGLE
-     {6}
-#
-# x,y,z bias for whole surface
-TRANSLATE
-    {7}     {8}     {9}
-#--------------------------------------------------------------""".format(
-           self.name, self.number_cord, self.cord_distribution,
-           self.number_span, self.span_distribution,
-           int(self.reflect_surface), self.angle_bias,
-           self.x, self.y, self.z)
-        return string
+        list  = ["#",
+                 "SURFACE",
+                 f"{self.name}",
+                 f"{self.number_cord}  {self.cord_distribution}"
+                 f"  {self.number_span}  {self.span_distribution}"
+                 "  !  Nchord   Cspace   Nspan  Sspace",
+                 "#",
+                 "# reflect image wing about y=0 plane",
+                 "YDUPLICATE",
+                 f"     {int(self.reflect_surface)}",
+                 "#",
+                 "# twist angle bias for whole surface",
+                 "ANGLE",
+                 f"     {self.angle_bias}",
+                 "#",
+                 "# x,y,z bias for whole surface",
+                 "TRANSLATE",
+                 f"    {self.x}     {self.y}     {self.z}",
+                 "#" + "-" * 62,
+                ]
+
+        return "\n".join(list)
 
     def __str__(self):
-        surface_string = self._ref_string + self._top_string
+        surface_string = "\n".join([self._ref_string, self._top_string])
 
         for section in self.sections:
-            section_string = str(section) + "\n#-----------------------"
-            surface_string += ("\n" + section_string)
+            list = [section.to_avl_string(),
+                    "#-----------------------",
+                    ]
+            surface_string += ("\n" + "\n".join(list))
 
         return surface_string
 
     def __len__(self):
         return len(self.sections)
+
+    def get_plot_coordinates(self):
+        pass
 
 
 class Section():
@@ -216,12 +215,21 @@ class Section():
         self.y = 0
         self.z = 0
         self.twist_angle = 0
+        self._control_surface = None
 
     def add_aerofoil(self, aerofoil_file_path: str):
         self.aerofoil = aerofoil_file_path
 
-    def _add_control_surface(self, control_surface: 'ControlSurface'):
-        self.control_surface = control_surface
+    @property
+    def control_surface(self):
+        if self._control_surface:
+            return self._control_surface
+        else:
+            raise NoControlSurfaceError
+
+    @control_surface.setter
+    def control_surface(self, control_surface: 'ControlSurface'):
+        self._control_surface = control_surface
 
     def translation_bias(self, x, y, z):
         """
@@ -231,11 +239,12 @@ class Section():
         self.y = y
         self.z = z
 
-    def __str__(self):
+    def to_avl_string(self):
 
         try:
-            control_surface = "CONTROL\n" + str(self.control_surface)
-        except AttributeError:
+            control_surface_string = self.control_surface.to_avl_string()
+            control_surface = f"CONTROL\n{control_surface_string}"
+        except NoControlSurfaceError:
             control_surface = ""
 
         try:
@@ -244,21 +253,17 @@ class Section():
             aerofoil = ""
 
 
-        string = """#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
-SECTION
-     {0}     {1}     {2}     {3}         {4}
-{5}
-AFIL
-{6}""".format(self.x,
-           self.y,
-           self.z,
-           self.cord,
-           self.twist_angle,
-           str(control_surface),
-           aerofoil)
+        lines = ["#    Xle         Yle         Zle         chord       angle   "
+                 "Nspan  Sspace",
+                 "SECTION",
+                 f"     {self.x}     {self.y}     {self.z}     {self.cord}"
+                 f"         {self.twist_angle}",
+                 f"{control_surface}",
+                 "AFIL",
+                 f"{aerofoil}"]
 
-        return string
 
+        return "\n".join(lines)
 
 
 class ControlSurface():
@@ -283,21 +288,24 @@ class ControlSurface():
         self.deflection_type = deflection_type
         self.gain = gain
 
-    def __str__(self):
+    def to_avl_string(self):
         """
         represents class as a string type for AVL use in .avl file
         """
 
         string = "{0}  {1}  {2}   {3} {4} {5}   {6}".format(
-                                                        self.name,
-                                                        self.gain,
-                                                        self.xhinge,
-                                                        self.rotation_axis[0],
-                                                        self.rotation_axis[1],
-                                                        self.rotation_axis[2],
-                                                        self.deflection_type.value)
+                                                    self.name,
+                                                    self.gain,
+                                                    self.xhinge,
+                                                    self.rotation_axis[0],
+                                                    self.rotation_axis[1],
+                                                    self.rotation_axis[2],
+                                                    self.deflection_type.value)
 
         return string
+
+    def __str__(self):
+        return self.to_avl_string()
 
 
 
@@ -311,60 +319,6 @@ class ControlDeflectionType(Enum):
     """
     SYMMETRIC = 1
     ANTISYMETRIC = -1
-
-def create_run_file(mass, velocity, x_center_of_gravity, cl_trim):
-
-    string = """---------------------------------------------
- Run case  1:   case_1
-
- alpha        ->  alpha          =  0.0
- beta         ->  beta        =   0.00000
- pb/2V        ->  pb/2V       =   0.00000
- qc/2V        ->  qc/2V       =   0.00000
- rb/2V        ->  rb/2V       =   0.00000
- aileron      ->  Cl roll mom =   0.00000
- elevator     ->  Cm pitchmom =   0.00000
- rudder       ->  Cn yaw  mom =   0.00000
-
- alpha     = -0.145500     deg
- beta      =   0.00000     deg
- pb/2V     =   0.00000
- qc/2V     =   0.00000
- rb/2V     = -0.282696E-35
- CL        =  {3}
- CDo       =  0.835000E-02
- bank      =   0.00000     deg
- elevation =   0.00000     deg
- heading   =   0.00000     deg
- Mach      =   0.00000
- velocity  =   {0}     m/s
- density   =  1.225 kg/m^3
- grav.acc. =   9.81     m/s^2
- turn_rad. =   0.00000     ft
- load_fac. =   1.00000
- X_cg      =  {1}
- Y_cg      =   0.00000
- Z_cg      =  0
- mass      =  {2}     kg
- Ixx       =   1.35000     slug-ft^2
- Iyy       =  0.750900     slug-ft^2
- Izz       =   2.09500     slug-ft^2
- Ixy       =   0.00000     slug-ft^2
- Iyz       =   0.00000     slug-ft^2
- Izx       =   0.00000     slug-ft^2
- visc CL_a =   0.00000
- visc CL_u =   0.00000
- visc CM_a =   0.00000
- visc CM_u =   0.00000
-""".format(velocity, x_center_of_gravity, mass, cl_trim)
-    return string
-
-
-
-
-
-
-
 
 
 
