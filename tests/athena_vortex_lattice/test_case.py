@@ -7,6 +7,15 @@ import unittest
 import uav_design_system.athena_vortex_lattice as avl
 
 
+def get_resource_content(file_name):
+    """
+    function to retrieve data from files in the resource folder for these tests
+    """
+    resources_directory = join(this_directory, "resources", "case_resources")
+    with open(join(resources_directory, file_name)) as open_file:
+        return open_file.read()
+
+
 class TestCase(unittest.TestCase):
 
 
@@ -86,53 +95,16 @@ class TestCase(unittest.TestCase):
         trim_case = avl.TrimCase(1)
         trim_case.to_file(file_name)
 
-        expected_string = """---------------------------------------------
- Run case  1:  0 deg. bank
-
- alpha        ->  CL          =  0.08
- beta         ->  Cl roll mom =   0.00000
- pb/2V        ->  pb/2V       =   0.00000
- qc/2V        ->  qc/2V       =   0.00000  s
- rb/2V        ->  rb/2V       =   0.00000
- elevator     ->  Cm pitchmom =   0.00000
-
-CL = 0.08
-alpha = 0
-beta = 0
-pb/2V = 0
-qc/2V = 0
-rb/2V = 0
-CDo = 0
-bank = 0
-elevation = 0
-heading = 0
-Mach = 0
-velocity = 5
-density = 1
-grav.acc. = 1
-turn_rad. = 0
-load_fac. = 1
-X_cg = 0
-Y_cg = 0
-Z_cg = 0
-mass = 1
-Ixx = 0
-Iyy = 0
-Izz = 0
-Ixy = 0
-Iyz = 0
-Izx = 0
-visc CL_a = 0
-visc CL_u = 0
-visc CM_a = 0
-visc CM_u = 0
-"""
+        expected_string = get_resource_content("case_to_file.txt")
 
         with open(file_name) as open_file:
             actual_string = open_file.read()
+        self.maxDiff = None
 
         self.assertEqual(expected_string.strip(), actual_string.strip())
         remove(file_name)
+
+
 
 
 if __name__ == "__main__":

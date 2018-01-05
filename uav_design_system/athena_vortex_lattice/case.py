@@ -123,13 +123,14 @@ class TrimCase():
  Run case  1:  0 deg. bank
 
  alpha        ->  CL          =  {0}
- beta         ->  Cl roll mom =   0.00000
+ beta         ->  beta =   0.00000
  pb/2V        ->  pb/2V       =   0.00000
  qc/2V        ->  qc/2V       =   0.00000
  rb/2V        ->  rb/2V       =   0.00000
  elevator     ->  Cm pitchmom =   0.00000
 
 """.format(self["cl"])
+
 
         bottom_string = ""
 
