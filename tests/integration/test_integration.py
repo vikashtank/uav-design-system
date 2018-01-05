@@ -19,12 +19,16 @@ class Test(unittest.TestCase):
         self.test_folder = join(this_directory, "test_folder")
         makedirs(self.test_folder)
 
+        self.results_dir = join(this_directory, "results")
+        makedirs(self.results_dir)
+
         # create temporary file names
         self.wing_file = join(self.test_folder, "wing.avl")
         self.mass_file = join(self.test_folder, "mass.mass")
         self.run_file = join(self.test_folder, "wing.run")
 
     def tearDown(self):
+        rmtree(self.results_dir)
         rmtree(self.test_folder)
 
     def test_integration(self):
@@ -47,9 +51,10 @@ class Test(unittest.TestCase):
         control_surface = avl.ControlSurface("elevator", 0.3, [0, 1, 0], avl.ControlDeflectionType.SYMMETRIC)
         surface.add_section(section1, section2, section3)
         surface.add_control_surface(control_surface, 1, 2)
+        surface.reflect_surface = True
 
         with open(self.wing_file, "w") as open_file:
-            open_file.write(str(surface))
+            open_file.write(surface.to_avl_string())
 
         # create a mass file ---------------------------------------------------
         # create sustructure from wing
@@ -68,6 +73,15 @@ class Test(unittest.TestCase):
         case.to_file(self.run_file)
         layout.create_mass_file(self.mass_file, arrangement, case)
 
+
+        # run through athena
+
+        avl_runner = avl.AVLRunner()
+        avl_runner.setup_analysis(self.wing_file,
+                                  self.mass_file,
+                                  self.run_file)
+        results = avl_runner.generate_results(self. results_dir)
+        print(results)
 
 
 
