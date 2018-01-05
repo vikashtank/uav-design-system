@@ -119,24 +119,24 @@ class TrimCase():
 
     def to_file(self, file_name):
 
-        top_string = """---------------------------------------------
- Run case  1:  0 deg. bank
+        list = ["---------------------------------------------",
+                      " Run case  1:  0 deg. bank",
+                      "",
+                      f" alpha        ->  CL          =  {self['cl']}",
+                      " beta         ->  beta =   0.00000",
+                      " pb/2V        ->  pb/2V       =   0.00000",
+                      " qc/2V        ->  qc/2V       =   0.00000",
+                      " rb/2V        ->  rb/2V       =   0.00000",
+                      " elevator     ->  Cm pitchmom =   0.00000",
+                     ]
 
- alpha        ->  CL          =  {0}
- beta         ->  beta =   0.00000
- pb/2V        ->  pb/2V       =   0.00000
- qc/2V        ->  qc/2V       =   0.00000
- rb/2V        ->  rb/2V       =   0.00000
- elevator     ->  Cm pitchmom =   0.00000
-
-""".format(self["cl"])
-
+        top_string = "\n".join(list) + "\n"
 
         bottom_string = ""
 
         for key, value in self._case_parameters.items():
             line = "{0} = {1}".format(TrimCase.ALIASDICT[key], value)
-            bottom_string += (line + "\n")
+            bottom_string += ("\n" + line)
 
         with open(file_name, "w") as open_file:
             open_file.write(top_string + bottom_string)
