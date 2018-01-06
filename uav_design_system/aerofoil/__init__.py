@@ -1,1 +1,1 @@
-from .aerofoil import Aerofoil
+from .aerofoil import *
