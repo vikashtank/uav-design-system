@@ -160,7 +160,10 @@ class Aerofoil():
 
         return boolean
 
-
+    def __mul__(self, value: float):
+        new_pressure_surface = self.pressure_surface * value
+        new_suction_surface = self.suction_surface * value
+        return Aerofoil(new_suction_surface, new_pressure_surface)
 
 
 class Surface():
@@ -211,3 +214,9 @@ class Surface():
         create a bezier curve class from the nodes
         """
         return bezier.Curve(self.nodes, degree = self.degree)
+
+    def __mul__(self, value: float):
+
+        new_nodes = self.nodes * value
+
+        return Surface(new_nodes, self.degree)

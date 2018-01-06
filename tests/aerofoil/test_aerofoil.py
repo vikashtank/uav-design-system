@@ -10,11 +10,11 @@ import numpy as np
 class TestAerofoil(unittest.TestCase):
 
     def setUp(self):
-        nodes1 = np.asfortranarray([[0, 0], [0.5, 0], [1, 0]])
-        nodes2 = np.asfortranarray([[0, 0], [0.5, 0.5], [1, 1]])
+        self.nodes1 = np.asfortranarray([[0, 0], [0.5, 0], [1, 0]])
+        self.nodes2 = np.asfortranarray([[0, 0], [0.5, 0.5], [1, 1]])
 
-        p_surface = aerofoil.Surface(nodes1, degree = 1)
-        s_surface = aerofoil.Surface(nodes2, degree = 1)
+        p_surface = aerofoil.Surface(self.nodes1, degree = 1)
+        s_surface = aerofoil.Surface(self.nodes2, degree = 1)
         self.aerofoil = aerofoil.Aerofoil(s_surface, p_surface)
 
     def tearDown(self):
@@ -72,6 +72,19 @@ class TestAerofoil(unittest.TestCase):
         rectangle.location = layout.Point2D(0.1, 0.05)
         self.assertTrue(aero.check_fits(rectangle))
 
+    def test_multiply(self):
+        new_aerofoil  = self.aerofoil * 3
+        ps_nodes = new_aerofoil.pressure_surface.nodes
+        ss_nodes = new_aerofoil.suction_surface.nodes
+
+        for i in range(3):
+            for j in [0, 1]:
+                self.assertEqual(ps_nodes[i][j], self.nodes1[i][j] * 3)
+
+        for i in range(3):
+            for j in [0, 1]:
+                self.assertEqual(ss_nodes[i][j], self.nodes2[i][j] * 3)
+
 
 class TestSurface(unittest.TestCase):
 
@@ -100,6 +113,21 @@ class TestSurface(unittest.TestCase):
             self.assertAlmostEqual(x[i], 0.01 * i)
             self.assertAlmostEqual(y[i], 0.01 * i)
 
+    def test_multiply(self):
+        new_surface = self.p_surface * 2
+        expected_nodes = np.asfortranarray([[0, 0], [1, 0], [2, 0]])
+
+        for i in range(3):
+            for j in [0, 1]:
+                self.assertEqual(new_surface.nodes[i][j], expected_nodes[i][j])
+
+
+        new_surface = self.p_surface * 3
+        expected_nodes = np.asfortranarray([[0, 0], [1.5, 0], [3, 0]])
+
+        for i in range(3):
+            for j in [0, 1]:
+                self.assertEqual(new_surface.nodes[i][j], expected_nodes[i][j])
 
 
 
