@@ -21,7 +21,10 @@ class TestAerofoil(unittest.TestCase):
         pass
 
     def test_get_top_bottom(self):
-
+        """
+        test function returns the upper surface y and lower surface y from a
+        x coordinate
+        """
         y_pressure, y_suction = self.aerofoil.get_maxmin_y(0.5, x0 = np.float(0.2))
 
         self.assertEqual(y_pressure, 0)
@@ -35,6 +38,9 @@ class TestAerofoil(unittest.TestCase):
         self.assertAlmostEqual(y_suction, 0.156091116794)
 
     def test_fits_false(self):
+        """
+        tests that the rectangle does not fit inside the aerofoil
+        """
         rectangle = layout.Rectangle(1, 1)
         self.assertFalse(self.aerofoil.check_fits(rectangle))
 
@@ -47,7 +53,10 @@ class TestAerofoil(unittest.TestCase):
         self.assertFalse(self.aerofoil.check_fits(rectangle))
 
     def test_fits_false_outrange(self):
-
+        """
+        tests function returns false when the rectangle is not within the x
+        range of the aerofoil
+        """
         rectangle = layout.Rectangle(0.5, 0.5)
         rectangle.location = layout.Point2D(1, 0)
         self.assertFalse(self.aerofoil.check_fits(rectangle))
@@ -57,7 +66,9 @@ class TestAerofoil(unittest.TestCase):
         self.assertFalse(self.aerofoil.check_fits(rectangle))
 
     def test_fits_true(self):
-
+        """
+        tests where rectangles do fit inside a dummy aerofoil class
+        """
         rectangle = layout.Rectangle(0.3, 0.3)
         rectangle.location = layout.Point2D(0.5, 0.1)
         self.assertTrue(self.aerofoil.check_fits(rectangle))
@@ -67,12 +78,18 @@ class TestAerofoil(unittest.TestCase):
         self.assertTrue(self.aerofoil.check_fits(rectangle))
 
     def test_fits_true_real_aerofoil(self):
+        """
+        test rectangle fits into an actual aerofoil shape
+        """
         aero = aerofoil.Aerofoil.develop_aerofoil(0.2, -0.2, 0.2, 0.2, 0.2)
         rectangle = layout.Rectangle(0.1, 0.1)
         rectangle.location = layout.Point2D(0.1, 0.05)
         self.assertTrue(aero.check_fits(rectangle))
 
     def test_multiply(self):
+        """
+        tests aerofoil can be scaled by multiplication
+        """
         new_aerofoil  = self.aerofoil * 3
         ps_nodes = new_aerofoil.pressure_surface.nodes
         ss_nodes = new_aerofoil.suction_surface.nodes
@@ -114,6 +131,9 @@ class TestSurface(unittest.TestCase):
             self.assertAlmostEqual(y[i], 0.01 * i)
 
     def test_multiply(self):
+        """
+        test surface can be scaled by multiplication
+        """
         new_surface = self.p_surface * 2
         expected_nodes = np.asfortranarray([[0, 0], [1, 0], [2, 0]])
 

@@ -119,7 +119,6 @@ class Aerofoil():
         for i in all_points:
             open_file.write(f"{i[0]} {i[1]}\n")
 
-
     def check_fits(self, shape: "TwoDimentional"):
         """
         checks that a 2D shape fits inside this aerofoil
@@ -156,11 +155,13 @@ class Aerofoil():
             if y[index] >= y_bottom:
                 return False
 
-
-
         return boolean
 
     def __mul__(self, value: float):
+        """
+        return a new aerofoil scaled with value (x and y coordinates multiplied
+        by value)
+        """
         new_pressure_surface = self.pressure_surface * value
         new_suction_surface = self.suction_surface * value
         return Aerofoil(new_suction_surface, new_pressure_surface)
@@ -216,7 +217,10 @@ class Surface():
         return bezier.Curve(self.nodes, degree = self.degree)
 
     def __mul__(self, value: float):
-
+        """
+        scale the nodes of this surface class and return a new instance (x and y
+        coordinates multiplied by value)
+        """
         new_nodes = self.nodes * value
 
         return Surface(new_nodes, self.degree)
