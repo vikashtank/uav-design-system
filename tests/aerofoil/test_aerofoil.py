@@ -4,9 +4,8 @@ this_directory = dirname(abspath(__file__))
 import sys
 sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
 import unittest
-from uav_design_system import aerofoil
+from uav_design_system import aerofoil, layout
 import numpy as np
-
 
 class TestAerofoil(unittest.TestCase):
 
@@ -34,6 +33,45 @@ class TestAerofoil(unittest.TestCase):
         y_pressure, y_suction = aero.get_maxmin_y(0.5, x0 = np.float(0.2))
         self.assertAlmostEqual(y_pressure, 0.0712798523671)
         self.assertAlmostEqual(y_suction, 0.156091116794)
+
+    def test_fits_false(self):
+        rectangle = layout.Rectangle(1, 1)
+        self.assertFalse(self.aerofoil.check_fits(rectangle))
+
+        rectangle = layout.Rectangle(0.5, 0.5)
+        rectangle.location = layout.Point2D(0.5, 0.5)
+        self.assertFalse(self.aerofoil.check_fits(rectangle))
+
+        rectangle = layout.Rectangle(0.5, 0.5)
+        rectangle.location = layout.Point2D(0.75, 0)
+        self.assertFalse(self.aerofoil.check_fits(rectangle))
+
+    def test_fits_false_outrange(self):
+
+        rectangle = layout.Rectangle(0.5, 0.5)
+        rectangle.location = layout.Point2D(1, 0)
+        self.assertFalse(self.aerofoil.check_fits(rectangle))
+
+        rectangle = layout.Rectangle(0.5, 0.5)
+        rectangle.location = layout.Point2D(2, 0)
+        self.assertFalse(self.aerofoil.check_fits(rectangle))
+
+    def test_fits_true(self):
+
+        rectangle = layout.Rectangle(0.3, 0.3)
+        rectangle.location = layout.Point2D(0.5, 0.1)
+        self.assertTrue(self.aerofoil.check_fits(rectangle))
+
+        rectangle = layout.Rectangle(0.5, 0.5)
+        rectangle.location = layout.Point2D(0.75, 0.25)
+        self.assertTrue(self.aerofoil.check_fits(rectangle))
+
+    def test_fits_true_real_aerofoil(self):
+        aero = aerofoil.Aerofoil.develop_aerofoil(0.2, -0.2, 0.2, 0.2, 0.2)
+        rectangle = layout.Rectangle(0.1, 0.1)
+        rectangle.location = layout.Point2D(0.1, 0.05)
+        self.assertTrue(aero.check_fits(rectangle))
+
 
 class TestSurface(unittest.TestCase):
 
