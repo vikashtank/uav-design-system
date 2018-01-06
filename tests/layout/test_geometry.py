@@ -51,6 +51,11 @@ class TestCuboid(unittest.TestCase):
         self.assertEqual(self.cuboid.reflect_y().centroid,
                          geometry.Point(1, -1.5, 2))
 
+    def test_get_xz_projection(self):
+
+        self.assertEqual(self.cuboid.project_xz.x_size, 2)
+        self.assertEqual(self.cuboid.project_xz.y_size, 4)
+
 
 class TestCylinder(unittest.TestCase):
 
@@ -177,6 +182,28 @@ class TestPoint(unittest.TestCase):
         point1 = geometry.Point(1, 2, 3)
         self.assertEqual(point1.reflect_y(),
                          geometry.Point(1, -2, 3))
+
+
+class TestPoint2D(unittest.TestCase):
+
+    def test_equals(self):
+
+        point1 = geometry.Point2D(1, 2)
+        point2 = geometry.Point2D(1, 2)
+        self.assertEqual(point1, point2)
+
+    def test_add(self):
+
+        point1 = geometry.Point2D(1, 2)
+        point2 = geometry.Point2D(1, 2)
+        point3 = point1 + point2
+        self.assertEqual(point3.x, 2)
+        self.assertEqual(point3.y, 4)
+
+    def test_reflect_y(self):
+        point1 = geometry.Point2D(1, 2)
+        self.assertEqual(point1.reflect_y(),
+                         geometry.Point2D(1, -2))
 
 
 

@@ -6,20 +6,26 @@ from math import pi
 class ThreeDimentional:
     pass
 
+class TwoDimentional:
+    pass
+
 class Cuboid(ThreeDimentional):
 
     def __init__(self, x_size: float, y_size: float, z_size: float):
         self.x_size = x_size
         self.y_size = y_size
         self.z_size = z_size
+        self.location = Point(0, 0, 0)
 
     @property
     def volume(self):
         return abs(self.x_size * self.y_size * self.z_size)
 
     @property
-    def project_xy(self):
-        pass
+    def project_xz(self):
+        rectangle = Rectangle(self.x_size, self.z_size)
+        rectangle.location =  Point2D(self.location.x, self.location.z)
+        return rectangle
 
     @property
     def centroid(self):
@@ -60,6 +66,7 @@ class Cylinder(ThreeDimentional):
     def __init__(self, radius: float, y_size: float):
         self.radius = radius
         self.y_size = y_size
+        self.location = Point(0, 0, 0)
 
     @property
     def volume(self):
@@ -102,6 +109,7 @@ class TrapeziumPlate(ThreeDimentional):
         self.x_shift = x_shift
         self.y_size = y_size
         self.z_size = z_size #thickness size
+        self.location = Point(0, 0, 0)
 
     @property
     def volume(self):
@@ -157,6 +165,21 @@ class TrapeziumPlate(ThreeDimentional):
                               -1 * self.y_size,
                               self.z_size,)
 
+class Rectangle(TwoDimentional):
+
+    def __init__(self, x: float, y:float):
+        self.x_size = x
+        self.y_size = y
+        self.location = Point(0, 0, 0)
+
+    @property
+    def area(self):
+        return abs(self.x * self.y)
+
+    @property
+    def centroid(self):
+        return Point(self.x * 0.5, self.y * 0.5)
+
 
 class Point():
 
@@ -189,3 +212,33 @@ class Point():
 
     def reflect_y(self):
         return Point(self.x, -1 * self.y, self.z)
+
+class Point2D():
+
+    def __init__(self, x: float, y: float):
+        self.x = x
+        self.y = y
+
+    def as_tuple(self):
+        return self.x, self.y
+
+    def __eq__(self, value: 'Point2D'):
+        """
+        checks if two points are located at the same place
+        """
+        if self.x == value.x and self.y == value.y:
+            is_equal = True
+        else:
+            is_equal = False
+
+        return is_equal
+
+    def __add__(self, value: 'Point'):
+
+        x = self.x + value.x
+        y = self.y + value.y
+
+        return Point2D(x, y)
+
+    def reflect_y(self):
+        return Point2D(self.x, -1 * self.y)

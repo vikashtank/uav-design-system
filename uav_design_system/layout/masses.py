@@ -113,21 +113,21 @@ class MassObject(IsArrangeable):
 
     @property
     def center_of_gravity_global(self):
-        return self.geometry.centroid + self._location
+        return self.geometry.centroid + self.location
 
     @property
     def location(self):
         """
         get the global position of the origin of this object
         """
-        return self._location
+        return self.geometry.location
 
     @location.setter
     def location(self, value: 'Point'):
         """
         set the global position of the origin of this object
         """
-        self._location = value
+        self.geometry.location = value
 
     @property
     def inertia_xx(self):
