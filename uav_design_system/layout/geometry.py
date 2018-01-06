@@ -216,9 +216,9 @@ class Rectangle(TwoDimentional):
         return x < x_left or x > x_right
 
     def get_y_vals(self, x):
-
-
-
+        """
+        return the y value from the input x value
+        """
         if self.is_x_inbound(x):
             raise OutOfBoundsError(f"{x} is not within rectangle")
         else:
@@ -226,6 +226,20 @@ class Rectangle(TwoDimentional):
             y_bottom  = self.bottom_left_point.y
 
         return y_top, y_bottom
+
+    @property
+    def plot_coordinates(self):
+        x = [self.bottom_left_point.x,
+             self.top_left_point.x,
+             self.top_right_point.x,
+             self.bottom_right_point.x]
+
+        y = [self.bottom_left_point.y,
+             self.top_left_point.y,
+             self.top_right_point.y,
+             self.bottom_right_point.y]
+
+        return x,y
 
 
 
