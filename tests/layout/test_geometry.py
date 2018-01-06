@@ -161,6 +161,70 @@ class TestTrapeziumPlate(unittest.TestCase):
         self.assertEqual(self.trapezium.reflect_y().centroid,
                          geometry.Point(38/15, -7/3, 0.5))
 
+
+class TestRectangle(unittest.TestCase):
+
+    def setUp(self):
+        self.rectangle = geometry.Rectangle(5, 10)
+
+    def test_area(self):
+        self.assertEqual(self.rectangle.area, 50)
+
+    def test_centroid(self):
+        self.assertEqual(self.rectangle.centroid, geometry.Point2D(2.5, 5))
+
+    def test_area_negative(self):
+        """
+        get area when the x value is negative
+        """
+        self.rectangle = geometry.Rectangle(-5, 10)
+        self.assertEqual(self.rectangle.area, 50)
+
+    def test_centroid_negative(self):
+        """
+        get centroid when the x value is negative
+        """
+        self.rectangle = geometry.Rectangle(-5, 10)
+        self.assertEqual(self.rectangle.centroid, geometry.Point2D(-2.5, 5))
+
+    def test_corner_points(self):
+        """
+        test that the corner point properties are correct
+        """
+        self.assertEqual(self.rectangle.top_left_point, geometry.Point2D(0, 10))
+        self.assertEqual(self.rectangle.top_right_point, geometry.Point2D(5, 10))
+
+        self.assertEqual(self.rectangle.bottom_left_point, geometry.Point2D(0, 0))
+        self.assertEqual(self.rectangle.bottom_right_point, geometry.Point2D(5, 0))
+
+    def test_corner_points_shifted(self):
+        """
+        test the corner points are obtained when the objects location is not
+        the default value
+        """
+        self.rectangle.location = geometry.Point2D(10, 0)
+
+        self.assertEqual(self.rectangle.top_left_point, geometry.Point2D(10, 10))
+        self.assertEqual(self.rectangle.top_right_point, geometry.Point2D(15, 10))
+
+        self.assertEqual(self.rectangle.bottom_left_point, geometry.Point2D(10, 0))
+        self.assertEqual(self.rectangle.bottom_right_point, geometry.Point2D(15, 0))
+
+
+    def test_get_y_vals(self):
+
+        self.assertEqual(self.rectangle.get_y_vals(0.01), (10, 0) )
+        self.assertEqual(self.rectangle.get_y_vals(4.99), (10, 0) )
+
+    def test_get_y_vals_fail(self):
+
+        with self.assertRaises(geometry.OutOfBoundsError):
+            self.rectangle.get_y_vals(-0.01)
+
+        with self.assertRaises(geometry.OutOfBoundsError):
+            self.rectangle.get_y_vals(5.01)
+
+
 class TestPoint(unittest.TestCase):
 
     def test_equals(self):

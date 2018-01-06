@@ -9,6 +9,9 @@ class ThreeDimentional:
 class TwoDimentional:
     pass
 
+class OutOfBoundsError(Exception):
+    pass
+
 class Cuboid(ThreeDimentional):
 
     def __init__(self, x_size: float, y_size: float, z_size: float):
@@ -60,6 +63,7 @@ class Cuboid(ThreeDimentional):
         create a new object of this class but reflected in the y axis
         """
         return Cuboid(self.x_size, -1 * self.y_size, self.z_size)
+
 
 class Cylinder(ThreeDimentional):
 
@@ -170,15 +174,59 @@ class Rectangle(TwoDimentional):
     def __init__(self, x: float, y:float):
         self.x_size = x
         self.y_size = y
-        self.location = Point(0, 0, 0)
+        self._location = Point2D(0, 0)
 
     @property
     def area(self):
-        return abs(self.x * self.y)
+        return abs(self.x_size * self.y_size)
 
     @property
     def centroid(self):
-        return Point(self.x * 0.5, self.y * 0.5)
+        return Point2D(self.x_size * 0.5, self.y_size * 0.5)
+
+    @property
+    def top_left_point(self):
+        return Point2D(0, self.y_size) + self.location
+
+    @property
+    def bottom_left_point(self):
+        return self.location
+
+    @property
+    def top_right_point(self):
+        return Point2D(self.x_size, self.y_size) + self.location
+
+    @property
+    def bottom_right_point(self):
+        return Point2D(self.x_size, 0) + self.location
+
+    @property
+    def location(self):
+        return self._location
+
+    @location.setter
+    def location(self, value: "Point2D"):
+        self._location = value
+
+    def is_x_inbound(self, x):
+
+        x_left = self.location.x
+        x_right = self.location.x + self.x_size
+
+        return x < x_left or x > x_right
+
+    def get_y_vals(self, x):
+
+
+
+        if self.is_x_inbound(x):
+            raise OutOfBoundsError(f"{x} is not within rectangle")
+        else:
+            y_top = self.top_left_point.y
+            y_bottom  = self.bottom_left_point.y
+
+        return y_top, y_bottom
+
 
 
 class Point():
