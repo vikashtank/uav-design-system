@@ -4,6 +4,7 @@ import numpy as np
 import bezier
 import scipy.optimize as opt
 
+
 class Aerofoil():
     """
     Class that represents an Aerofoil
@@ -75,8 +76,6 @@ class Aerofoil():
         gets the top surface y coordinate and bottom surface y coordinate at a
         given x
         """
-        pressure_surface = self.pressure_surface.bezier
-        suction_surface = self.suction_surface.bezier
 
         y_pressure, _ = self.pressure_surface.get_y(x_target, **kwargs)
         y_suction, _ = self.suction_surface.get_y(x_target, **kwargs)
@@ -119,6 +118,49 @@ class Aerofoil():
 
         for i in all_points:
             open_file.write(f"{i[0]} {i[1]}\n")
+
+
+    def check_fits(self, shape: "TwoDimentional"):
+        """
+        checks that a 2D shape fits inside this aerofoil
+        """
+        x, y = self.suction_surface.get_xy_coords()
+        boolean = True
+
+        # check suction surface
+        skip_number = 0
+        for index, x_val in enumerate(x):
+
+            try:
+                y_top, _ = shape.get_y_vals(x_val)
+            except:
+                skip_number += 1
+                continue
+
+            if y[index] <= y_top:
+                return False
+
+        # for when the whole object is located outside of the aerofoil x range
+        if len(x) == skip_number:
+            return False
+
+        # check pressure surface
+        x, y = self.pressure_surface.get_xy_coords()
+
+        for index, x_val in enumerate(x):
+            try:
+                _, y_bottom = shape.get_y_vals(x_val)
+            except:
+                continue
+
+            if y[index] >= y_bottom:
+                return False
+
+
+
+        return boolean
+
+
 
 
 class Surface():
