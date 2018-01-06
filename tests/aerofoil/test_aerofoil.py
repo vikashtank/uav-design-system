@@ -8,7 +8,7 @@ from uav_design_system import aerofoil
 import numpy as np
 
 
-class Test(unittest.TestCase):
+class TestAerofoil(unittest.TestCase):
 
     def setUp(self):
         nodes1 = np.asfortranarray([[0, 0], [0.5, 0], [1, 0]])
@@ -34,6 +34,35 @@ class Test(unittest.TestCase):
         y_pressure, y_suction = aero.get_maxmin_y(0.5, x0 = np.float(0.2))
         self.assertAlmostEqual(y_pressure, 0.0712798523671)
         self.assertAlmostEqual(y_suction, 0.156091116794)
+
+class TestSurface(unittest.TestCase):
+
+    def setUp(self):
+        nodes1 = np.asfortranarray([[0, 0], [0.5, 0], [1, 0]])
+        nodes2 = np.asfortranarray([[0, 0], [0.5, 0.5], [1, 1]])
+
+        self.p_surface = aerofoil.Surface(nodes1, degree = 1)
+        self.s_surface = aerofoil.Surface(nodes2, degree = 1)
+
+    def test_get_xy_coords_flat(self):
+        """
+        tests get xy coordinares for a flat line
+        """
+        x, y= self.p_surface.get_xy_coords(num_points = 101)
+        for i in range(100):
+            self.assertAlmostEqual(x[i], 0.01*i)
+            self.assertEqual(y[i], 0)
+
+    def test_get_xy_coords_slope(self):
+        """
+        tests get xy coordinares for a sloped line
+        """
+        x, y= self.s_surface.get_xy_coords(num_points = 101)
+        for i in range(100):
+            self.assertAlmostEqual(x[i], 0.01 * i)
+            self.assertAlmostEqual(y[i], 0.01 * i)
+
+
 
 
 if __name__ == "__main__":

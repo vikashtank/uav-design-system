@@ -107,6 +107,9 @@ class Aerofoil():
 
     @property
     def file_title(self):
+        """
+        returns a string that represents this class
+        """
         nodes1 = self.pressure_surface.nodes
         nodes2 = self.suction_surface.nodes
 
@@ -114,7 +117,6 @@ class Aerofoil():
         node2_str = str(nodes2).replace("\n", "").replace(" ", "")
 
         return f"pressure surface: {node1_str}, suction surface: {node2_str}"
-
 
     def write(self, open_file, number_nodes: int = 100):
         """
@@ -132,14 +134,13 @@ class Aerofoil():
         open_file.write(self.file_title + "\n")
 
         points = np.linspace(0, 1, number_nodes)
-        pressure_surface_points = self.pressure_surface.bezier.evaluate_multi(points)
-        suction_surface_points = self.suction_surface.bezier.evaluate_multi(points)
+        p_surface_points = self.pressure_surface.get_xy_coords(points)
+        s_surface_points = self.suction_surface.get_xy_coords(points)[::-1]
 
-        suction_surface_points = suction_surface_points[::-1]
-        all_points = np.concatenate((suction_surface_points,pressure_surface_points))
+        all_points = np.concatenate((s_surface_points, p_surface_points))
 
         for i in all_points:
-            open_file.write("{0} {1}\n".format(i[0], i[1]))
+            open_file.write(f"{i[0]} {i[1]}\n")
 
 
 class Surface():
@@ -150,6 +151,16 @@ class Surface():
     def __init__(self, nodes, degree: int = 2):
         self.nodes = nodes
         self.degree = degree
+
+    def get_xy_coords(self, num_points = 100):
+        """
+        get x and y coordinates of the whole surface
+        """
+        s_vals = np.linspace(0, 1, num_points)
+        points = self.bezier.evaluate_multi(s_vals)
+        x, y = zip(*points)
+
+        return list(x), list(y)
 
     @property
     def bezier(self):
