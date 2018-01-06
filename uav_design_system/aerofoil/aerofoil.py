@@ -69,28 +69,6 @@ class Aerofoil():
 
         return aerofoil
 
-    def get_y(self, surface: "Surface", x: float, **kwargs):
-        """
-        Get the y coordinate of a point given by x
-
-        returns:
-            y coordinate, s value
-        """
-
-        def newton_rap(function, target, **kwargs):
-
-            def get_zero_function(function, target):
-
-                def the_function(x):
-                    coords = function(x)
-                    return coords[0][0] - target
-
-                return the_function
-
-            return opt.newton(get_zero_function(function, target), **kwargs)
-
-        s = newton_rap(surface.evaluate, x, **kwargs)
-        return surface.evaluate(s)[0][1], s
 
     def get_maxmin_y(self, x_target: float, **kwargs):
         """
@@ -100,8 +78,8 @@ class Aerofoil():
         pressure_surface = self.pressure_surface.bezier
         suction_surface = self.suction_surface.bezier
 
-        y_pressure, _ = self.get_y(pressure_surface, x_target, **kwargs)
-        y_suction, _ = self.get_y(suction_surface, x_target, **kwargs)
+        y_pressure, _ = self.pressure_surface.get_y(x_target, **kwargs)
+        y_suction, _ = self.suction_surface.get_y(x_target, **kwargs)
 
         return  y_pressure, y_suction
 
@@ -161,6 +139,29 @@ class Surface():
         x, y = zip(*points)
 
         return list(x), list(y)
+
+    def get_y(self, x: float, **kwargs):
+        """
+        Get the y coordinate of a point given by x
+
+        returns:
+            y coordinate, s value
+        """
+
+        def newton_rap(function, target, **kwargs):
+
+            def get_zero_function(function, target):
+
+                def the_function(x):
+                    coords = function(x)
+                    return coords[0][0] - target
+
+                return the_function
+
+            return opt.newton(get_zero_function(function, target), **kwargs)
+
+        s = newton_rap(self.bezier.evaluate, x, **kwargs)
+        return self.bezier.evaluate(s)[0][1], s
 
     @property
     def bezier(self):
