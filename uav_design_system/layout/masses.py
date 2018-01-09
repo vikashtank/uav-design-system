@@ -38,10 +38,13 @@ class Arrangement(IsArrangeable):
             mass_list = []
             for object in objects:
                 if isinstance(object, Arrangement):
-                    mass_list += _all_mass_objects(object.objects)
+                    new_masses = _all_mass_objects(object.objects)
+                    mass_list += new_masses
                 else:
                     mass_list.append(object)
             return mass_list
+
+
 
         return _all_mass_objects(self.objects)
 
@@ -88,6 +91,15 @@ class Arrangement(IsArrangeable):
 
         return clone
 
+    def __getitem__(self, value):
+
+        val = [ob for ob in self.objects if ob.name == value]
+
+        if not val:
+            raise KeyError(f"no object in arrangement with name {value}")
+
+        return val
+
 
 class MassObject(IsArrangeable):
     """
@@ -98,7 +110,6 @@ class MassObject(IsArrangeable):
         self.name = name
         self.geometry = geometry
         self.density = density
-        self._location = Point(0, 0, 0)
 
     @property
     def mass(self):

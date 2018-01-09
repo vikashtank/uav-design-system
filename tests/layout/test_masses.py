@@ -13,11 +13,11 @@ class TestArrangement(unittest.TestCase):
 
     def setUp(self):
         geometry = layout.Cuboid(1,2,3)
-        mass1 = layout.MassObject(geometry, 1, "name")
-        mass2 = layout.MassObject(geometry, 2, "name")
-        mass3 = layout.MassObject(geometry, 3, "name")
-        mass4 = layout.MassObject(geometry, 4, "name")
-        self.mass_list = [mass1, mass2, mass3, mass4]
+        self.mass1 = layout.MassObject(geometry, 1, "name1")
+        self.mass2 = layout.MassObject(geometry, 2, "name2")
+        self.mass3 = layout.MassObject(geometry, 3, "name3")
+        self.mass4 = layout.MassObject(geometry, 4, "name4")
+        self.mass_list = [self.mass1, self.mass2, self.mass3, self.mass4]
 
     def tearDown(self):
         pass
@@ -55,6 +55,26 @@ class TestArrangement(unittest.TestCase):
         self.assertEqual(len(mass_list), len(self.mass_list))
         for i in range(len(self.mass_list)):
             self.assertEqual(mass_list[i], self.mass_list[i])
+
+    def _test_all_mass_objects_nested_locations(self):
+        """
+        tests obtaining all mass objects within an arrangement, with nested
+        arrangements all with their own locations
+        """
+        sub_arrangement = layout.Arrangement("arrangement1", *self.mass_list)
+        sub_arrangement.location = layout.Point(0, 0, 1)
+        arrangement = layout.Arrangement("arrangement2", sub_arrangement)
+        mass_list = arrangement.all_mass_objects
+
+    def test_getitem(self):
+        arrangement = layout.Arrangement("arrangement1", *self.mass_list)
+        self.assertEqual(arrangement["name1"][0],  self.mass1)
+
+    def test_getitem_missing(self):
+        arrangement = layout.Arrangement("arrangement1", *self.mass_list)
+
+        with self.assertRaises(KeyError):
+            self.assertEqual(arrangement["name"], self.mass1)
 
 
     def test_create_mass_list(self):
