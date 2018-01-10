@@ -5,6 +5,8 @@ import sys
 sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
 import unittest
 import uav_design_system.athena_vortex_lattice as avl
+from uav_design_system import aerofoil
+import shutil
 
 
 def get_resource_content(file_name):
@@ -20,8 +22,14 @@ class DummyAerofoil():
     def __init__(self, name):
         self.name = name
 
+    @property
     def avl_file_name(self):
-        return self.name
+        return f"{self.name}.txt"
+
+    def write(self, file_name):
+        with open(file_name, "w") as open_file:
+            open_file.write("hey")
+
 
 class TestSurface(unittest.TestCase):
 
@@ -195,11 +203,42 @@ class TestSurfaceWrite(unittest.TestCase):
         self.assertEqual(self.surface.to_avl_string().strip(),
                          expected_string.strip())
 
+class TestSurfaceDump(unittest.TestCase):
+
+    def setUp(self):
+        self.temp_dir = join(this_directory, "temp")
+        makedirs(self.temp_dir)
+
+        # create wing with aerofoil
+        self.aerofoil = DummyAerofoil("aerofoil_file")
+        self.surface = avl.Surface("surface1")
+        self.surface.define_mesh(20, 30, 1.0, 1.0)
+
+        section1 = avl.Section(10)
+        section1.aerofoil = self.aerofoil
+
+        section2 = avl.Section(2)
+        section2.aerofoil = self.aerofoil
+
+        section2.translation_bias(0, 10, 0)
+
+        self.surface.add_section(section1, section2)
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir)
+
+    def test_dump(self):
+
+        self.surface.dump_avl_inputs(self.temp_dir)
+
+        self.assertTrue(exists(join(self.temp_dir, "section1_aerofoil.txt")))
+        self.assertTrue(exists(join(self.temp_dir, "surface1.avl")))
+
 
 class TestSection(unittest.TestCase):
 
         def setUp(self):
-            self.aerofoil = DummyAerofoil("hello")
+            self.aerofoil = DummyAerofoil("hey")
             self.section = avl.Section(5)
             self.control_surface = avl.ControlSurface("elevator",
                                                        0.8,
@@ -212,7 +251,7 @@ class TestSection(unittest.TestCase):
             """
             tests that the correct AVL string is produced by the surface
             """
-            string = self.section.to_avl_string()
+            string = self.section._to_avl_string("")
 
             expected_string = get_resource_content("section_to_string.txt")
 
@@ -247,7 +286,7 @@ class TestSection(unittest.TestCase):
             tests that the correct AVL string is produced by the surface
             """
             self.section.control_surface = self.control_surface
-            string = self.section.to_avl_string()
+            string = self.section._to_avl_string("")
             expected_string = get_resource_content("section_to_control.txt")
 
             self.assertEqual(string.strip(), expected_string.strip())
@@ -257,6 +296,7 @@ class TestSection(unittest.TestCase):
 
         def test_trailing_edge_coordinates(self):
             self.assertEqual((5, 0, 0), self.section.trailing_edge_coordinates)
+
 
 class TestControlSurface(unittest.TestCase):
 

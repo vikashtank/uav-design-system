@@ -1,6 +1,7 @@
 import collections
 from enum import Enum
 from typing import List
+from os.path import join
 
 
 class NoControlSurfaceError(Exception):
@@ -11,7 +12,6 @@ class NoSectionError(Exception):
 
 class NoAerofoilError(Exception):
     pass
-
 
 
 class Surface():
@@ -215,8 +215,8 @@ class Surface():
         surface_string = "\n".join([self._ref_string, self._top_string])
 
         # add section strings
-        for section in self.sections:
-            list = [section.to_avl_string(),
+        for i, section in enumerate(self.sections):
+            list = [section._to_avl_string(f"section{i}_aerofoil.txt"),
                     "#" + "-" * 23,
                     ]
             surface_string += ("\n" + "\n".join(list))
@@ -255,8 +255,24 @@ class Surface():
 
         return x, y, z
 
+    def _write_aerofoil_files(self, directory):
+
+        for i, section in enumerate(self):
+            try:
+                section.aerofoil.write(join(directory, f"section{i}_aerofoil.txt"))
+            except NoAerofoilError:
+                continue
+
     def dump_avl_inputs(self, directory: str):
-        pass
+        """
+        dumps the avl and aerofoil files to a directory
+        """
+        avl_file = join(directory, f"{self.name}.avl")
+        with open(avl_file, "w") as open_file:
+            open_file.write(self.to_avl_string())
+        self._write_aerofoil_files(directory)
+
+
 
 class Section():
 
@@ -277,7 +293,7 @@ class Section():
             raise NoAerofoilError
 
     @aerofoil.setter
-    def aerofoil(self, aerofoil):
+    def aerofoil(self, aerofoil: "Aerofoil"):
         self._aerofoil = aerofoil
 
     @property
@@ -307,18 +323,13 @@ class Section():
     def trailing_edge_coordinates(self):
         return self.x + self.cord, self.y, self.z
 
-    def to_avl_string(self):
+    def _to_avl_string(self, aerofoil_file_name):
 
         try:
             control_surface_string = self.control_surface.to_avl_string()
             control_surface = f"CONTROL\n{control_surface_string}"
         except NoControlSurfaceError:
             control_surface = ""
-
-        try:
-            aerofoil = self.aerofoil.avl_file_name()
-        except NoAerofoilError:
-            aerofoil = ""
 
         lines = ["#    Xle         Yle         Zle         chord       angle   "
                  "Nspan  Sspace",
@@ -327,8 +338,7 @@ class Section():
                  f"         {self.twist_angle}",
                  f"{control_surface}",
                  "AFIL",
-                 f"{aerofoil}"]
-
+                 f"{aerofoil_file_name}"]
 
         return "\n".join(lines)
 
