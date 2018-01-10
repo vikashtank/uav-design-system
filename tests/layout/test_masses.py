@@ -43,20 +43,39 @@ class TestArrangement(unittest.TestCase):
         for i in range(len(self.mass_list)):
             self.assertEqual(mass_list[i], self.mass_list[i])
 
-    def test_all_mass_objects_nested(self):
+    def test_all_mass_objects_not_clones(self):
+        """
+        tests the all mass objects method does not clone the masses it outputs
+        """
+        arrangement = layout.Arrangement("arrangement1", *self.mass_list)
+        mass_list = arrangement.all_mass_objects
+
+        for i in range(len(mass_list)):
+
+            self.assertEqual(id(mass_list[i]), id(self.mass_list[i]))
+
+    def test_all_mass_objects_nested_twice(self):
         """
         tests obtaining all mass objects within an arrangement, with nested
         arrangements
         """
-        sub_arrangement = layout.Arrangement("arrangement1", *self.mass_list)
-        arrangement = layout.Arrangement("arrangement2", sub_arrangement)
+        sub_arrangement = layout.Arrangement("arrangement1", *[self.mass1,
+                                                              self.mass2,
+                                                              ])
+        sub_arrangement2 = layout.Arrangement("arrangement2", *[self.mass3,
+                                                               self.mass4,
+                                                               ])
+        arrangement = layout.Arrangement("arrangement3", *[sub_arrangement,
+                                                          sub_arrangement2,
+                                                          ])
+
         mass_list = arrangement.all_mass_objects
 
         self.assertEqual(len(mass_list), len(self.mass_list))
         for i in range(len(self.mass_list)):
             self.assertEqual(mass_list[i], self.mass_list[i])
 
-    def _test_all_mass_objects_nested_locations(self):
+    def test_all_mass_objects_nested(self):
         """
         tests obtaining all mass objects within an arrangement, with nested
         arrangements all with their own locations
@@ -65,6 +84,10 @@ class TestArrangement(unittest.TestCase):
         sub_arrangement.location = layout.Point(0, 0, 1)
         arrangement = layout.Arrangement("arrangement2", sub_arrangement)
         mass_list = arrangement.all_mass_objects
+
+        self.assertEqual(len(mass_list), len(self.mass_list))
+        for i in range(len(self.mass_list)):
+            self.assertEqual(mass_list[i], self.mass_list[i])
 
     def test_getitem(self):
         arrangement = layout.Arrangement("arrangement1", *self.mass_list)
@@ -75,7 +98,6 @@ class TestArrangement(unittest.TestCase):
 
         with self.assertRaises(KeyError):
             self.assertEqual(arrangement["name"], self.mass1)
-
 
     def test_create_mass_list(self):
         arrangement = layout.Arrangement("arrangement1", *self.mass_list)
@@ -117,7 +139,6 @@ class TestArrangement(unittest.TestCase):
         self.assertEqual(arrangement.center_of_gravity,
                         arrangement_clone.center_of_gravity)
 
-
     def test_reflect_y(self):
         """
         tests that the y refelection method creates a new arrangement reflected
@@ -137,6 +158,73 @@ class TestArrangement(unittest.TestCase):
         self.assertEqual(arrangement_reflect.center_of_gravity.y, reflected_cog.y)
         self.assertEqual(arrangement_reflect.center_of_gravity.z, reflected_cog.z)
 
+    def test_len(self):
+        arrangement = layout.Arrangement("arrangement1", *self.mass_list)
+        self.assertEqual(len(arrangement), 4)
+
+    def test_flatten_arrangement_1layer(self):
+        """
+        test flatten maintains arrangement when the arrangement only contains
+        one layer of masses
+        """
+        arrangement = layout.Arrangement("arrangement1", *self.mass_list)
+        flattened_arrangement = arrangement.flatten()
+        mass_list = flattened_arrangement.all_mass_objects
+
+        for i in range(len(mass_list)):
+            self.assertEqual(mass_list[i], self.mass_list[i])
+
+    def test_flatten_arrangement_2layer(self):
+        """
+        test flatten maintains arrangement when the arrangement only contains
+        multiple layers of masses
+        """
+        arrangement = layout.Arrangement("arrangement1", *self.mass_list[0:2])
+        arrangement2 = layout.Arrangement("arrangement2", *self.mass_list[2:])
+        arrangement3 = layout.Arrangement("arrangement3", arrangement,
+                                                          arrangement2,
+                                                          self.mass_list[0])
+        flattened_arrangement = arrangement3.flatten()
+        mass_list = flattened_arrangement.all_mass_objects
+        expected_mass_list = self.mass_list + [self.mass1]
+
+        self.assertEqual(len(flattened_arrangement), 5)
+        for i in range(len(mass_list)):
+            self.assertEqual(mass_list[i], expected_mass_list[i])
+
+    def test_flatten_arrangement_clones(self):
+        """
+        tests the  method clones the masses it outputs
+        """
+        arrangement = layout.Arrangement("arrangement1", *self.mass_list)
+        flattened_arrangement = arrangement.flatten()
+        mass_list = flattened_arrangement.all_mass_objects
+        self.assertEqual(len(flattened_arrangement), 4)
+        for i in range(len(mass_list)):
+            self.assertNotEqual(id(mass_list[i]), id(self.mass_list[i]))
+
+    def test_flatten_arrangement_2layer_locations(self):
+        """
+        test flatten applies correct locations
+        """
+        arrangement = layout.Arrangement("arrangement1", *self.mass_list[0:2])
+        arrangement.location = layout.Point(0, 0, 1)
+        arrangement2 = layout.Arrangement("arrangement2", *self.mass_list[2:])
+        arrangement2.location = layout.Point(0, 0, 2)
+        arrangement3 = layout.Arrangement("arrangement3", arrangement,
+                                                          arrangement2,
+                                                          self.mass_list[0])
+        arrangement3.location = layout.Point(1, 7, 0)
+
+        flattened_arrangement = arrangement3.flatten()
+        mass_list = flattened_arrangement.all_mass_objects
+        expected_mass_list = self.mass_list + [self.mass1]
+
+        self.assertEqual(mass_list[0].location, layout.Point(1, 7 , 1))
+        self.assertEqual(mass_list[1].location, layout.Point(1, 7 , 1))
+        self.assertEqual(mass_list[2].location, layout.Point(1, 7 , 2))
+        self.assertEqual(mass_list[3].location, layout.Point(1, 7 , 2))
+        self.assertEqual(mass_list[4].location, layout.Point(1, 7 , 0))
 
 class TestMassObject(unittest.TestCase):
 
@@ -153,7 +241,6 @@ class TestMassObject(unittest.TestCase):
         mass_object = layout.MassObject(self.geometry, 1, "name")
         self.assertEqual(mass_object.center_of_gravity,
                           layout.Point(0.5, 1, 1.5))
-
 
     def test_default_location(self):
         """
@@ -181,6 +268,11 @@ class TestMassObject(unittest.TestCase):
 
         expected_string = "6   1.5   2.0   2.5    6.5   5.0   2.5"
         self.assertEqual(mass_object.avl_mass_string, expected_string)
+
+    def test_equal(self):
+        mass1 = layout.MassObject(self.geometry, 1, "name")
+        mass2 = layout.MassObject(self.geometry, 1, "name")
+        self.assertEqual(mass1, mass2)
 
 
 if __name__ == "__main__":

@@ -22,7 +22,16 @@ class Arrangement(IsArrangeable):
             self.objects = []
 
 
-        self.location = Point(0, 0, 0)
+        self._location = Point(0, 0, 0)
+
+    @property
+    def location(self):
+        return self._location
+
+    @location.setter
+    def location(self, value):
+
+        self._location = value
 
     def append(self, value: IsArrangeable):
         self.objects.append(value)
@@ -35,18 +44,45 @@ class Arrangement(IsArrangeable):
             generator of all mass objects contained within objects and all masses
             within objects
             """
+
             mass_list = []
             for object in objects:
+
                 if isinstance(object, Arrangement):
-                    new_masses = _all_mass_objects(object.objects)
-                    mass_list += new_masses
+                    mass_list += _all_mass_objects(object.objects)
                 else:
                     mass_list.append(object)
             return mass_list
 
-
-
         return _all_mass_objects(self.objects)
+
+    def flatten(self, name: str = ""):
+        """
+        converts an arrangement of nested arrangements and masses into an
+        arrangement that only contains mass objects, where each mass object has
+        had the location of its parent arrangements added to it.
+
+        returns an arrangement with masses with global locations
+        """
+        def _all_mass_objects_global(arrangement):
+
+            mass_list = []
+            for object in arrangement:
+
+                if isinstance(object, Arrangement):
+                    new_mass_list = _all_mass_objects_global(object)
+                    mass_list += new_mass_list
+                else:
+                    mass_list.append(object)
+
+            # create copies so original instances are not editted
+            cloned_list = [mass.clone() for mass in mass_list]
+            # correct locations to add the arrangements
+            for ob in cloned_list:
+                ob.location += arrangement.location
+            return cloned_list
+
+        return Arrangement(name, *_all_mass_objects_global(self))
 
     @property
     def avl_mass_list(self):
@@ -80,12 +116,9 @@ class Arrangement(IsArrangeable):
         clone and return this object
         """
         clone = copy.deepcopy(self)
-
         if reflect_y:
             # change the locations of all points in the test_clone
-
             for mass in clone.all_mass_objects:
-
                 mass.location = mass.location.reflect_y()
                 mass.geometry = mass.geometry.reflect_y()
 
@@ -99,6 +132,13 @@ class Arrangement(IsArrangeable):
             raise KeyError(f"no object in arrangement with name {value}")
 
         return val
+
+    def __iter__(self):
+        for ob in self.objects:
+            yield ob
+
+    def __len__(self):
+        return len(self.objects)
 
 
 class MassObject(IsArrangeable):
@@ -170,6 +210,16 @@ class MassObject(IsArrangeable):
 
     def clone(self):
         return copy.deepcopy(self)
+
+    def __eq__(self, value):
+
+        return self.name == value.name and \
+               self.location == value.location and \
+               self.density == value.density and \
+               self.center_of_gravity == value.center_of_gravity and \
+               type(self.geometry) == type(value.geometry)
+
+
 
 
 if __name__  == "__main__":
