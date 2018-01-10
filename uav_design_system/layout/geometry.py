@@ -272,8 +272,16 @@ class Point():
 
         return Point(x, y, z)
 
+    def __iadd__(self, value: 'Point'):
+        self.x += value.x
+        self.y += value.y
+        self.z += value.z
+        return self
+
     def reflect_y(self):
         return Point(self.x, -1 * self.y, self.z)
+
+
 
 class Point2D():
 

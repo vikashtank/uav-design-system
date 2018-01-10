@@ -227,24 +227,28 @@ class TestRectangle(unittest.TestCase):
 
 class TestPoint(unittest.TestCase):
 
+    def setUp(self):
+        self.point1 = geometry.Point(1, 2, 3)
+        self.point2 = geometry.Point(1, 2, 3)
+
     def test_equals(self):
 
-        point1 = geometry.Point(1, 2, 3)
-        point2 = geometry.Point(1, 2, 3)
-        self.assertEqual(point1, point2)
+        self.assertEqual(self.point1, self.point2)
 
     def test_add(self):
-
-        point1 = geometry.Point(1, 2, 3)
-        point2 = geometry.Point(1, 2, 3)
-        point3 = point1 + point2
+        point3 = self.point1 + self.point2
         self.assertEqual(point3.x, 2)
         self.assertEqual(point3.y, 4)
         self.assertEqual(point3.z, 6)
 
+    def test_iadd(self):
+        self.point1 += self.point2
+        self.assertEqual(self.point1.x, 2)
+        self.assertEqual(self.point1.y, 4)
+        self.assertEqual(self.point1.z, 6)
+
     def test_reflect_y(self):
-        point1 = geometry.Point(1, 2, 3)
-        self.assertEqual(point1.reflect_y(),
+        self.assertEqual(self.point1.reflect_y(),
                          geometry.Point(1, -2, 3))
 
 
