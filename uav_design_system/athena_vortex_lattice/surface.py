@@ -259,7 +259,8 @@ class Surface():
 
         for i, section in enumerate(self):
             try:
-                section.aerofoil.write(join(directory, f"section{i}_aerofoil.txt"))
+                with open(join(directory, f"section{i}_aerofoil.txt"), "w") as open_file:
+                    section.aerofoil.write(open_file)
             except NoAerofoilError:
                 continue
 
@@ -271,7 +272,6 @@ class Surface():
         with open(avl_file, "w") as open_file:
             open_file.write(self.to_avl_string())
         self._write_aerofoil_files(directory)
-
 
 
 class Section():

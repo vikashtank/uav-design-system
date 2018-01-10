@@ -22,13 +22,8 @@ class DummyAerofoil():
     def __init__(self, name):
         self.name = name
 
-    @property
-    def avl_file_name(self):
-        return f"{self.name}.txt"
-
-    def write(self, file_name):
-        with open(file_name, "w") as open_file:
-            open_file.write("hey")
+    def write(self, open_file):
+        open_file.write("hey")
 
 
 class TestSurface(unittest.TestCase):
@@ -231,6 +226,7 @@ class TestSurfaceDump(unittest.TestCase):
 
         self.surface.dump_avl_inputs(self.temp_dir)
 
+        self.assertTrue(exists(join(self.temp_dir, "section0_aerofoil.txt")))
         self.assertTrue(exists(join(self.temp_dir, "section1_aerofoil.txt")))
         self.assertTrue(exists(join(self.temp_dir, "surface1.avl")))
 
