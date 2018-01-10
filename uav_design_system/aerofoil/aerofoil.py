@@ -38,8 +38,6 @@ class Aerofoil():
 
         return plot
 
-
-
     @staticmethod
     def develop_aerofoil(le_top: float, le_bottom: float, thickness: float,
                          camber_x: float, camber_y: float):
@@ -92,8 +90,8 @@ class Aerofoil():
         nodes1 = self.pressure_surface.nodes
         nodes2 = self.suction_surface.nodes
 
-        node1_str = str(nodes1).replace("\n", "").replace(" ", "")
-        node2_str = str(nodes2).replace("\n", "").replace(" ", "")
+        node1_str = str([list(x) for x in nodes1])
+        node2_str = str([list(x) for x in nodes2])
 
         return f"pressure surface: {node1_str}, suction surface: {node2_str}"
 
@@ -112,13 +110,14 @@ class Aerofoil():
 
         open_file.write(self.file_title + "\n")
 
-        p_surface_points = self.pressure_surface.get_xy_coords(number_nodes)
-        s_surface_points = self.suction_surface.get_xy_coords(number_nodes)[::-1]
+        px, py = self.pressure_surface.get_xy_coords(number_nodes)
+        sx, sy = self.suction_surface.get_xy_coords(number_nodes)
 
-        all_points = np.concatenate((s_surface_points, p_surface_points))
+        x = sx[::-1] + px
+        y = sy[::-1] + py
 
-        for i in all_points:
-            open_file.write(f"{i[0]} {i[1]}\n")
+        for i in range(number_nodes * 2):
+            open_file.write(f"{x[i]} {y[i]}\n")
 
     def check_fits(self, shape: "TwoDimentional"):
         """

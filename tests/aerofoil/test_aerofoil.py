@@ -8,6 +8,15 @@ from uav_design_system import aerofoil, layout
 import numpy as np
 from matplotlib import pyplot as plt
 
+
+def get_resource_content(file_name):
+    """
+    function to retrieve data from files in the resource folder for these tests
+    """
+    resources_directory = join(this_directory, "resources")
+    with open(join(resources_directory, file_name)) as open_file:
+        return open_file.read()
+
 class TestAerofoil(unittest.TestCase):
 
     def setUp(self):
@@ -20,6 +29,12 @@ class TestAerofoil(unittest.TestCase):
 
     def tearDown(self):
         pass
+
+    def test_title(self):
+        expected_string = "pressure surface: [[0.0, 0.0], [0.5, 0.0], [1.0, 0.0]], "\
+                          "suction surface: [[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]]"
+        self.assertEqual(self.aerofoil.file_title, expected_string)
+
 
     def test_get_top_bottom(self):
         """
@@ -106,7 +121,12 @@ class TestAerofoil(unittest.TestCase):
 class TestAerofoilWrite(unittest.TestCase):
 
     def setUp(self):
-        self.aerofoil = aerofoil.Aerofoil.develop_aerofoil(0.2, 0.2, 0.2, 0.2, 0.2)
+        self.nodes1 = np.asfortranarray([[0, 0], [0, -0.1], [0.5, -0.1], [1, 0]])
+        self.nodes2 = np.asfortranarray([[0, 0], [0, 0.1], [0.5, 0.1], [1, 0]])
+
+        p_surface = aerofoil.Surface(self.nodes1, degree = 1)
+        s_surface = aerofoil.Surface(self.nodes2, degree = 1)
+        self.aerofoil = aerofoil.Aerofoil(s_surface, p_surface)
         self.test_file = join(this_directory, "test_file.txt")
 
     def tearDown(self):
@@ -118,6 +138,12 @@ class TestAerofoilWrite(unittest.TestCase):
             self.aerofoil.write(open_file)
 
         self.assertTrue(exists(self.test_file))
+
+        with open(self.test_file) as open_file:
+            content = open_file.read()
+        self.maxDiff = None
+        expected_content = get_resource_content("test_aerofoil.txt")
+        self.assertEqual(content, expected_content)
 
 
 class TestSurface(unittest.TestCase):
