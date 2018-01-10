@@ -67,7 +67,7 @@ class Test(unittest.TestCase):
 
         xfoil_dict = self.expected_json["xfoil"]
 
-        self.assertEqual(results, self.expected_json )
+        self.assertEqual(results._results_dict, self.expected_json )
 
 if __name__ == "__main__":
     unittest.main()
