@@ -1,11 +1,12 @@
 from os.path import join, exists, dirname, abspath
-from os import makedirs
+from os import makedirs, remove
 this_directory = dirname(abspath(__file__))
 import sys
 sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
 import unittest
 from uav_design_system import aerofoil, layout
 import numpy as np
+from matplotlib import pyplot as plt
 
 class TestAerofoil(unittest.TestCase):
 
@@ -101,6 +102,22 @@ class TestAerofoil(unittest.TestCase):
         for i in range(3):
             for j in [0, 1]:
                 self.assertEqual(ss_nodes[i][j], self.nodes2[i][j] * 3)
+
+class TestAerofoilWrite(unittest.TestCase):
+
+    def setUp(self):
+        self.aerofoil = aerofoil.Aerofoil.develop_aerofoil(0.2, 0.2, 0.2, 0.2, 0.2)
+        self.test_file = join(this_directory, "test_file.txt")
+
+    def tearDown(self):
+        remove(self.test_file)
+
+    def test_write(self):
+
+        with open(self.test_file, "w") as open_file:
+            self.aerofoil.write(open_file)
+
+        self.assertTrue(exists(self.test_file))
 
 
 class TestSurface(unittest.TestCase):

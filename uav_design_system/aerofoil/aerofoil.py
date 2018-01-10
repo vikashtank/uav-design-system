@@ -38,6 +38,8 @@ class Aerofoil():
 
         return plot
 
+
+
     @staticmethod
     def develop_aerofoil(le_top: float, le_bottom: float, thickness: float,
                          camber_x: float, camber_y: float):
@@ -110,9 +112,8 @@ class Aerofoil():
 
         open_file.write(self.file_title + "\n")
 
-        points = np.linspace(0, 1, number_nodes)
-        p_surface_points = self.pressure_surface.get_xy_coords(points)
-        s_surface_points = self.suction_surface.get_xy_coords(points)[::-1]
+        p_surface_points = self.pressure_surface.get_xy_coords(number_nodes)
+        s_surface_points = self.suction_surface.get_xy_coords(number_nodes)[::-1]
 
         all_points = np.concatenate((s_surface_points, p_surface_points))
 
