@@ -16,15 +16,7 @@ def get_resource_content(file_name):
     resources_directory = join(this_directory, "resources", "surface_resources")
     with open(join(resources_directory, file_name)) as open_file:
         return open_file.read()
-
-class DummyAerofoil():
-
-    def __init__(self, name):
-        self.name = name
-
-    def write(self, open_file):
-        open_file.write("hey")
-
+    
 
 class TestSurface(unittest.TestCase):
 
@@ -32,7 +24,7 @@ class TestSurface(unittest.TestCase):
         """
         create surface class
         """
-        self.aerofoil = DummyAerofoil("")
+        self.aerofoil = aerofoil.Aerofoil.develop_aerofoil(0.2, 0.2, 0.2, 0.2, 0.2)
         self.surface = avl.Surface("wing")
         self.surface.define_mesh()
         self.control_surface = avl.ControlSurface("elevator", 0.6, [0,0.1,0],
@@ -147,7 +139,7 @@ class TestSurface(unittest.TestCase):
 class TestSurfaceWrite(unittest.TestCase):
 
     def setUp(self):
-        self.aerofoil = DummyAerofoil("aerofoil_file")
+        self.aerofoil = aerofoil.Aerofoil.develop_aerofoil(0.2, 0.2, 0.2, 0.2, 0.2)
         self.surface = avl.Surface("surface1")
         self.surface.define_mesh(20, 30, 1.0, 1.0)
 
@@ -205,7 +197,7 @@ class TestSurfaceDump(unittest.TestCase):
         makedirs(self.temp_dir)
 
         # create wing with aerofoil
-        self.aerofoil = DummyAerofoil("aerofoil_file")
+        self.aerofoil = aerofoil.Aerofoil.develop_aerofoil(0.2, 0.2, 0.2, 0.2, 0.2)
         self.surface = avl.Surface("surface1")
         self.surface.define_mesh(20, 30, 1.0, 1.0)
 
@@ -234,7 +226,7 @@ class TestSurfaceDump(unittest.TestCase):
 class TestSection(unittest.TestCase):
 
         def setUp(self):
-            self.aerofoil = DummyAerofoil("hey")
+            self.aerofoil = aerofoil.Aerofoil.develop_aerofoil(0.2, 0.2, 0.2, 0.2, 0.2)
             self.section = avl.Section(5)
             self.control_surface = avl.ControlSurface("elevator",
                                                        0.8,
