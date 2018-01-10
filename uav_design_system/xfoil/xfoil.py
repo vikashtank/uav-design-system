@@ -60,7 +60,7 @@ class XfoilRunner():
         self.process.command("SEQP")
 
 
-    def generate_results(self, start, stop, step, keep_results = True, results_dir = ""):
+    def __call__(self, start, stop, step, keep_results = True, results_dir = ""):
         """
         creates a results file and returns the results at a number of angles
         of attack of the aerofoil

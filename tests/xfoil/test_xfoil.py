@@ -40,7 +40,7 @@ class Test(unittest.TestCase):
 
         xfoil_runner = XfoilRunner(file_path)
         xfoil_runner.setup_analysis(self.aerofoil_file, 1e6)
-        results = xfoil_runner.generate_results(0, 5, 0.5, True, self.results_dir)
+        results = xfoil_runner(0, 5, 0.5, True, self.results_dir)
 
         results_file = os.path.join(self.results_dir, "aerofoil_results.txt")
         self.assertTrue(os.path.exists(results_file))
@@ -49,8 +49,8 @@ class Test(unittest.TestCase):
             content = open_file.read()
 
         self.assertEqual(content.replace(" ", ""),
-                        self.expected_content.replace(" ", ""),
-                        "content in xfoil result is not correct")
+                         self.expected_content.replace(" ", ""),
+                         "content in xfoil result is not correct")
 
     def test_correct_json(self):
 
@@ -60,7 +60,7 @@ class Test(unittest.TestCase):
 
         xfoil_runner = XfoilRunner(file_path)
         xfoil_runner.setup_analysis(self.aerofoil_file, 1e6)
-        results = xfoil_runner.generate_results(0, 5, 0.5, True, self.results_dir)
+        results = xfoil_runner(0, 5, 0.5, True, self.results_dir)
 
         results_file = os.path.join(self.results_dir, "aerofoil_results.txt")
         self.assertTrue(os.path.exists(results_file))
