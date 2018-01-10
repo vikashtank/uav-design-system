@@ -9,6 +9,9 @@ class NoControlSurfaceError(Exception):
 class NoSectionError(Exception):
     pass
 
+class NoAerofoilError(Exception):
+    pass
+
 
 
 class Surface():
@@ -156,7 +159,9 @@ class Surface():
 
     @property
     def _ref_string(self):
-
+        """
+        reference string at the top of the avl input file
+        """
         list = ["all",
                 "0.0                      Mach",
                 "0     0     0.0          iYsym  iZsym  Zsym",
@@ -173,7 +178,9 @@ class Surface():
 
     @property
     def _top_string(self):
-
+        """
+        add surface information to the avl input string
+        """
         if self.reflect_surface:
             y_duplicate_string = f"YDUPLICATE\n     0"
         else:
@@ -202,8 +209,12 @@ class Surface():
         return "\n".join(list)
 
     def to_avl_string(self):
+        """
+        avl input file string
+        """
         surface_string = "\n".join([self._ref_string, self._top_string])
 
+        # add section strings
         for section in self.sections:
             list = [section.to_avl_string(),
                     "#" + "-" * 23,
@@ -244,19 +255,30 @@ class Surface():
 
         return x, y, z
 
+    def dump_avl_inputs(self, directory: str):
+        pass
+
 class Section():
 
-    def __init__(self, aerofoil_file_path: str, cord: float):
-        self.add_aerofoil(aerofoil_file_path)
+    def __init__(self, cord: float):
         self.cord = cord
         self.x = 0
         self.y = 0
         self.z = 0
         self.twist_angle = 0
         self._control_surface = None
+        self._aerofoil = None
 
-    def add_aerofoil(self, aerofoil_file_path: str):
-        self.aerofoil = aerofoil_file_path
+    @property
+    def aerofoil(self):
+        if self._aerofoil:
+            return self._aerofoil
+        else:
+            raise NoAerofoilError
+
+    @aerofoil.setter
+    def aerofoil(self, aerofoil):
+        self._aerofoil = aerofoil
 
     @property
     def control_surface(self):
@@ -294,10 +316,9 @@ class Section():
             control_surface = ""
 
         try:
-            aerofoil = self.aerofoil
-        except AttributeError:
+            aerofoil = self.aerofoil.avl_file_name()
+        except NoAerofoilError:
             aerofoil = ""
-
 
         lines = ["#    Xle         Yle         Zle         chord       angle   "
                  "Nspan  Sspace",

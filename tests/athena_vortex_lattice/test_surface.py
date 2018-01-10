@@ -15,21 +15,29 @@ def get_resource_content(file_name):
     with open(join(resources_directory, file_name)) as open_file:
         return open_file.read()
 
+class DummyAerofoil():
 
-class Test(unittest.TestCase):
+    def __init__(self, name):
+        self.name = name
+
+    def avl_file_name(self):
+        return self.name
+
+class TestSurface(unittest.TestCase):
 
     def setUp(self):
         """
         create surface class
         """
-
+        self.aerofoil = DummyAerofoil("")
         self.surface = avl.Surface("wing")
         self.surface.define_mesh()
         self.control_surface = avl.ControlSurface("elevator", 0.6, [0,0.1,0],
                             avl.ControlDeflectionType.SYMMETRIC)
 
         for i in range(5):
-            section = avl.Section("", 2)
+            section = avl.Section(2)
+            section.aerofoil = self.aerofoil
             section.translation_bias(0, i, 0)
             self.surface.add_section(section)
 
@@ -133,56 +141,66 @@ class Test(unittest.TestCase):
         self.assertEqual(y, expected_y_coords)
         self.assertEqual(z, expected_z_coords)
 
+class TestSurfaceWrite(unittest.TestCase):
+
+    def setUp(self):
+        self.aerofoil = DummyAerofoil("aerofoil_file")
+        self.surface = avl.Surface("surface1")
+        self.surface.define_mesh(20, 30, 1.0, 1.0)
+
+        section1 = avl.Section(10)
+        section1.aerofoil = self.aerofoil
+
+        section2 = avl.Section(2)
+        section2.aerofoil = self.aerofoil
+
+        section2.translation_bias(0, 10, 0)
+
+        self.surface.add_section(section1, section2)
+
+        self.control_surface = avl.ControlSurface("elevator",
+                                                  0.8,
+                                                  [0, 1, 0],
+                                                  avl.ControlDeflectionType.SYMMETRIC)
+
     def test_avl_write(self):
         """
         tests the avl file is correctl written from the surface class
         """
-        surface = avl.Surface("surface1")
-        surface.define_mesh(20, 30, 1.0, 1.0)
-        section1 = avl.Section("aerofoil_file", 10)
-        section2 = avl.Section("aerofoil_file", 2)
-        section2.translation_bias(0, 10, 0)
-        surface.add_section(section1, section2)
-        surface.reflect_surface = True
+
+        self.surface.reflect_surface = True
         expected_string = get_resource_content("surface.txt")
-        self.assertEqual(surface.to_avl_string().strip(), expected_string.strip())
+        self.maxDiff = None
+        self.assertEqual(self.surface.to_avl_string().strip(),
+                         expected_string.strip())
 
     def test_avl_write_no_duplicate(self):
         """
         tests the avl file is correctl written from the surface class
         """
-        surface = avl.Surface("surface1")
-        surface.define_mesh(20, 30, 1.0, 1.0)
-        section1 = avl.Section("aerofoil_file", 10)
-        section2 = avl.Section("aerofoil_file", 2)
-        section2.translation_bias(0, 10, 0)
-        surface.add_section(section1, section2)
         expected_string = get_resource_content("surface_no_dup.txt")
         self.maxDiff = None
-        self.assertEqual(surface.to_avl_string().strip(), expected_string.strip())
+        self.assertEqual(self.surface.to_avl_string().strip(),
+                         expected_string.strip())
 
     def test_avl_write_with_controls(self):
         """
         tests the avl file is correctl written from the surface class
         """
-        surface = avl.Surface("surface1")
-        surface.define_mesh(20, 30, 1.0, 1.0)
-        section1 = avl.Section("aerofoil_file", 10)
-        section2 = avl.Section("aerofoil_file", 2)
-        control_surface = avl.ControlSurface("elevator", 0.8, [0, 1, 0], avl.ControlDeflectionType.SYMMETRIC)
-        section2.translation_bias(0, 10, 0)
-        surface.add_section(section1, section2)
-        surface.add_control_surface(control_surface, 0, 0)
+
+        self.surface.add_control_surface(self.control_surface, 0, 0)
         expected_string = get_resource_content("surface_control.txt")
-        surface.reflect_surface = True
+        self.surface.reflect_surface = True
         self.maxDiff = None
-        self.assertEqual(surface.to_avl_string().strip(), expected_string.strip())
+        self.assertEqual(self.surface.to_avl_string().strip(),
+                         expected_string.strip())
 
 
 class TestSection(unittest.TestCase):
 
         def setUp(self):
-            self.section = avl.Section("hello", 5)
+            self.aerofoil = DummyAerofoil("hello")
+            self.section = avl.Section(5)
             self.control_surface = avl.ControlSurface("elevator",
                                                        0.8,
                                                        [0, 1, 0],
@@ -214,6 +232,16 @@ class TestSection(unittest.TestCase):
             self.section.control_surface = self.control_surface
             self.assertEqual(self.section.control_surface, self.control_surface)
 
+        def test_aerofoil(self):
+
+            self.section.aerofoil = self.aerofoil
+            self.assertEqual(self.section.aerofoil, self.aerofoil)
+
+        def test_aerofoil_missing(self):
+
+            with self.assertRaises(avl.NoAerofoilError):
+                self.section.aerofoil
+
         def test_section_to_string_control(self):
             """
             tests that the correct AVL string is produced by the surface
@@ -221,7 +249,6 @@ class TestSection(unittest.TestCase):
             self.section.control_surface = self.control_surface
             string = self.section.to_avl_string()
             expected_string = get_resource_content("section_to_control.txt")
-
 
             self.assertEqual(string.strip(), expected_string.strip())
 
