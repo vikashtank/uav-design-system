@@ -31,6 +31,12 @@ class Cuboid(ThreeDimentional):
         return rectangle
 
     @property
+    def project_xy(self):
+        rectangle = Rectangle(self.x_size, self.y_size)
+        rectangle.location =  Point2D(self.location.x, self.location.y)
+        return rectangle
+
+    @property
     def centroid(self):
         return Point(0.5*self.x_size, 0.5*self.y_size, 0.5*self.z_size)
 

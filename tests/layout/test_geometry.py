@@ -12,6 +12,8 @@ class TestCuboid(unittest.TestCase):
 
     def setUp(self):
         self.cuboid = geometry.Cuboid(2, 3, 4)
+        self.location = geometry.Point(1,2,3)
+
 
     def tearDown(self):
         pass
@@ -52,9 +54,22 @@ class TestCuboid(unittest.TestCase):
                          geometry.Point(1, -1.5, 2))
 
     def test_get_xz_projection(self):
+        self.cuboid.location = self.location
 
         self.assertEqual(self.cuboid.project_xz.x_size, 2)
         self.assertEqual(self.cuboid.project_xz.y_size, 4)
+
+        xz_location = geometry.Point2D(self.location.x, self.location.z)
+        self.assertEqual(self.cuboid.project_xz.location, xz_location)
+
+    def test_get_xy_projection(self):
+        self.cuboid.location = self.location
+        
+        self.assertEqual(self.cuboid.project_xy.x_size, 2)
+        self.assertEqual(self.cuboid.project_xy.y_size, 3)
+
+        xy_location = geometry.Point2D(self.location.x, self.location.y)
+        self.assertEqual(self.cuboid.project_xy.location, xy_location)
 
 
 class TestCylinder(unittest.TestCase):
