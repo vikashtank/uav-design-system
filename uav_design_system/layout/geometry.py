@@ -68,8 +68,9 @@ class Cuboid(ThreeDimentional):
         """
         create a new object of this class but reflected in the y axis
         """
-        return Cuboid(self.x_size, -1 * self.y_size, self.z_size)
-
+        cuboid = Cuboid(self.x_size, -1 * self.y_size, self.z_size)
+        cuboid.location = self.location.reflect_y()
+        return cuboid
 
 class Cylinder(ThreeDimentional):
 
@@ -105,7 +106,9 @@ class Cylinder(ThreeDimentional):
         """
         create a new object of this class but reflected in the y axis
         """
-        return Cylinder(self.radius, -1 * self.y_size)
+        cylinder = Cylinder(self.radius, -1 * self.y_size)
+        cylinder.location = self.location.reflect_y()
+        return cylinder
 
 
 class TrapeziumPlate(ThreeDimentional):
@@ -169,11 +172,14 @@ class TrapeziumPlate(ThreeDimentional):
         return self._calc_interia(self.y_size, x_approx)
 
     def reflect_y(self):
-        return TrapeziumPlate(self.x1_size,
+        trap_plate = TrapeziumPlate(self.x1_size,
                               self.x2_size,
                               self.x_shift,
                               -1 * self.y_size,
                               self.z_size,)
+        trap_plate.location = self.location.reflect_y()
+        return trap_plate
+
     @property
     def project_xy(self):
         trapezium = Trapezium(self.x1_size, self.x2_size, self.x_shift, self.y_size)
@@ -306,6 +312,9 @@ class Point():
         self.x = x
         self.y = y
         self.z = z
+
+    def __str__(self):
+        return f"Point x:{self.x}, y:{self.y}, z:{self.z}"
 
     def as_tuple(self):
         return self.x, self.y, self.z

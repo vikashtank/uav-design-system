@@ -159,6 +159,23 @@ class TestArrangement(unittest.TestCase):
         self.assertEqual(arrangement_reflect.center_of_gravity.y, reflected_cog.y)
         self.assertEqual(arrangement_reflect.center_of_gravity.z, reflected_cog.z)
 
+    def test_reflect_y_offset(self):
+        """
+        tests that the y refelection method creates a new arrangement reflected
+        in the y axis
+        """
+        arrangement = layout.Arrangement("arrangement1", *self.mass_list)
+
+        # offset the masses within the arrangement
+        for mass in self.mass_list:
+            mass.location = layout.Point(0, 10, 0)
+
+        arrangement_reflect = arrangement.clone(reflect_y = True)
+
+        self.assertEqual(arrangement_reflect.center_of_gravity.x, 0.5)
+        self.assertEqual(arrangement_reflect.center_of_gravity.y, -11)
+        self.assertEqual(arrangement_reflect.center_of_gravity.z, 1.5)
+
     def test_len(self):
         arrangement = layout.Arrangement("arrangement1", *self.mass_list)
         self.assertEqual(len(arrangement), 4)

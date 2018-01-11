@@ -29,8 +29,7 @@ class Arrangement(IsArrangeable):
         return self._location
 
     @location.setter
-    def location(self, value):
-
+    def location(self, value: "Point"):
         self._location = value
 
     def append(self, value: IsArrangeable):
@@ -119,9 +118,7 @@ class Arrangement(IsArrangeable):
         if reflect_y:
             # change the locations of all points in the test_clone
             for mass in clone.all_mass_objects:
-                mass.location = mass.location.reflect_y()
                 mass.geometry = mass.geometry.reflect_y()
-
         return clone
 
     def __getitem__(self, value):
