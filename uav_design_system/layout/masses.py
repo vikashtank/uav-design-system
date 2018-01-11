@@ -148,7 +148,7 @@ class MassObject(IsArrangeable):
 
     def __init__(self, geometry: 'ThreeDimentional', density: float, name = ""):
         self.name = name
-        self.geometry = geometry
+        self.geometry = copy.deepcopy(geometry)
         self.density = density
 
     @property

@@ -5,6 +5,7 @@ import sys
 sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
 import unittest
 from uav_design_system import layout
+import copy
 
 class DummyMass(layout.IsArrangeable):
     pass
@@ -225,6 +226,32 @@ class TestArrangement(unittest.TestCase):
         self.assertEqual(mass_list[2].location, layout.Point(1, 7 , 2))
         self.assertEqual(mass_list[3].location, layout.Point(1, 7 , 2))
         self.assertEqual(mass_list[4].location, layout.Point(1, 7 , 0))
+
+    def test_flatten_arrangement_2layer_locations_complicated(self):
+        """
+        test flatten applies correct locations
+        """
+        self.mass1.location = layout.Point(4, -5, 6)
+        self.mass2.location = layout.Point(3, 2, 1)
+
+        arrangement = layout.Arrangement("arrangement1", *[self.mass1, self.mass2])
+        arrangement.location = layout.Point(3, -2, 7)
+        arrangement2 = layout.Arrangement("arrangement2", *[self.mass3, self.mass4])
+        arrangement2.location = layout.Point(-5, 0, 12)
+        arrangement3 = layout.Arrangement("arrangement3", arrangement,
+                                                          arrangement2,
+                                                          self.mass1)
+        arrangement3.location = layout.Point(1, 7, 0)
+
+        flattened_arrangement = arrangement3.flatten()
+        mass_list = flattened_arrangement.all_mass_objects
+        expected_mass_list = self.mass_list + [self.mass1]
+
+        self.assertEqual(mass_list[0].location, layout.Point(8, 0 , 13))
+        self.assertEqual(mass_list[1].location, layout.Point(7, 7 , 8))
+        self.assertEqual(mass_list[2].location, layout.Point(-4, 7 , 12))
+        self.assertEqual(mass_list[3].location, layout.Point(-4, 7 , 12))
+        self.assertEqual(mass_list[4].location, layout.Point(5, 2, 6))
 
 class TestMassObject(unittest.TestCase):
 
