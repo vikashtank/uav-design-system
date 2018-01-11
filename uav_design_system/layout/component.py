@@ -64,7 +64,7 @@ class StructureFactory():
             x1 = section1.cord
             x2 = section2.cord
             y = section2.y - section1.y
-            x_shift = section1.x - section2.x
+            x_shift = -1*(section1.x - section2.x)
             thickness = wall_thickness * 2
 
             section = FoamSection(x1, x2, x_shift, y, thickness, name)
