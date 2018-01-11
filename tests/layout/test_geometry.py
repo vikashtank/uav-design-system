@@ -14,7 +14,6 @@ class TestCuboid(unittest.TestCase):
         self.cuboid = geometry.Cuboid(2, 3, 4)
         self.location = geometry.Point(1,2,3)
 
-
     def tearDown(self):
         pass
 
@@ -64,7 +63,7 @@ class TestCuboid(unittest.TestCase):
 
     def test_get_xy_projection(self):
         self.cuboid.location = self.location
-        
+
         self.assertEqual(self.cuboid.project_xy.x_size, 2)
         self.assertEqual(self.cuboid.project_xy.y_size, 3)
 
@@ -176,6 +175,13 @@ class TestTrapeziumPlate(unittest.TestCase):
         self.assertEqual(self.trapezium.reflect_y().centroid,
                          geometry.Point(38/15, -7/3, 0.5))
 
+    def test_project_xy(self):
+        trapezium = self.trapezium.project_xy
+        self.assertEqual(trapezium.x1_size, 6)
+        self.assertEqual(trapezium.x2_size, 4)
+        self.assertEqual(trapezium.x_shift, 0)
+        self.assertEqual(trapezium.y_size, 5)
+
 
 class TestRectangle(unittest.TestCase):
 
@@ -225,7 +231,6 @@ class TestRectangle(unittest.TestCase):
         self.assertEqual(self.rectangle.bottom_left_point, geometry.Point2D(10, 0))
         self.assertEqual(self.rectangle.bottom_right_point, geometry.Point2D(15, 0))
 
-
     def test_get_y_vals(self):
 
         self.assertEqual(self.rectangle.get_y_vals(0.01), (10, 0) )
@@ -238,6 +243,21 @@ class TestRectangle(unittest.TestCase):
 
         with self.assertRaises(geometry.OutOfBoundsError):
             self.rectangle.get_y_vals(5.01)
+
+class TestTrapezium(unittest.TestCase):
+
+    def setUp(self):
+        self.trapezium = geometry.Trapezium(5, 3, 2, 5)
+
+    def test_get_plot_coordinates(self):
+        x_expected = [0, 2, 5, 5]
+        y_expected = [0, 5, 5, 0]
+
+        x, y = self.trapezium.plot_coordinates
+
+        self.assertEqual(x_expected, x)
+        self.assertEqual(y_expected, y)
+
 
 
 class TestPoint(unittest.TestCase):

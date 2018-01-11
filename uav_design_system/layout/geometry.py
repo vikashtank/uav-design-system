@@ -174,6 +174,11 @@ class TrapeziumPlate(ThreeDimentional):
                               self.x_shift,
                               -1 * self.y_size,
                               self.z_size,)
+    @property
+    def project_xy(self):
+        trapezium = Trapezium(self.x1_size, self.x2_size, self.x_shift, self.y_size)
+        trapezium.location =  Point2D(self.location.x, self.location.y)
+        return trapezium
 
 class Rectangle(TwoDimentional):
 
@@ -247,7 +252,53 @@ class Rectangle(TwoDimentional):
 
         return x,y
 
+class Trapezium():
 
+    def __init__(self, x1_size, x2_size, x_shift, y_size):
+        self.x1_size = x1_size
+        self.x2_size = x2_size
+        self.x_shift = x_shift
+        self.y_size = y_size
+        self._location = Point2D(0, 0)
+
+    @property
+    def location(self):
+        return self._location
+
+    @location.setter
+    def location(self, value: "Point2D"):
+        self._location = value
+
+    @property
+    def top_left_point(self):
+        return Point2D(self.x_shift, self.y_size) + self.location
+
+    @property
+    def bottom_left_point(self):
+        return self.location
+
+    @property
+    def top_right_point(self):
+        return Point2D(self.x_shift + self.x2_size, self.y_size) + self.location
+
+    @property
+    def bottom_right_point(self):
+        return Point2D(self.x1_size, 0) + self.location
+
+    @property
+    def plot_coordinates(self):
+
+        x = [self.bottom_left_point.x,
+             self.top_left_point.x,
+             self.top_right_point.x,
+             self.bottom_right_point.x]
+
+        y = [self.bottom_left_point.y,
+             self.top_left_point.y,
+             self.top_right_point.y,
+             self.bottom_right_point.y]
+
+        return x, y
 
 class Point():
 
