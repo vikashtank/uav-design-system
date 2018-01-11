@@ -10,6 +10,13 @@ from uav_design_system import layout
 from uav_design_system import athena_vortex_lattice as avl
 
 
+def get_resource_content(file_name):
+    """
+    function to retrieve data from files in the resource folder for these tests
+    """
+    resources_directory = join(this_directory, "resources")
+    with open(join(resources_directory, file_name)) as open_file:
+        return open_file.read()
 
 class TestAthenaApi(unittest.TestCase):
 
@@ -18,7 +25,7 @@ class TestAthenaApi(unittest.TestCase):
         surface = avl.Surface(name = "test_surface")
 
         for i in range(5):
-            section = avl.Section("", 1)
+            section = avl.Section(1)
             section.translation_bias(0, i, 0)
             surface.add_section(section)
 
@@ -46,18 +53,7 @@ class TestAthenaApi(unittest.TestCase):
 
         layout.create_mass_file(self.file_name, self.structure , self.properties)
 
-        expected_content = """# Plane Name: test_surface
-Lunit = 1.0 m
-Munit = 1.0 kg
-Tunit = 1.0 s
-
-g   = 9.81
-rho = 1.225
-10.0   0.5   0.5   1.0    4.166666666666667   4.166666666666667   1.6666666666666665
-10.0   0.5   1.5   1.0    4.166666666666667   4.166666666666667   1.6666666666666665
-10.0   0.5   2.5   1.0    4.166666666666667   4.166666666666667   1.6666666666666665
-10.0   0.5   3.5   1.0    4.166666666666667   4.166666666666667   1.6666666666666665
-"""
+        expected_content = get_resource_content("mass_file.txt")
 
         with open(self.file_name) as open_file:
             actual_content = open_file.read()
