@@ -5,7 +5,7 @@ this_directory = dirname(abspath(__file__))
 import sys
 sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
 import unittest
-from uav_design_system.athena_vortex_lattice import AVLRunner as AVL
+import uav_design_system.athena_vortex_lattice as AVL
 import json
 
 
@@ -22,10 +22,23 @@ class Test(unittest.TestCase):
 
     def setUp(self):
         self.content = json.loads(get_resource_content("avl_output.json"))
-        
+        self.result_api = AVL.AVLResults(self.content)
 
-    def test_get_cl(self):
-        print(self.content["total_forces"])
+    def test_alpha(self):
+        self.assertEqual(self.result_api.alpha, 1.28763)
+
+    def test_cl(self):
+        self.assertEqual(self.result_api.cl, 0.16549)
+
+    def test_cd(self):
+        self.assertEqual(self.result_api.cd, 0.00193)
+
+    def test_efficiency(self):
+        self.assertEqual(self.result_api.efficiency, 0.8828)
+
+    def test_elevator(self):
+        self.assertEqual(self.result_api.elevator_deflection, 2.81795)
+
 
 
 
