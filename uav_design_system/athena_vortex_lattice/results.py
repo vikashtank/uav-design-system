@@ -12,8 +12,16 @@ class AVLResults():
     def _total_forces(self):
         return self._results_dict["total_forces"]
 
+    @property
+    def _strip_forces(self):
+        return self._results_dict["strip_forces"]
+
+    @property
+    def _number_exp(self):
+        return "-?\d*\.\d*"
+
     def _get_reg_expression(self, parameter_name):
-        return rf"{parameter_name}\s*=\s*(\d*\.\d*)"
+        return f"{parameter_name}\s*=\s*({self._number_exp})"
 
     def extract_field(self, parameter_name):
         reg_exp = self._get_reg_expression(parameter_name)
@@ -52,6 +60,24 @@ class AVLResults():
     def Span(self):
         return self.extract_field("Bref")
 
+    def _get_strip_re_exp(self):
+        return "^\s*\d*" + f"\s*({self._number_exp})"
+
+
     @property
-    def cord_distribution(self):
-        pass
+    def y_distribution(self):
+
+        lines = self._strip_forces.split("\n")
+        for line in lines:
+            match = re.match(self._get_strip_re_exp(), line)
+            if match is not None:
+                yield float(match.group(1))
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    pass

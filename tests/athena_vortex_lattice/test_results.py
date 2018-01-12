@@ -8,7 +8,6 @@ import unittest
 import uav_design_system.athena_vortex_lattice as AVL
 import json
 
-
 def get_resource_content(file_name):
     """
     function to retrieve data from files in the resource folder for these tests
@@ -16,7 +15,6 @@ def get_resource_content(file_name):
     resources_directory = join(this_directory, "resources", "results_resources")
     with open(join(resources_directory, file_name)) as open_file:
         return open_file.read()
-
 
 class Test(unittest.TestCase):
 
@@ -38,6 +36,16 @@ class Test(unittest.TestCase):
 
     def test_elevator(self):
         self.assertEqual(self.result_api.elevator_deflection, 2.81795)
+
+    def test_y_distribution(self):
+        actual_list = list(self.result_api.y_distribution)
+        self.assertEqual(len(actual_list), 60)
+        self.assertEqual(actual_list[0], 0.0006)
+        self.assertEqual(actual_list[1], 0.0053)
+        self.assertEqual(actual_list[2], 0.0148)
+        self.assertEqual(actual_list[29], 0.8494)
+        self.assertEqual(actual_list[30], -0.0006)
+        self.assertEqual(actual_list[59], -0.8494)
 
 
 
