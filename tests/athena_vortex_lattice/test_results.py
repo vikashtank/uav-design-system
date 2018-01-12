@@ -38,7 +38,7 @@ class Test(unittest.TestCase):
         self.assertEqual(self.result_api.elevator_deflection, 2.81795)
 
     def test_y_distribution(self):
-        actual_list = list(self.result_api.y_distribution)
+        actual_list = self.result_api.y_distribution
         self.assertEqual(len(actual_list), 60)
         self.assertEqual(actual_list[0], 0.0006)
         self.assertEqual(actual_list[1], 0.0053)
@@ -47,8 +47,16 @@ class Test(unittest.TestCase):
         self.assertEqual(actual_list[30], -0.0006)
         self.assertEqual(actual_list[59], -0.8494)
 
+    def test_cl_distrbution(self):
+        actual_list = list(self.result_api.cl_distribution)
 
-
+        self.assertEqual(len(actual_list), 60)
+        self.assertEqual(actual_list[0], 0.0618)
+        self.assertEqual(actual_list[1], 0.0626)
+        self.assertEqual(actual_list[2], 0.0638)
+        self.assertEqual(actual_list[29], 0.0620)
+        self.assertEqual(actual_list[30], 0.0618)
+        self.assertEqual(actual_list[59], 0.0620)
 
 if __name__ == "__main__":
     unittest.main()
