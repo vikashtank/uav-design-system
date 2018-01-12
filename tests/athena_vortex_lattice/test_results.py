@@ -58,5 +58,9 @@ class Test(unittest.TestCase):
         self.assertEqual(actual_list[30], 0.0618)
         self.assertEqual(actual_list[59], 0.0620)
 
+    def test_elevetor_hinge(self):
+        self.assertEqual(self.result_api.elevator_hinge_coefficient, -0.002504)
+
+
 if __name__ == "__main__":
     unittest.main()

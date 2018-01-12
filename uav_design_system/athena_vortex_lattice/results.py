@@ -18,7 +18,7 @@ class AVLResults():
 
     @property
     def _hinge_forces(self):
-        return self._results_dict["hinge_moment"]
+        return self._results_dict["hinge_moments"]
 
     @property
     def _number_exp(self):
@@ -102,8 +102,9 @@ class AVLResults():
 
     @property
     def elevator_hinge_coefficient(self):
-        pass
-
+        reg_ex = r"\s*elevator\s*(.*)"
+        match = re.search(reg_ex, self._hinge_forces)
+        return float(match.group(1))
 
 
 
