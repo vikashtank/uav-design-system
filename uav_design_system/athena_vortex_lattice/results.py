@@ -21,6 +21,10 @@ class AVLResults():
         return self._results_dict["hinge_moments"]
 
     @property
+    def _stability_forces(self):
+        return self._results_dict["stability_derivatives"]
+
+    @property
     def _number_exp(self):
         return "-?\d*\.\d*"
 
@@ -104,6 +108,12 @@ class AVLResults():
     def elevator_hinge_coefficient(self):
         reg_ex = r"\s*elevator\s*(.*)"
         match = re.search(reg_ex, self._hinge_forces)
+        return float(match.group(1))
+
+    @property
+    def neutral_point(self):
+        match = re.search(self._get_reg_expression("Neutral point  Xnp"),
+                          self._stability_forces)
         return float(match.group(1))
 
 

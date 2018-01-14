@@ -61,6 +61,9 @@ class Test(unittest.TestCase):
     def test_elevetor_hinge(self):
         self.assertEqual(self.result_api.elevator_hinge_coefficient, -0.002504)
 
+    def test_neutral_point(self):
+        self.assertEqual(self.result_api.neutral_point, 0.494015)
+
 
 if __name__ == "__main__":
     unittest.main()
