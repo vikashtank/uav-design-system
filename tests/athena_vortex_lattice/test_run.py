@@ -4,7 +4,7 @@ this_directory = dirname(abspath(__file__))
 import sys
 sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
 import unittest
-from uav_design_system.athena_vortex_lattice import AVLRunner
+from uav_design_system.athena_vortex_lattice import AVLRunner, AVLResults
 import shutil
 
 class CustomAssertions():
@@ -39,6 +39,12 @@ class TestRun(unittest.TestCase, CustomAssertions):
         self.mass_file = join(self.resources_folder, "allegro.mass")
         self.config_file = join(self.resources_folder, "bd2.run")
 
+        avl_runner = AVLRunner()
+        avl_runner.setup_analysis(self.geom_file,
+                                  self.mass_file,
+                                  self.config_file)
+        self.results = avl_runner.generate_results(self.results_dir)
+
     def tearDown(self):
         shutil.rmtree(self.results_dir)
 
@@ -46,12 +52,6 @@ class TestRun(unittest.TestCase, CustomAssertions):
         """
         uses files in resources to test if avl is generating the correct files
         """
-
-        avl_runner = AVLRunner()
-        avl_runner.setup_analysis(self.geom_file,
-                                  self.mass_file,
-                                  self.config_file)
-        results_dict = avl_runner.generate_results(self.results_dir)
 
         self.assertTrue(exists(join(self.results_dir, "ft.txt")))
         self.assertTrue(exists(join(self.results_dir, "hm.txt")))
@@ -65,12 +65,6 @@ class TestRun(unittest.TestCase, CustomAssertions):
         checks the files created by AVL running contain the correct content,
         when compared to the manual runs
         """
-        avl_runner = AVLRunner()
-        avl_runner.setup_analysis(self.geom_file,
-                                  self.mass_file,
-                                  self.config_file)
-        avl_runner.generate_results(self.results_dir)
-
         # get expected files
         expected_ft = join(self.resources_folder, "ft.txt")
         expected_hm = join(self.resources_folder, "hm.txt")
@@ -85,6 +79,18 @@ class TestRun(unittest.TestCase, CustomAssertions):
         self.assertFilesSame(expected_ft, actual_ft)
         self.assertFilesSame(expected_hm, actual_hm)
         self.assertFilesSame(expected_st, actual_st)
+
+    def test_run_correct_output(self):
+
+        # get actual files
+        actual_ft = join(self.results_dir, "ft.txt")
+        actual_hm = join(self.results_dir, "hm.txt")
+        actual_st = join(self.results_dir, "st.txt")
+        
+        self.assertTrue(isinstance(self.results, AVLResults))
+        self.assertEqual(self._read_file(actual_ft), self.results._total_forces)
+        self.assertEqual(self._read_file(actual_hm), self.results._hinge_forces)
+        self.assertEqual(self._read_file(actual_st), self.results._stability_forces)
 
 
 

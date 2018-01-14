@@ -7,6 +7,7 @@ from typing import List
 import shutil
 import time
 from process import Process, Runner
+from .results import AVLResults
 
 
 class AVLRunner(Runner):
@@ -76,8 +77,7 @@ class AVLRunner(Runner):
             results_dict[analysis_alias] = content
             shutil.copy(temp_file, results_dir)
 
-
-        return results_dict
+        return AVLResults(results_dict)
 
 
     def _get_results(self, analysis_name: str, file_name: str) -> str:
