@@ -2,6 +2,7 @@ import collections
 from enum import Enum
 from typing import List
 from os.path import join
+from matplotlib import pyplot as plt
 
 
 class NoControlSurfaceError(Exception):
@@ -254,6 +255,14 @@ class Surface():
             z = z + z[::-1]
 
         return x, y, z
+
+    def plot_xy(self, subplot = None, marker = "g_"):
+
+        if subplot is None:
+            subplot = plt.subplot(111)
+        x, y, _ = self.get_plot_coordinates()
+        subplot.plot(x, y, marker)
+        return subplot
 
     def _write_aerofoil_files(self, directory):
         files = []

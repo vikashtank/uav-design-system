@@ -4,6 +4,7 @@ import sys
 sys.path.append(this_directory)# so uggo thanks to atom runner
 from .geometry import Point
 import copy
+from matplotlib import pyplot as plt
 
 class IsArrangeable:
     pass
@@ -136,6 +137,28 @@ class Arrangement(IsArrangeable):
 
     def __len__(self):
         return len(self.objects)
+
+    def plot_xy(self, subplot = None, center_of_gravity = False, marker = "b-"):
+        """
+        plots arrangement, optional centers of gravities of masses, key word
+        arguments for matplotlib plot options
+        """
+        if subplot is None:
+            plot = plt.subplot(111)
+
+        for mass in self.all_mass_objects:
+            x,y  = mass.geometry.project_xy.plot_coordinates
+            subplot.plot(x, y, marker)
+
+            if center_of_gravity:
+                x, y, _ = mass.center_of_gravity_global.as_tuple()
+                subplot.plot(x, y,"*")
+
+        x, y, _ = self.center_of_gravity_global.as_tuple()
+        subplot.plot(x, y, "o")
+
+        return subplot
+
 
 
 class MassObject(IsArrangeable):
