@@ -16,7 +16,7 @@ def get_resource_content(file_name):
     resources_directory = join(this_directory, "resources", "surface_resources")
     with open(join(resources_directory, file_name)) as open_file:
         return open_file.read()
-    
+
 
 class TestSurface(unittest.TestCase):
 
@@ -166,7 +166,7 @@ class TestSurfaceWrite(unittest.TestCase):
         self.surface.reflect_surface = True
         expected_string = get_resource_content("surface.txt")
         self.maxDiff = None
-        self.assertEqual(self.surface.to_avl_string().strip(),
+        self.assertEqual(self.surface._to_avl_string().strip(),
                          expected_string.strip())
 
     def test_avl_write_no_duplicate(self):
@@ -175,7 +175,7 @@ class TestSurfaceWrite(unittest.TestCase):
         """
         expected_string = get_resource_content("surface_no_dup.txt")
         self.maxDiff = None
-        self.assertEqual(self.surface.to_avl_string().strip(),
+        self.assertEqual(self.surface._to_avl_string().strip(),
                          expected_string.strip())
 
     def test_avl_write_with_controls(self):
@@ -187,7 +187,7 @@ class TestSurfaceWrite(unittest.TestCase):
         expected_string = get_resource_content("surface_control.txt")
         self.surface.reflect_surface = True
         self.maxDiff = None
-        self.assertEqual(self.surface.to_avl_string().strip(),
+        self.assertEqual(self.surface._to_avl_string().strip(),
                          expected_string.strip())
 
 class TestSurfaceDump(unittest.TestCase):
@@ -216,11 +216,18 @@ class TestSurfaceDump(unittest.TestCase):
 
     def test_dump(self):
 
-        self.surface.dump_avl_inputs(self.temp_dir)
-
+        avl_file, aero_files = self.surface.dump_avl_inputs(self.temp_dir)
         self.assertTrue(exists(join(self.temp_dir, "section0_aerofoil.txt")))
         self.assertTrue(exists(join(self.temp_dir, "section1_aerofoil.txt")))
         self.assertTrue(exists(join(self.temp_dir, "surface1.avl")))
+
+    def test_dump_returns(self):
+
+        avl_file, aero_files = self.surface.dump_avl_inputs(self.temp_dir)
+        self.assertEqual(avl_file, join(self.temp_dir, "surface1.avl"))
+        self.assertEqual(len(aero_files), 2)
+        self.assertEqual(aero_files[0], join(self.temp_dir, "section0_aerofoil.txt"))
+        self.assertEqual(aero_files[1], join(self.temp_dir, "section1_aerofoil.txt"))
 
 
 class TestSection(unittest.TestCase):

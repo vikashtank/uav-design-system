@@ -208,7 +208,7 @@ class Surface():
 
         return "\n".join(list)
 
-    def to_avl_string(self):
+    def _to_avl_string(self):
         """
         avl input file string
         """
@@ -256,22 +256,30 @@ class Surface():
         return x, y, z
 
     def _write_aerofoil_files(self, directory):
-
+        files = []
         for i, section in enumerate(self):
             try:
-                with open(join(directory, f"section{i}_aerofoil.txt"), "w") as open_file:
+                aerofoil_file = join(directory, f"section{i}_aerofoil.txt")
+                with open(aerofoil_file, "w") as open_file:
                     section.aerofoil.write(open_file)
+                files.append(aerofoil_file)
             except NoAerofoilError:
                 continue
+        return files
 
     def dump_avl_inputs(self, directory: str):
         """
         dumps the avl and aerofoil files to a directory
+
+        returns:
+            (str, List[str]): a string to the avl_file and a list of aerofoil
+                              file paths
         """
         avl_file = join(directory, f"{self.name}.avl")
         with open(avl_file, "w") as open_file:
-            open_file.write(self.to_avl_string())
-        self._write_aerofoil_files(directory)
+            open_file.write(self._to_avl_string())
+        files = self._write_aerofoil_files(directory)
+        return avl_file, files
 
 
 class Section():
