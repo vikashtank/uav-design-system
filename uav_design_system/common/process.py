@@ -56,7 +56,7 @@ class Process():
 
         return Process(process)
 
-    def print_it(self):
+    def print(self):
         self.process.stdin.close()
         i = 0
         while i < 500:
