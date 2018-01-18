@@ -29,44 +29,38 @@ class Test(unittest.TestCase):
         with open(comparison_json) as open_file:
             self.expected_json = json.load(open_file)
 
+        file_path = "/Applications/Xfoil.app/Contents/Resources/xfoil"
+        os.makedirs(self.results_dir)
+        self.xfoil_runner = XfoilRunner(file_path)
+
     def tearDown(self):
         shutil.rmtree(self.results_dir)
 
     def test_run_success(self):
 
-        file_path = "/Applications/Xfoil.app/Contents/Resources/xfoil"
-
-        os.makedirs(self.results_dir)
-
-        xfoil_runner = XfoilRunner(file_path)
-        xfoil_runner.setup_analysis(self.aerofoil_file, 1e6)
-        results = xfoil_runner(0, 5, 0.5, True, self.results_dir)
+        self.xfoil_runner.setup_analysis(self.aerofoil_file, 1e6)
+        results = self.xfoil_runner(0, 5, 0.5, True, self.results_dir)
 
         results_file = os.path.join(self.results_dir, "aerofoil_results.txt")
         self.assertTrue(os.path.exists(results_file))
 
         with open(results_file) as open_file:
             content = open_file.read()
-
+        self.maxDiff = None
         self.assertEqual(content.replace(" ", ""),
                          self.expected_content.replace(" ", ""),
                          "content in xfoil result is not correct")
 
     def test_correct_json(self):
 
-        file_path = "/Applications/Xfoil.app/Contents/Resources/xfoil"
-
-        os.makedirs(self.results_dir)
-
-        xfoil_runner = XfoilRunner(file_path)
-        xfoil_runner.setup_analysis(self.aerofoil_file, 1e6)
-        results = xfoil_runner(0, 5, 0.5, True, self.results_dir)
+        self.xfoil_runner.setup_analysis(self.aerofoil_file, 1e6)
+        results = self.xfoil_runner(0, 5, 0.5, True, self.results_dir)
 
         results_file = os.path.join(self.results_dir, "aerofoil_results.txt")
         self.assertTrue(os.path.exists(results_file))
 
         xfoil_dict = self.expected_json["xfoil"]
-
+        self.maxDiff = None
         self.assertEqual(results._results_dict, self.expected_json )
 
 if __name__ == "__main__":

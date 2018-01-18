@@ -30,13 +30,11 @@ class XfoilRunner():
         # create a variable for the path to the location of the xfoil executable
         self.executable = file_path
 
-
     def __del__(self):
         """
         remove temporary folder with results
         """
         shutil.rmtree(self.temp_folder)
-
 
     def setup_analysis(self, aerofoil_file_path, Re):
         """
@@ -56,10 +54,11 @@ class XfoilRunner():
         self.reynolds_number = Re
         self.process = Process.initialise_process(self.executable)
         self.process.command("LOAD {0}".format(aerofoil_file_path))
+        # this line deactivates the stupid X11 plot, which ruined my life.
+        self.process.command("PLOP\nG\n")
         self.process.command("OPER")
         self.process.command("visc {0}".format(self.reynolds_number))
         self.process.command("SEQP")
-
 
     def __call__(self, start, stop, step, keep_results = True, results_dir = ""):
         """
@@ -81,6 +80,8 @@ class XfoilRunner():
         self.process.command("")
 
         content = self._get_results(start, stop, step, temp_file)
+
+        self.process.close()
 
         if keep_results:
             shutil.copy(temp_file, results_dir)

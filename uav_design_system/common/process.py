@@ -46,6 +46,12 @@ class Process():
         self.process.stdin.flush()
         return command
 
+    def close(self):
+        self.process.stdout.close()
+        self.process.stdin.close()
+        self.process.kill()
+        self.process.poll()
+
     @staticmethod
     def initialise_process(file_path):
 
