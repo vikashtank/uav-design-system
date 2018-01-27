@@ -2,9 +2,9 @@ from os.path import join, exists, dirname, abspath
 from os import makedirs
 this_directory = dirname(abspath(__file__))
 import sys
-sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
+sys.path.append(this_directory + "/../../../")  # so uggo thanks to atom runner
 import unittest
-from uav_design_system.athena_vortex_lattice import AVLRunner, AVLResults
+from uav_design_system.aerodynamics.athena_vortex_lattice import AVLRunner, AVLResults
 import shutil
 
 class CustomAssertions():
@@ -86,7 +86,7 @@ class TestRun(unittest.TestCase, CustomAssertions):
         actual_ft = join(self.results_dir, "ft.txt")
         actual_hm = join(self.results_dir, "hm.txt")
         actual_st = join(self.results_dir, "st.txt")
-        
+
         self.assertTrue(isinstance(self.results, AVLResults))
         self.assertEqual(self._read_file(actual_ft), self.results._total_forces)
         self.assertEqual(self._read_file(actual_hm), self.results._hinge_forces)

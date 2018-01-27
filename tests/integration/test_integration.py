@@ -9,7 +9,8 @@ this_directory = dirname(abspath(__file__))
 import sys
 sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
 import unittest
-from uav_design_system import layout, aerofoil, athena_vortex_lattice as avl
+from uav_design_system import layout, aerofoil
+from uav_design_system.aerodynamics import athena_vortex_lattice as avl
 from matplotlib import pyplot as plt
 import json
 
@@ -29,7 +30,7 @@ class Test(unittest.TestCase):
         self.run_file = join(self.test_folder, "UAV.run")
 
         self.run_analysis = False
-        self.plot = True
+        self.plot = False
 
     def tearDown(self):
         rmtree(self.results_dir)

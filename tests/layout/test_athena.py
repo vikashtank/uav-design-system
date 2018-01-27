@@ -7,7 +7,7 @@ import sys
 sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
 import unittest
 from uav_design_system import layout
-from uav_design_system import athena_vortex_lattice as avl
+from uav_design_system.aerodynamics import athena_vortex_lattice as avl
 
 
 def get_resource_content(file_name):

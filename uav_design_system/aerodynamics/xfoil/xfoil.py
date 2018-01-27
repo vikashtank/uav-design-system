@@ -3,7 +3,7 @@ Xfoil API
 """
 import sys
 import os
-from ..common import Process, Runner
+from ...common import Process, Runner
 import time
 import tempfile
 import shutil

@@ -3,9 +3,9 @@ from os import makedirs
 from shutil import rmtree
 this_directory = dirname(abspath(__file__))
 import sys
-sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
+sys.path.append(this_directory + "/../../../")  # so uggo thanks to atom runner
 import unittest
-import uav_design_system.athena_vortex_lattice as AVL
+import uav_design_system.aerodynamics.athena_vortex_lattice as AVL
 import json
 
 def get_resource_content(file_name):

@@ -2,9 +2,9 @@ from os.path import join, exists, dirname, abspath
 from os import makedirs
 this_directory = dirname(abspath(__file__))
 import sys
-sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
+sys.path.append(this_directory + "/../../../")  # so uggo thanks to atom runner
 import unittest
-from uav_design_system.xfoil import AerofoilResults
+from uav_design_system.aerodynamics.xfoil import AerofoilResults
 import json
 
 class TestCase(unittest.TestCase):

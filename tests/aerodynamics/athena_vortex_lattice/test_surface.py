@@ -2,9 +2,9 @@ from os.path import join, exists, dirname, abspath
 from os import makedirs
 this_directory = dirname(abspath(__file__))
 import sys
-sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
+sys.path.append(this_directory + "/../../../")  # so uggo thanks to atom runner
 import unittest
-import uav_design_system.athena_vortex_lattice as avl
+import uav_design_system.aerodynamics.athena_vortex_lattice as avl
 from uav_design_system import aerofoil
 import shutil
 

@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.append(os.path.dirname(__file__) + "/../common")
+sys.path.append(os.path.dirname(__file__) + "/../../common")
 import subprocess
 import tempfile
 from typing import List
