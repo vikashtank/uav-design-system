@@ -49,6 +49,10 @@ class Schema():
     def __getitem__(self, key):
         return [x for x in self._constraints if x.name == key][0]
 
+    def __iter__(self):
+        for i in self._constraints:
+            yield i
+
     def _compare_size(self, dict):
         """
         checks the size of the dictionary is correct against the schema

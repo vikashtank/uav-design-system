@@ -65,8 +65,14 @@ class TestSchema(unittest.TestCase):
         with self.assertRaises(opt.SchemaComparisonError):
             self.schema(self.test_dict)
 
-    def test_create_random(self):
-        pass
+    def test_iter(self):
+        self.schema.append(self.constraint_1)
+        self.schema.append(self.constraint_2)
+        constraint_list = [self.constraint_1, self.constraint_2]
+
+        for index, value in enumerate(self.schema):
+            self.assertEqual(value, constraint_list[index])
+
 
 class TestConstraint(unittest.TestCase):
 
