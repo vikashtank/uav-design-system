@@ -19,6 +19,13 @@ class TestCase(unittest.TestCase):
                                         "min": 2
                                      }
                            }
+        self.test_dict = {
+                            "name1": 0,
+                            "name2": 1,
+                            "name3": 2,
+                            "name4": 3,
+                            "name5": 4
+                        }
         self.schema = opt.Schema.from_dict(self.input_dict)
         self.genetic = opt.Genetic(opt.GeneticFactory(), self.schema)
 
@@ -33,13 +40,7 @@ class TestCase(unittest.TestCase):
         self.assertTrue(2 < actual_dict["name2"] < 7)
 
     def test_combine(self):
-        test_dict = {
-                        "name1": 0,
-                        "name2": 1,
-                        "name3": 2,
-                        "name4": 3,
-                        "name5": 4
-                    }
+
         test_dict2 = {
                         "name1": 5,
                         "name2": 6,
@@ -47,13 +48,30 @@ class TestCase(unittest.TestCase):
                         "name4": 8,
                         "name5": 9
                     }
-        new_dict = self.genetic._combine(test_dict, test_dict2)
+        new_dict = self.genetic._combine(self.test_dict, test_dict2)
         self.assertEqual(new_dict, {"name1": 0,
                                     "name2": 6,
                                     "name3": 2,
                                     "name4": 8,
                                     "name5": 4
                                     })
+
+    def test_mutate(self):
+        test_dict = {
+                        "name1": 4.5,
+                        "name2": 4,
+                    }
+        actual_dict = self.genetic._mutate(test_dict)
+        self.assertTrue("name1" in actual_dict)
+        self.assertTrue("name2" in actual_dict)
+        print(actual_dict)
+        self.assertTrue(4 < actual_dict["name1"] < 5)
+        self.assertTrue(2 < actual_dict["name2"] < 7)
+        self.assertTrue(actual_dict["name1"] != 4.5)
+        self.assertTrue(actual_dict["name2"] != 4)
+
+
+
 
 
 if __name__ == "__main__":

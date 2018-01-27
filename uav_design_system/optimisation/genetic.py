@@ -44,11 +44,18 @@ class Genetic(ABC):
     def analyse(self, child: Child):
         pass
 
-    def _mutate(self):
+    def _mutate(self, kwargs):
         """
+        mutate the kwarg dictionary according to schema
+        """
+        new_dict = {}
+        for key, value in kwargs.items():
+            constraint = self.schema[key]
+            delta = 0.05 * (constraint.max - constraint.min)
+            sign = random.choice([1, -1])
+            new_dict[key] = value + sign * delta
+        return new_dict
 
-        """
-        pass
 
     def run_genetic(self, generations = 10, store = False, display = False):
 
