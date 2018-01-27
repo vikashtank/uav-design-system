@@ -20,18 +20,40 @@ class TestCase(unittest.TestCase):
                                      }
                            }
         self.schema = opt.Schema.from_dict(self.input_dict)
-        self.Genetic = opt.Genetic(opt.GeneticFactory(), self.schema)
+        self.genetic = opt.Genetic(opt.GeneticFactory(), self.schema)
 
     def test_create_random_dict(self):
         """
         tests a random dict is created within schema constraints
         """
-        actual_dict = self.Genetic._create_random_dict()
+        actual_dict = self.genetic._create_random_dict()
         self.assertTrue("name1" in actual_dict)
         self.assertTrue("name2" in actual_dict)
         self.assertTrue(4 < actual_dict["name1"] < 5)
         self.assertTrue(2 < actual_dict["name2"] < 7)
 
+    def test_combine(self):
+        test_dict = {
+                        "name1": 0,
+                        "name2": 1,
+                        "name3": 2,
+                        "name4": 3,
+                        "name5": 4
+                    }
+        test_dict2 = {
+                        "name1": 5,
+                        "name2": 6,
+                        "name3": 7,
+                        "name4": 8,
+                        "name5": 9
+                    }
+        new_dict = self.genetic._combine(test_dict, test_dict2)
+        self.assertEqual(new_dict, {"name1": 0,
+                                    "name2": 6,
+                                    "name3": 2,
+                                    "name4": 8,
+                                    "name5": 4
+                                    })
 
 
 if __name__ == "__main__":

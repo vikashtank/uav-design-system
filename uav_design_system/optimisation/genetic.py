@@ -44,7 +44,7 @@ class Genetic(ABC):
     def analyse(self, child: Child):
         pass
 
-    def mutate(self):
+    def _mutate(self):
         """
 
         """
@@ -56,13 +56,18 @@ class Genetic(ABC):
             child.results = self.analyse(child)
             fitness = self.fitness(child.results)
 
-    def combine(self, child1: Child, child2: Child):
+    def _combine(self, dict1, dict2):
         """
         takes two children, and combines their input dictionaries to create
         a new child
         """
-        child3_inputs = child1.inputs + child2.inputs
-        return Child(child3)
+        dict3 = {}
+        for index, key in enumerate(dict1):
+            if index%2 == 0:
+                dict3[key] = dict1[key]
+            else:
+                dict3[key] = dict2[key]
+        return dict3
 
     def create_random_child(self, kwargs):
         # create a child dictionary from schema
