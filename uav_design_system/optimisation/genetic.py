@@ -51,7 +51,7 @@ class Genetic(ABC):
         new_dict = {}
         for key, value in kwargs.items():
             constraint = self.schema[key]
-            delta = 0.05 * (constraint.max - constraint.min)
+            delta = 0.01 * (constraint.max - constraint.min)
             sign = random.choice([1, -1])
             new_dict[key] = value + sign * delta
         return new_dict
