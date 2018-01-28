@@ -33,7 +33,7 @@ class TestCase(unittest.TestCase):
         """
         tests a random dict is created within schema constraints
         """
-        actual_dict = self.genetic._create_random_dict()
+        actual_dict = self.genetic._create_random_child()
         self.assertTrue("name1" in actual_dict)
         self.assertTrue("name2" in actual_dict)
         self.assertTrue(4 < actual_dict["name1"] < 5)
@@ -75,6 +75,10 @@ class TestCase(unittest.TestCase):
         self.assertEqual(self.genetic._confine(6, 4, 6), 6)
         self.assertEqual(self.genetic._confine(3, 4, 6), 4)
         self.assertEqual(self.genetic._confine(7, 4, 6), 6)
+
+    def test_run(self):
+        children = self.genetic()
+        self.assertEqual(len(children), 100)
 
 
 

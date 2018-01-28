@@ -18,7 +18,7 @@ class GeneticFactory(ABC):
     pass
 
 
-class Genetic(ABC):
+class Genetic():
 
 
     def __init__(self, factory: GeneticFactory, schema: Schema):
@@ -28,14 +28,14 @@ class Genetic(ABC):
     def fitness(self):
         pass
 
-    def generate_population(self, population_size):
+    def generate_initial_population(self, population_size):
         """
         generate many potential designs for the initial run
         """
         population = []
 
         while(len(population) < population_size):
-            child = create_random_child()
+            child = self._create_random_child()
             if self.is_valid_child(child):
                 population.append(child)
 
@@ -44,12 +44,19 @@ class Genetic(ABC):
     def analyse(self, child: Child):
         pass
 
+    def is_valid_child(self, child):
+        """
+        checks the child created
+        """
+        return True
+
     def filter_population(self, children):
         """
         filters the population on how well they perform
         """
+        half_size = int(0.5 * len(children))
+        best_children = children[0: half_size]
         return best_children
-
 
     def _mutate(self, kwargs):
         """
@@ -72,10 +79,26 @@ class Genetic(ABC):
             value = max
         return value
 
-    def run_genetic(self, generations = 10, store = False, display = False):
+    def run_genetic(self, initial_population, current_generation, max_generations):
+        """
+        takes an intial population and returns
+        """
+        children = initial_population
 
-        best_children = self.filter_population(generate_population())
+        if current_generation < max_generations - 1:
+            best_children = self.filter_population(initial_population)
+            next_population = self.generate_next_population(best_children)
+            children = children + self.run_genetic(next_population,
+                                                   current_generation + 1,
+                                                   max_generations)
 
+        return children
+
+    def generate_next_population(self, population):
+        """
+        create a new population from the filtered population
+        """
+        return population * 2
 
     def _combine(self, dict1, dict2):
         """
@@ -94,15 +117,15 @@ class Genetic(ABC):
         """
         create a child from two parents and mutate the child to produce
         next generation
+
+        inputs
+            parent1(dict[str, foat]): a dictionary of strings to floats
+            parent2(dict[str, foat]): a dictionary of strings to floats
         """
         combined_dict = self._combine(parent1, parent2)
         return self.mutate(combined_dict)
 
-    def create_random_child(self, kwargs):
-        # create a child dictionary from schema
-        new_child_dict = self._create_random_dict()
-
-    def _create_random_dict(self):
+    def _create_random_child(self):
         """
         creates a random dictionary within the schema constraints
         """
@@ -112,6 +135,10 @@ class Genetic(ABC):
             val = round(val, 4)
             new_child_dict[constraint.name] = val
         return new_child_dict
+
+    def __call__(self, generations = 10, store = False, display = False):
+        initial_population = self.generate_initial_population(generations)
+        return self.run_genetic(initial_population, 0, generations)
 
 
 class GeneticInterface(ABC):
