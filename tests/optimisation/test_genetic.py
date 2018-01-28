@@ -64,11 +64,17 @@ class TestCase(unittest.TestCase):
         actual_dict = self.genetic._mutate(test_dict)
         self.assertTrue("name1" in actual_dict)
         self.assertTrue("name2" in actual_dict)
-        print(actual_dict)
         self.assertTrue(4 < actual_dict["name1"] < 5)
         self.assertTrue(2 < actual_dict["name2"] < 7)
         self.assertTrue(actual_dict["name1"] != 4.5)
         self.assertTrue(actual_dict["name2"] != 4)
+
+    def test_confine(self):
+        self.assertEqual(self.genetic._confine(5, 4, 6), 5)
+        self.assertEqual(self.genetic._confine(4, 4, 6), 4)
+        self.assertEqual(self.genetic._confine(6, 4, 6), 6)
+        self.assertEqual(self.genetic._confine(3, 4, 6), 4)
+        self.assertEqual(self.genetic._confine(7, 4, 6), 6)
 
 
 

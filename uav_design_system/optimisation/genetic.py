@@ -44,6 +44,13 @@ class Genetic(ABC):
     def analyse(self, child: Child):
         pass
 
+    def filter_population(self, children):
+        """
+        filters the population on how well they perform
+        """
+        return best_children
+
+
     def _mutate(self, kwargs):
         """
         mutate the kwarg dictionary according to schema
@@ -53,15 +60,22 @@ class Genetic(ABC):
             constraint = self.schema[key]
             delta = 0.01 * (constraint.max - constraint.min)
             sign = random.choice([1, -1])
-            new_dict[key] = value + sign * delta
+            new_value = value + sign * delta
+            #enforce schema constraints
+            new_dict[key] = self._confine(new_value, constraint.min, constraint.max)
         return new_dict
 
+    def _confine(self, value, min, max):
+        if value < min:
+            value = min
+        elif value > max:
+            value = max
+        return value
 
     def run_genetic(self, generations = 10, store = False, display = False):
 
-        for child in generate_population():
-            child.results = self.analyse(child)
-            fitness = self.fitness(child.results)
+        best_children = self.filter_population(generate_population())
+
 
     def _combine(self, dict1, dict2):
         """
@@ -75,6 +89,14 @@ class Genetic(ABC):
             else:
                 dict3[key] = dict2[key]
         return dict3
+
+    def child_from_parents(self, parent1, parent2):
+        """
+        create a child from two parents and mutate the child to produce
+        next generation
+        """
+        combined_dict = self._combine(parent1, parent2)
+        return self.mutate(combined_dict)
 
     def create_random_child(self, kwargs):
         # create a child dictionary from schema
