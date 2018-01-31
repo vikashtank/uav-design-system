@@ -80,6 +80,13 @@ class TestCase(unittest.TestCase):
         children = self.genetic()
         self.assertEqual(len(children), 100)
 
+    def test_next_population(self):
+        test_dict = {
+                        "name1": 4.5,
+                        "name2": 4,
+                    }
+        new_population = self.genetic.generate_next_population([test_dict] * 5)
+        self.assertEqual(len(new_population), 10)
 
 
 

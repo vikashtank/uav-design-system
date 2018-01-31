@@ -25,8 +25,8 @@ class Genetic():
         self.factory = factory
         self.schema = schema
 
-    def fitness(self):
-        pass
+    def fitness(self, child):
+        return id(child)
 
     def generate_initial_population(self, population_size):
         """
@@ -42,12 +42,14 @@ class Genetic():
         return population
 
     def analyse(self, child: Child):
+        # run analysis on sections
         pass
 
     def is_valid_child(self, child):
         """
         checks the child created
         """
+        # test that the sections fit the aerofoils
         return True
 
     def filter_population(self, children):
@@ -55,6 +57,7 @@ class Genetic():
         filters the population on how well they perform
         """
         half_size = int(0.5 * len(children))
+        children.sort(key = lambda x: self.fitness(x))
         best_children = children[0: half_size]
         return best_children
 
@@ -98,7 +101,17 @@ class Genetic():
         """
         create a new population from the filtered population
         """
-        return population * 2
+        new_population = []
+        for i in range(len(population)):
+
+            parent1 = population[i]
+            parent2 = population[-i]
+            child = self.child_from_parents(parent1, parent2)
+            new_population.append(child)
+            child = self.child_from_parents(parent2, parent1)
+            new_population.append(child)
+
+        return new_population
 
     def _combine(self, dict1, dict2):
         """
@@ -123,7 +136,7 @@ class Genetic():
             parent2(dict[str, foat]): a dictionary of strings to floats
         """
         combined_dict = self._combine(parent1, parent2)
-        return self.mutate(combined_dict)
+        return self._mutate(combined_dict)
 
     def _create_random_child(self):
         """
