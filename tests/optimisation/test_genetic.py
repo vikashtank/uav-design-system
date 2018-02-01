@@ -26,18 +26,31 @@ class TestCase(unittest.TestCase):
                             "name4": 3,
                             "name5": 4
                         }
+        self.test_dict_small = {
+                                "name1": 4.5,
+                                "name2": 4,
+                                }
         self.schema = opt.Schema.from_dict(self.input_dict)
         self.genetic = opt.Genetic(opt.GeneticFactory(), self.schema)
 
-    def test_create_random_dict(self):
+    def test_create_random_child(self):
         """
         tests a random dict is created within schema constraints
         """
-        actual_dict = self.genetic._create_random_child()
+        child = self.genetic._create_random_child()
+        self.assertIsInstance(child, opt.Child)
+        actual_dict = child.inputs
         self.assertTrue("name1" in actual_dict)
         self.assertTrue("name2" in actual_dict)
         self.assertTrue(4 < actual_dict["name1"] < 5)
         self.assertTrue(2 < actual_dict["name2"] < 7)
+
+    def test_create_initial_population(self):
+        population = self.genetic.generate_initial_population(10)
+        self.assertEqual(len(population), 10)
+        for i in population:
+            self.assertIsInstance(i, opt.Child)
+
 
     def test_combine(self):
 
@@ -57,11 +70,7 @@ class TestCase(unittest.TestCase):
                                     })
 
     def test_mutate(self):
-        test_dict = {
-                        "name1": 4.5,
-                        "name2": 4,
-                    }
-        actual_dict = self.genetic._mutate(test_dict)
+        actual_dict = self.genetic._mutate(self.test_dict_small)
         self.assertTrue("name1" in actual_dict)
         self.assertTrue("name2" in actual_dict)
         self.assertTrue(4 < actual_dict["name1"] < 5)
@@ -80,13 +89,32 @@ class TestCase(unittest.TestCase):
         children = self.genetic()
         self.assertEqual(len(children), 100)
 
-    def test_next_population(self):
-        test_dict = {
-                        "name1": 4.5,
-                        "name2": 4,
-                    }
-        new_population = self.genetic.generate_next_population([test_dict] * 5)
+    def test_generate_next_population(self):
+        initial_population = []
+        for i in range(5):
+            child = opt.Child(self.test_dict_small)
+            initial_population.append(child)
+
+        new_population = self.genetic.generate_next_population(initial_population)
         self.assertEqual(len(new_population), 10)
+
+class TestChild(unittest.TestCase):
+
+    def setUp(self):
+        self.input_dict = {"inputs": 1}
+        self.child_instance = opt.Child(self.input_dict)
+
+    def tearDown(self):
+        pass
+
+    def test_results_property(self):
+
+        self.child_instance.results = "hello"
+        self.assertEqual(self.child_instance.results, "hello")
+
+    def test_inputs_property(self):
+
+        self.assertEqual(self.child_instance.inputs, self.input_dict)
 
 
 
