@@ -196,7 +196,7 @@ class Surface():
         surface_string = self._surface_string
         # add section strings
         for i, section in enumerate(self.sections):
-            list = [section._to_avl_string(f"{prefix}section{i}_aerofoil.txt"),
+            list = [section._to_avl_string(f"{prefix}sec{i}_af.txt"),
                     "#" + "-" * 23,
                     ]
             surface_string += ("\n" + "\n".join(list))
