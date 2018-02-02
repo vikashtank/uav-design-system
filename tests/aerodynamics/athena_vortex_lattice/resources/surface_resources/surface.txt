@@ -1,11 +1,3 @@
-all
-0.0                      Mach
-0     0     0.0          iYsym  iZsym  Zsym
-120.0 10  20          Sref   Cref   Bref   reference area, chord, span
-0 0   0          Xref   Yref   Zref   moment reference location (arb.)
-0.020                    CDoref
-#
-#==============================================================
 #
 SURFACE
 surface1

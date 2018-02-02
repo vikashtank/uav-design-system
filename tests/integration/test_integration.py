@@ -29,7 +29,7 @@ class Test(unittest.TestCase):
         self.mass_file = join(self.test_folder, "UAV.mass")
         self.run_file = join(self.test_folder, "UAV.run")
 
-        self.run_analysis = False
+        self.run_analysis = True
         self.plot = False
 
     def tearDown(self):
@@ -60,8 +60,9 @@ class Test(unittest.TestCase):
         surface.add_section(section1, section2, section3)
         surface.add_control_surface(control_surface, 1, 2)
         surface.reflect_surface = True
+        plane = avl.Plane("UAV", surface)
 
-        avl_input, aerofoil_files = surface.dump_avl_inputs(self.test_folder)
+        avl_input, aerofoil_files = plane.dump_avl_files(self.test_folder)
 
         # create a mass file ---------------------------------------------------
         # create sustructure from wing
@@ -89,6 +90,7 @@ class Test(unittest.TestCase):
                                       self.run_file,
                                       *aerofoil_files)
             results = avl_runner.generate_results(self.results_dir)
+        print(results.alpha)
 
         if self.plot:
             plot = plt.subplot(111)

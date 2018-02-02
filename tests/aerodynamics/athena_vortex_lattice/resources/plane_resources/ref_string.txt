@@ -1,0 +1,7 @@
+plane1
+0.0                      Mach
+0     0     0.0          iYsym  iZsym  Zsym
+60.0 10  10          Sref   Cref   Bref   reference area, chord, span
+0 0   0          Xref   Yref   Zref   moment reference location (arb.)
+0.020                    CDoref
+#

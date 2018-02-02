@@ -158,27 +158,9 @@ class Surface():
     def __getitem__(self, key):
         return self.sections[key]
 
-    @property
-    def _ref_string(self):
-        """
-        reference string at the top of the avl input file
-        """
-        list = ["all",
-                "0.0                      Mach",
-                "0     0     0.0          iYsym  iZsym  Zsym",
-                f"{self.area} {self.cord}  {self.span}          "
-                "Sref   Cref   Bref   reference area, chord, span",
-                f"{self.x_reference_coordinate} {self.y_ref}   {self.z_ref}"
-                "          Xref   Yref   Zref   moment reference location (arb.)",
-                "0.020                    CDoref",
-                "#",
-                "#" + "=" * 62,
-                ]
-
-        return "\n".join(list)
 
     @property
-    def _top_string(self):
+    def _surface_string(self):
         """
         add surface information to the avl input string
         """
@@ -209,15 +191,12 @@ class Surface():
 
         return "\n".join(list)
 
-    def _to_avl_string(self):
-        """
-        avl input file string
-        """
-        surface_string = "\n".join([self._ref_string, self._top_string])
 
+    def _to_avl_string(self, prefix = ""):
+        surface_string = self._surface_string
         # add section strings
         for i, section in enumerate(self.sections):
-            list = [section._to_avl_string(f"section{i}_aerofoil.txt"),
+            list = [section._to_avl_string(f"{prefix}section{i}_aerofoil.txt"),
                     "#" + "-" * 23,
                     ]
             surface_string += ("\n" + "\n".join(list))
@@ -286,7 +265,7 @@ class Surface():
         """
         avl_file = join(directory, f"{self.name}.avl")
         with open(avl_file, "w") as open_file:
-            open_file.write(self._to_avl_string())
+            open_file.write(self._to_avl_string_2())
         files = self._write_aerofoil_files(directory)
         return avl_file, files
 

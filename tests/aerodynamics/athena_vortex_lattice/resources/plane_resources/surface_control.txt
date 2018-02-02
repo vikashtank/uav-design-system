@@ -1,3 +1,11 @@
+plane1
+0.0                      Mach
+0     0     0.0          iYsym  iZsym  Zsym
+120.0 10  20          Sref   Cref   Bref   reference area, chord, span
+0 0   0          Xref   Yref   Zref   moment reference location (arb.)
+0.020                    CDoref
+#
+#==============================================================
 #
 SURFACE
 surface1
@@ -21,12 +29,12 @@ SECTION
 CONTROL
 elevator  1  0.8   0 1 0   1
 AFIL
-section0_aerofoil.txt
+surf0_section0_aerofoil.txt
 #-----------------------
 #    Xle         Yle         Zle         chord       angle   Nspan  Sspace
 SECTION
      0     10     0     2         0
 
 AFIL
-section1_aerofoil.txt
+surf0_section1_aerofoil.txt
 #-----------------------

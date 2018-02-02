@@ -136,6 +136,7 @@ class TestSurface(unittest.TestCase):
         self.assertEqual(y, expected_y_coords)
         self.assertEqual(z, expected_z_coords)
 
+
 class TestSurfaceWrite(unittest.TestCase):
 
     def setUp(self):
@@ -189,45 +190,6 @@ class TestSurfaceWrite(unittest.TestCase):
         self.maxDiff = None
         self.assertEqual(self.surface._to_avl_string().strip(),
                          expected_string.strip())
-
-class TestSurfaceDump(unittest.TestCase):
-
-    def setUp(self):
-        self.temp_dir = join(this_directory, "temp")
-        makedirs(self.temp_dir)
-
-        # create wing with aerofoil
-        self.aerofoil = aerofoil.Aerofoil.develop_aerofoil(0.2, 0.2, 0.2, 0.2, 0.2)
-        self.surface = avl.Surface("surface1")
-        self.surface.define_mesh(20, 30, 1.0, 1.0)
-
-        section1 = avl.Section(10)
-        section1.aerofoil = self.aerofoil
-
-        section2 = avl.Section(2)
-        section2.aerofoil = self.aerofoil
-
-        section2.translation_bias(0, 10, 0)
-
-        self.surface.add_section(section1, section2)
-
-    def tearDown(self):
-        shutil.rmtree(self.temp_dir)
-
-    def test_dump(self):
-
-        avl_file, aero_files = self.surface.dump_avl_inputs(self.temp_dir)
-        self.assertTrue(exists(join(self.temp_dir, "section0_aerofoil.txt")))
-        self.assertTrue(exists(join(self.temp_dir, "section1_aerofoil.txt")))
-        self.assertTrue(exists(join(self.temp_dir, "surface1.avl")))
-
-    def test_dump_returns(self):
-
-        avl_file, aero_files = self.surface.dump_avl_inputs(self.temp_dir)
-        self.assertEqual(avl_file, join(self.temp_dir, "surface1.avl"))
-        self.assertEqual(len(aero_files), 2)
-        self.assertEqual(aero_files[0], join(self.temp_dir, "section0_aerofoil.txt"))
-        self.assertEqual(aero_files[1], join(self.temp_dir, "section1_aerofoil.txt"))
 
 
 class TestSection(unittest.TestCase):

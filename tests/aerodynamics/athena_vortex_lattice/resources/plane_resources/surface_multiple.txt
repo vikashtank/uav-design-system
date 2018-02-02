@@ -1,0 +1,69 @@
+plane1
+0.0                      Mach
+0     0     0.0          iYsym  iZsym  Zsym
+60.0 10  10          Sref   Cref   Bref   reference area, chord, span
+0 0   0          Xref   Yref   Zref   moment reference location (arb.)
+0.020                    CDoref
+#
+#==============================================================
+#
+SURFACE
+surface1
+20  1.0  30  1.0  !  Nchord   Cspace   Nspan  Sspace
+#
+# reflect image wing about y=0 plane
+
+#
+# twist angle bias for whole surface
+ANGLE
+     0
+#
+# x,y,z bias for whole surface
+TRANSLATE
+    0     0     0
+#--------------------------------------------------------------
+#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
+SECTION
+     0     0     0     10         0
+
+AFIL
+surf0_section0_aerofoil.txt
+#-----------------------
+#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
+SECTION
+     0     10     0     2         0
+
+AFIL
+surf0_section1_aerofoil.txt
+#-----------------------
+#==============================================================
+#
+SURFACE
+tail
+20  1  40  1  !  Nchord   Cspace   Nspan  Sspace
+#
+# reflect image wing about y=0 plane
+
+#
+# twist angle bias for whole surface
+ANGLE
+     0
+#
+# x,y,z bias for whole surface
+TRANSLATE
+    10     0     0
+#--------------------------------------------------------------
+#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
+SECTION
+     0     0     0     1         0
+
+AFIL
+surf1_section0_aerofoil.txt
+#-----------------------
+#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
+SECTION
+     0     5     0     1         0
+
+AFIL
+surf1_section1_aerofoil.txt
+#-----------------------
