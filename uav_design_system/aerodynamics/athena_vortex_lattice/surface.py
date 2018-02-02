@@ -255,20 +255,6 @@ class Surface():
                 continue
         return files
 
-    def dump_avl_inputs(self, directory: str):
-        """
-        dumps the avl and aerofoil files to a directory
-
-        returns:
-            (str, List[str]): a string to the avl_file and a list of aerofoil
-                              file paths
-        """
-        avl_file = join(directory, f"{self.name}.avl")
-        with open(avl_file, "w") as open_file:
-            open_file.write(self._to_avl_string_2())
-        files = self._write_aerofoil_files(directory)
-        return avl_file, files
-
 
 class Section():
 
