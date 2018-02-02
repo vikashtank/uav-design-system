@@ -41,7 +41,7 @@ class AVLRunner(Runner):
             self._move_to_runtime(required_file)
 
         # begin avl executable
-        self.process = Process.initialise_process(self.executable)
+        self.process = Process.initialise_process(self.executable, cwd = self.run_time_directory)
 
         self.process.command("LOAD " + self.geom_file)
         self.process.command("CASE " + self.config_file)

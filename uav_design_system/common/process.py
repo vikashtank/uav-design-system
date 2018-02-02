@@ -25,6 +25,10 @@ class Runner():
         # create a variable for the path to the location of the xfoil executable
         self.executable = file_path
 
+    @property
+    def run_time_directory(self):
+        return self.temp_folder
+
 
     def _move_to_runtime(self, file_path):
 
@@ -53,12 +57,18 @@ class Process():
         self.process.poll()
 
     @staticmethod
-    def initialise_process(file_path):
+    def initialise_process(file_path: str, cwd: str = ""):
 
-        process = subprocess.Popen([file_path], stdin = subprocess.PIPE,
-        stdout = subprocess.PIPE,
-        stderr = subprocess.STDOUT,
-        universal_newlines=True)
+        if cwd is "":
+            process = subprocess.Popen([file_path], stdin = subprocess.PIPE,
+            stdout = subprocess.PIPE,
+            stderr = subprocess.STDOUT,
+            universal_newlines=True)
+        else:
+            process = subprocess.Popen([file_path],cwd = cwd, stdin = subprocess.PIPE,
+            stdout = subprocess.PIPE,
+            stderr = subprocess.STDOUT,
+            universal_newlines=True)
 
         return Process(process)
 
