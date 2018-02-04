@@ -116,6 +116,30 @@ class TestArrangement(unittest.TestCase):
         self.assertEqual(arrangement.center_of_gravity,
                          layout.Point(0.5, 1, 1.5))
 
+    def test_center_of_gravity_complicated(self):
+        """
+        tests the calculation of the center of gravity with masses in different
+        locations
+        """
+        self.mass1.location = layout.Point(6, 5, 4)
+        geometry = layout.Cuboid(1,2,3)
+        mass2 = layout.MassObject(geometry, 1, "name2")
+        arrangement = layout.Arrangement("arrangement1", self.mass1, mass2)
+        self.assertEqual(arrangement.center_of_gravity,
+                         layout.Point(3.5, 3.5, 3.5))
+
+    def test_center_of_gravity_global(self):
+        """
+        tests the calculation of the center of gravity global
+        """
+        self.mass1.location = layout.Point(6, 5, 4)
+        geometry = layout.Cuboid(1,2,3)
+        mass2 = layout.MassObject(geometry, 1, "name2")
+        arrangement = layout.Arrangement("arrangement1", self.mass1, mass2)
+        arrangement.location = layout.Point(1, 2, 3)
+        self.assertEqual(arrangement.center_of_gravity_global,
+                         layout.Point(4.5, 5.5, 6.5))
+
     def test_total_mass(self):
         arrangement = layout.Arrangement("arrangement1", *self.mass_list)
         self.assertEqual(arrangement.total_mass, 60)
