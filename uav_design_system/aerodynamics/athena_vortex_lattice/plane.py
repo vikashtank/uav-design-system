@@ -89,3 +89,15 @@ class Plane():
     @property
     def reference_span(self):
         return self.main_surface.span
+
+
+    def plot_xy(self, subplot = None, marker = "g_"):
+
+        if subplot is None:
+            subplot = plt.subplot(111)
+        for surface in self:
+            x, y, _ = surface.get_plot_coordinates()
+            x = [i + surface.x for i in x]
+            y = [i + surface.y for i in y]
+            subplot.plot(x, y, marker)
+        return subplot
