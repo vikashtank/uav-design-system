@@ -286,6 +286,10 @@ class TestPoint(unittest.TestCase):
         self.assertEqual(self.point1.reflect_y(),
                          geometry.Point(1, -2, 3))
 
+    def test_subtract(self):
+        self.assertEqual(self.point1 - self.point2,
+                         geometry.Point(0, 0, 0))
+
 
 class TestPoint2D(unittest.TestCase):
 

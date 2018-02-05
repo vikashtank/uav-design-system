@@ -338,6 +338,15 @@ class Point():
 
         return Point(x, y, z)
 
+    def __sub__(self, value: 'Point'):
+
+        x = self.x - value.x
+        y = self.y - value.y
+        z = self.z - value.z
+
+        return Point(x, y, z)
+
+
     def __iadd__(self, value: 'Point'):
         self.x += value.x
         self.y += value.y
