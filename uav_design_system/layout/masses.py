@@ -98,18 +98,19 @@ class Arrangement(IsArrangeable):
 
     @property
     def center_of_gravity(self):
+        return self.center_of_gravity_global - self.location
 
-        mom_x = sum(mass.mass * mass.center_of_gravity_global.x for mass in self.all_mass_objects)
-        mom_y = sum(mass.mass * mass.center_of_gravity_global.y for mass in self.all_mass_objects)
-        mom_z = sum(mass.mass * mass.center_of_gravity_global.z for mass in self.all_mass_objects)
+    @property
+    def center_of_gravity_global(self):
+        flat = self.flatten()
+
+        mom_x = sum(mass.mass * mass.center_of_gravity_global.x for mass in flat)
+        mom_y = sum(mass.mass * mass.center_of_gravity_global.y for mass in flat)
+        mom_z = sum(mass.mass * mass.center_of_gravity_global.z for mass in flat)
 
         return Point(mom_x/self.total_mass,
                      mom_y/self.total_mass,
                      mom_z/self.total_mass)
-
-    @property
-    def center_of_gravity_global(self):
-        return self.center_of_gravity + self.location
 
     def clone(self, reflect_y = False):
         """
@@ -146,7 +147,7 @@ class Arrangement(IsArrangeable):
         if subplot is None:
             plot = plt.subplot(111)
 
-        for mass in self.all_mass_objects:
+        for mass in self.flatten():
             x,y  = mass.geometry.project_xy.plot_coordinates
             subplot.plot(x, y, marker)
 
