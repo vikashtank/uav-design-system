@@ -25,7 +25,7 @@ class StructuralModel(masses.Arrangement):
 
 class FoamSection(masses.MassObject):
 
-    FOAMDENSITY = 5
+    FOAMDENSITY = 36
 
     def __init__(self, x1: float, x2: float, x_shift: float, y: float,
                  thickness: float, name: str = ""):

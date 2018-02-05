@@ -14,27 +14,32 @@ class TestCreateFoamWing(unittest.TestCase):
     """
 
     def setUp(self):
-        surface = avl.Surface(name = "test_surface")
+        self.surface = avl.Surface(name = "test_surface")
 
         # add five square sections side by side to form a rectangular surface
         for i in range(5):
             section = avl.Section(1)
             section.translation_bias(0, i, 0)
-            surface.add_section(section)
+            self.surface.add_section(section)
 
-        foam_factory = layout.StructureFactory(layout.StructuralModelType.HOLLOWFOAM)
-        self.structural_model = foam_factory(surface, wall_thickness = 1)
+        self.foam_factory = layout.StructureFactory(layout.StructuralModelType.HOLLOWFOAM)
+        self.structural_model = self.foam_factory(self.surface, wall_thickness = 1)
 
     def tearDown(self):
         pass
+
+    def test_return_type(self):
+        """
+        tests the correct object type and size is returned
+        """
+        self.assertTrue(isinstance(self.structural_model, layout.StructuralModel))
+        self.assertEqual(len(self.structural_model.objects), 4)
 
     def test_structural_factory_foam(self):
         """
         tests that the stuctural factory produces the correct structural model
         for the foam model and returns the correct centers of gravity
         """
-        self.assertTrue(isinstance(self.structural_model, layout.StructuralModel))
-        self.assertEqual(len(self.structural_model.objects), 4)
 
         for index, section in enumerate(self.structural_model.objects):
             point = layout.Point(0.5, index + 0.5, 1)
@@ -42,9 +47,8 @@ class TestCreateFoamWing(unittest.TestCase):
             self.assertEqual(section.center_of_gravity_global.y, point.y)
             self.assertEqual(section.center_of_gravity_global.z, point.z)
 
-
     def test_total_mass(self):
-        density = 5
+        density = 36
         thickness = 1
         number_of_sections = 4
         self.assertEqual(self.structural_model.total_mass, density * 2 *
