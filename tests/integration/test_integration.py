@@ -89,8 +89,8 @@ class Test(unittest.TestCase):
                                   self.run_file,
                                   *aerofoil_files)
         results = avl_runner.generate_results(self.results_dir)
-        self.assertEqual(results.alpha, 1.29549)
-        self.assertEqual(results.elevator_deflection, 2.80441)
+        self.assertEqual(results.alpha, 6.70371)
+        self.assertEqual(results.elevator_deflection, 26.68316)
 
 
         if self.plot:
