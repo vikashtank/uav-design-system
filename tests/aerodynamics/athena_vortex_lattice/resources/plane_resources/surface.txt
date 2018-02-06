@@ -28,12 +28,12 @@ SECTION
      0     0     0     10         0
 
 AFIL
-surf0_section0_aerofoil.txt
+surf0_sec0_af.txt
 #-----------------------
 #    Xle         Yle         Zle         chord       angle   Nspan  Sspace
 SECTION
      0     10     0     2         0
 
 AFIL
-surf0_section1_aerofoil.txt
+surf0_sec1_af.txt
 #-----------------------
