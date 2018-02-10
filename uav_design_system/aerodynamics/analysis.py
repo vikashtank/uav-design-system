@@ -135,7 +135,7 @@ class AerodynamicAnalysis():
             aerofoil.write(open_file)
         xfoil_runner = aero.xfoil.XfoilRunner(self.xfoil_file_path)
         xfoil_runner.setup_analysis(aerofoil_file, reynolds_number)
-        return xfoil_runner(angle_of_attack - 1, angle_of_attack + 1, 0.5, False).get_alpha(angle_of_attack)
+        return xfoil_runner(angle_of_attack - 2, angle_of_attack + 1, 0.5, False).get_alpha(angle_of_attack)
 
     def _run_xfoil_plane(self, alpha):
         xfoil_results = {}
