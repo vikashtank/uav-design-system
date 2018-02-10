@@ -358,6 +358,26 @@ class TestMassObject(unittest.TestCase):
         mass = layout.MassObject.from_mass(self.geometry, 1, "name")
         self.assertEqual(mass.density, 1/6)
 
+    def test_clone(self):
+        self.geometry = layout.Cuboid(1,2,3)
+        mass_object = layout.MassObject(self.geometry, 1, "name")
+        cloned_mass = mass_object.clone()
+        self.assertEqual(cloned_mass.geometry.x_size, 1)
+        self.assertEqual(cloned_mass.geometry.y_size, 2)
+        self.assertEqual(cloned_mass.geometry.z_size, 3)
+
+        self.assertEqual(mass_object.center_of_gravity, layout.Point(0.5, 1, 1.5))
+
+    def test_clone_reflect_y(self):
+        self.geometry = layout.Cuboid(1,2,3)
+        mass_object = layout.MassObject(self.geometry, 1, "name")
+        cloned_mass = mass_object.clone(reflect_y = True)
+        self.assertEqual(cloned_mass.geometry.x_size, 1)
+        self.assertEqual(cloned_mass.geometry.y_size,  -2)
+        self.assertEqual(cloned_mass.geometry.z_size, 3)
+
+        self.assertEqual(cloned_mass.center_of_gravity, layout.Point(0.5, -1, 1.5))
+
 
 if __name__ == "__main__":
     unittest.main()

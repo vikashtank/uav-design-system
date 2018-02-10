@@ -229,8 +229,15 @@ class MassObject(IsArrangeable):
                                                                      izz)
         return template
 
-    def clone(self):
-        return copy.deepcopy(self)
+    def clone(self, reflect_y = False):
+
+        clone = copy.deepcopy(self)
+
+        if reflect_y:
+            reflected_geom = clone.geometry.reflect_y()
+            clone.geometry = clone.geometry.reflect_y()
+
+        return clone
 
     def __eq__(self, value):
 
