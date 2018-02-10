@@ -111,6 +111,53 @@ class Cylinder(ThreeDimentional):
         return cylinder
 
 
+class HollowCylinder(ThreeDimentional):
+
+    def __init__(self, radius: float, y_size: float, thickness: float):
+        self.radius = radius
+        self.y_size = y_size
+        self.thickness = thickness
+        self.location = Point(0, 0, 0)
+        self.outer_cylinder = Cylinder(radius, y_size)
+        self.inner_cylinder = Cylinder(radius - thickness, y_size)
+
+    @property
+    def volume(self):
+        return self.outer_cylinder.volume - self.inner_cylinder.volume
+
+    @property
+    def centroid(self):
+        return Point(0, 0.5 * self.y_size, 0)
+
+    def calc_x_y_interias(self, radius, length):
+        return (1 / 12) * (3 * r * r + h * h)
+
+    @property
+    def inertia_xx(self):
+        return self.outer_cylinder.inertia_xx - self.inner_cylinder.inertia_xx
+
+    @property
+    def inertia_zz(self):
+        return self.inertia_xx
+
+    @property
+    def inertia_yy(self):
+        return self.outer_cylinder.inertia_yy - self.inner_cylinder.inertia_yy
+
+    def reflect_y(self):
+        """
+        create a new object of this class but reflected in the y axis
+        """
+        cylinder = HollowCylinder(self.radius, -1 * self.y_size, self.thickness)
+        cylinder.location = self.location.reflect_y()
+        return cylinder
+
+    @property
+    def project_xy(self):
+        rectangle = Rectangle(self.radius * 2, self.y_size)
+        rectangle.location =  Point2D(self.location.x, self.location.y)
+        return rectangle
+
 class TrapeziumPlate(ThreeDimentional):
 
     def __init__(self, x1_size, x2_size, x_shift, y_size, z_size):
