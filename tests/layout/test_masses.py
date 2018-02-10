@@ -354,6 +354,10 @@ class TestMassObject(unittest.TestCase):
         mass2 = layout.MassObject(self.geometry, 1, "name")
         self.assertEqual(mass1, mass2)
 
+    def test_from_mass(self):
+        mass = layout.MassObject.from_mass(self.geometry, 1, "name")
+        self.assertEqual(mass.density, 1/6)
+
 
 if __name__ == "__main__":
     unittest.main()

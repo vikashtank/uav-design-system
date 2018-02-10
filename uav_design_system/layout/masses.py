@@ -240,6 +240,11 @@ class MassObject(IsArrangeable):
                self.center_of_gravity == value.center_of_gravity and \
                type(self.geometry) == type(value.geometry)
 
+    @staticmethod
+    def from_mass(geometry: 'ThreeDimentional', mass: float, name = ""):
+        density = mass/geometry.volume
+        return MassObject(geometry, density, name)
+
 
 
 
