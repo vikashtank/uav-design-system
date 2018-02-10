@@ -69,8 +69,8 @@ class TestAnalysis(unittest.TestCase):
         self.assertIsInstance(self.result, aero.AerodynamicStudy)
 
     def test_total_drag(self):
-        print(self.result.viscous_drag_coefficient)
-        print(self.result.total_drag_coefficient)
+        self.assertEqual(self.result.viscous_drag_coefficient, 0.017256236044657095)
+        self.assertEqual(self.result.total_drag_coefficient, 0.11138 + 0.017256236044657095)
 
 
 

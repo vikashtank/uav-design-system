@@ -47,8 +47,8 @@ class AerodynamicStudy():
             drag += self._calc_surface_drag(self.results.xfoil_results[index],
                                             surface)
 
-        # non dimenionalise
-        drag_coefficient = drag/(self.dynamic_pressure * self.inputs.plane.main_surface.area)
+        # non dimenionalise (alread per unit dynamic pressure)
+        drag_coefficient = drag/(self.inputs.plane.main_surface.area)
 
         return drag_coefficient
 
@@ -72,14 +72,25 @@ class AerodynamicStudy():
 
         return drag
 
-
     def _get_section_drag(self, xfoil_results, index, section, next_section):
         """
         get drag per dynamic pressure between two sections
         """
-        cd, cord = xfoil_results[index]["cd"], section.cord
-        cd2, cord2 = xfoil_results[index + 1]["cd"], next_section.cord
-        return 0.5 * (cd2*cord2 + cd*cord) * (next_section.y - section.y)
+        cd, cord, y = xfoil_results[index]["cd"], section.cord, section.y
+        cd2, cord2, y2 = xfoil_results[index + 1]["cd"], next_section.cord, next_section.y
+        span = y2 - y
+        mc = (cord2 - cord) / span
+        mv = (cd2 - cd) / span
+        return self._integrate( mc*mv, cord*mv + cd*mc, cord*cd, span)
+
+    def _integrate(self, coeff1, coeff2, coeff3, span):
+        """
+        analytic function for the calculation of viscous drag per dynamic
+        pressure along a section.
+        assuming linear interpolation of viscous drag coefficients between sections
+        """
+        return (coeff1 * (1/3) * span**3) +  (coeff2 * 0.5 * span**2) + coeff3 * span
+
 
 
 class AerodynamicAnalysis():
@@ -96,7 +107,6 @@ class AerodynamicAnalysis():
         #setup athena_vortex_lattice
         self.athena_results_dir = tempfile.mkdtemp()
 
-
     def __del__(self):
         shutil.rmtree(self.xfoil_results_dir)
         shutil.rmtree(self.athena_results_dir)
@@ -111,7 +121,6 @@ class AerodynamicAnalysis():
                                        case_file,
                                        *aerofoil_files)
         return avl_runner.generate_results(self.athena_results_dir)
-
 
     def _generate_avl_files(self, plane, case, arrangement):
         run_file = join(self.athena_results_dir, "run.avl")
