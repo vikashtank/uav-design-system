@@ -123,6 +123,11 @@ class TestHollowCylinder(unittest.TestCase):
     def test_centroid(self):
         self.assertEqual(self.hollow_cylinder.centroid, geometry.Point(0, 5, 0))
 
+    def test_reflect_y(self):
+        reflected = self.hollow_cylinder.reflect_y()
+        self.assertEqual(reflected.centroid, geometry.Point(0, -5, 0))
+        self.assertEqual(reflected.volume, pi * 80)
+
 
 class TestTrapeziumPlate(unittest.TestCase):
 
