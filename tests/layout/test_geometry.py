@@ -87,7 +87,7 @@ class TestCylinder(unittest.TestCase):
         self.assertAlmostEqual(self.cylinder.volume, 10 * pi)
 
     def test_centroid(self):
-        self.assertEqual(self.cylinder.centroid, geometry.Point(0, 5, 0))
+        self.assertEqual(self.cylinder.centroid, geometry.Point(1, 5, 1))
 
     def test_inertias(self):
         self.assertAlmostEqual(self.cylinder.inertia_xx, 103/12)
@@ -107,7 +107,7 @@ class TestCylinder(unittest.TestCase):
 
     def test_reflect_y(self):
         self.assertEqual(self.cylinder.reflect_y().centroid,
-                         geometry.Point(0, -5, 0))
+                         geometry.Point(1, -5, 1))
 
 class TestHollowCylinder(unittest.TestCase):
 
@@ -121,11 +121,11 @@ class TestHollowCylinder(unittest.TestCase):
         self.assertEqual(self.hollow_cylinder.volume, pi * 80)
 
     def test_centroid(self):
-        self.assertEqual(self.hollow_cylinder.centroid, geometry.Point(0, 5, 0))
+        self.assertEqual(self.hollow_cylinder.centroid, geometry.Point(3, 5, 3))
 
     def test_reflect_y(self):
         reflected = self.hollow_cylinder.reflect_y()
-        self.assertEqual(reflected.centroid, geometry.Point(0, -5, 0))
+        self.assertEqual(reflected.centroid, geometry.Point(3, -5, 3))
         self.assertEqual(reflected.volume, pi * 80)
 
 

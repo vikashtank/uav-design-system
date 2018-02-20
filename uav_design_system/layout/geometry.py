@@ -85,7 +85,7 @@ class Cylinder(ThreeDimentional):
 
     @property
     def centroid(self):
-        return Point(0, 0.5 * self.y_size, 0)
+        return Point(self.radius, 0.5 * self.y_size, self.radius)
 
     def calc_x_y_interias(self, radius, length):
         return (1/12)*(3*r*r + h*h)
@@ -127,7 +127,7 @@ class HollowCylinder(ThreeDimentional):
 
     @property
     def centroid(self):
-        return Point(0, 0.5 * self.y_size, 0)
+        return Point(self.radius, 0.5 * self.y_size, self.radius)
 
     def calc_x_y_interias(self, radius, length):
         return (1 / 12) * (3 * r * r + h * h)
