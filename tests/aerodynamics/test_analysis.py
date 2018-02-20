@@ -59,8 +59,7 @@ class TestAnalysis(unittest.TestCase):
         return plane, case, arrangement
 
     def setUp(self):
-        self.plane, self.case, self.mass = self.create()
-        self.result = aero.AerodynamicAnalysis.run(self.plane, self.case, self.mass)
+        pass
 
     def tearDown(self):
         pass
@@ -69,9 +68,17 @@ class TestAnalysis(unittest.TestCase):
         self.assertIsInstance(self.result, aero.AerodynamicStudy)
 
     def test_total_drag(self):
+        self.plane, self.case, self.mass = self.create()
+        self.result = aero.AerodynamicAnalysis.run(self.plane, self.case, self.mass)
         self.assertEqual(self.result.viscous_drag_coefficient, 0.017256236044657095)
         self.assertEqual(self.result.total_drag_coefficient, 0.11138 + 0.017256236044657095)
 
+    def _test_total_drag_slow(self):
+        self.plane, self.case, self.mass = self.create()
+        self.case["velocity"] = 16
+        self.result = aero.AerodynamicAnalysis.run(self.plane, self.case, self.mass)
+        self.assertAlmostEqual(self.result.viscous_drag_coefficient, 0.0404, 4)
+        self.assertAlmostEqual(self.result.total_drag_coefficient, 0.4620, 4)
 
 
 
