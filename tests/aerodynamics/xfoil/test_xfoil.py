@@ -1,4 +1,5 @@
 import os
+from os.path import join
 this_directory = os.path.dirname(os.path.abspath(__file__))
 import sys
 sys.path.append(this_directory + "/../../../")
@@ -7,6 +8,13 @@ from uav_design_system.aerodynamics.xfoil import XfoilRunner
 import shutil
 import json
 
+def get_resource_content(file_name):
+    """
+    function to retrieve data from files in the resource folder for these tests
+    """
+    resources_directory = join(this_directory, "resources")
+    with open(join(resources_directory, file_name)) as open_file:
+        return open_file.read()
 
 class Test(unittest.TestCase):
 
@@ -19,13 +27,9 @@ class Test(unittest.TestCase):
             pass
 
         # read the results file that is expected to be produced
-        comparison_file = os.path.join(this_directory, "resources", "aerofoil_results.txt")
-        comparison_json = os.path.join(this_directory, "resources", "expected_results.json")
         self.aerofoil_file = os.path.join(this_directory, "resources", "test_aerofoil.txt")
-
-        with open(comparison_file) as open_file:
-            self.expected_content = open_file.read()
-
+        self.expected_content = get_resource_content("aerofoil_results.txt")
+        comparison_json = os.path.join(this_directory, "resources", "expected_results.json")
         with open(comparison_json) as open_file:
             self.expected_json = json.load(open_file)
 
@@ -62,6 +66,11 @@ class Test(unittest.TestCase):
         xfoil_dict = self.expected_json["xfoil"]
         self.maxDiff = None
         self.assertEqual(results._results_dict, self.expected_json )
+
+    def _test_(self):
+        aerofoil_file = os.path.join(this_directory, "resources", "test_aerofoil2.txt")
+        self.xfoil_runner.setup_analysis(aerofoil_file, 67952)
+        results = self.xfoil_runner(-1, 1, 0.5, True, self.results_dir)
 
 if __name__ == "__main__":
     unittest.main()
