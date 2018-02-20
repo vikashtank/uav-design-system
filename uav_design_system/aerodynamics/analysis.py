@@ -9,7 +9,7 @@ sys.path.append(this_directory + "/../../")  # so uggo thanks to atom runner
 from uav_design_system import layout, aerodynamics as aero
 import tempfile
 import shutil
-from scipy.integrate import quad
+import math
 
 class Inputs():
 
@@ -135,7 +135,8 @@ class AerodynamicAnalysis():
             aerofoil.write(open_file)
         xfoil_runner = aero.xfoil.XfoilRunner(self.xfoil_file_path)
         xfoil_runner.setup_analysis(aerofoil_file, reynolds_number)
-        return xfoil_runner(angle_of_attack - 2, angle_of_attack + 1, 0.5, False).get_alpha(angle_of_attack)
+        result =  xfoil_runner(angle_of_attack - 4, angle_of_attack + 1, 0.1, False).get_alpha(angle_of_attack)
+        return result
 
     def _run_xfoil_plane(self, alpha):
         xfoil_results = {}
