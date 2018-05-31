@@ -26,7 +26,7 @@ class Test(unittest.TestCase):
         makedirs(self.results_dir)
 
         # create temporary file names
-        self.mass_file = join(self.test_folder, "UAV.mass")
+        self.mass_file = join(self.test_folder, "mass.mass")
         self.run_file = join(self.test_folder, "UAV.run")
 
         self.alphas = []
@@ -35,7 +35,7 @@ class Test(unittest.TestCase):
         self.cl_cd = []
 
         self.run_analysis = True
-        self.plot = False
+        self.plot = True
 
     def tearDown(self):
         rmtree(self.results_dir)
@@ -86,21 +86,26 @@ class Test(unittest.TestCase):
 
         # create a mass file ---------------------------------------------------
         # create sustructure from wing
-        structure_creator  = layout.StructureFactory(layout.StructuralModelType.HOLLOWFOAM)
+        """structure_creator  = layout.StructureFactory(layout.StructuralModelType.HOLLOWFOAM)
         structural_model = structure_creator(surface, wall_thickness = input_dict["wall_thickness"])
-        structural_clone =  structural_model.clone(reflect_y = True)
+        structural_clone =  structural_model.clone(reflect_y = True)"""
 
         # add some more weights and arrangement
-        battery = layout.MassObject(layout.Cuboid(0.1, 0.1, 0.1), 1)
-        battery.location = layout.Point(input_dict["battery_x_loc"] * cord1, -0.05, -0.05)
+        battery = layout.MassObject.from_mass(layout.Cuboid(0.19, 0.035, 0.07), 0.306)
+        battery.location = layout.Point(input_dict["battery_x_loc"] * cord1, -0.035*0.5, -0.07*0.5)
 
-        motor = layout.MassObject(layout.Cuboid(0.1, 0.1, 0.1), 1)
-        motor.location = layout.Point(cord1, -0.05, -0.05)
+        motor = layout.MassObject.from_mass(layout.Cuboid(0.092, 0.042, 0.042), 0.231*2)
+        motor.location = layout.Point(cord1, -0.042*0.5, -0.042*0.5)
 
-        arrangement = layout.Arrangement("plane arrangement", battery, motor, structural_model, structural_clone)
+        structure = layout.MassObject.from_mass(layout.Cuboid(0.01, 0.01, 0.01), 6)
+        structure.location = layout.Point(cord1*0.6, -0.005, -0.005)
+
+        arrangement = layout.Arrangement("plane arrangement", battery, motor, structure)
 
         # create case file -----------------------------------------------------
-        case = avl.TrimCase(surface.area * 2, velocity = 22,
+        print('AREA ', surface.area)
+        print('mass ', arrangement.total_mass)
+        case = avl.TrimCase(surface.area, velocity = 22,
                             mass = arrangement.total_mass)
 
         plane = avl.Plane(name, surface)
@@ -118,19 +123,19 @@ class Test(unittest.TestCase):
             "elevator_size": 0.3,
             "battery_x_loc": 0,
             "wall_thickness": 1,
+            "twist_angle_2": 0,
+            "twist_angle_3": 0,
+            "wing_shift_1": 0.1,
+            "wing_shift_2": 0.1,
             "aerofoil_1_thickness": 0.2,
             "aerofoil_1_camber": 0,
             "aerofoil_1_thickness_loc": 0.5,
             "aerofoil_2_thickness": 0.2,
-            "aerofoil_2_camber": 0,
+            "aerofoil_2_camber": 0.05,
             "aerofoil_2_thickness_loc": 0.5,
             "aerofoil_3_thickness": 0.2,
-            "aerofoil_3_camber": 0,
+            "aerofoil_3_camber": 0.05,
             "aerofoil_3_thickness_loc": 0.5,
-            "twist_angle_2": 0,
-            "twist_angle_3": 0,
-            "wing_shift_1": 0.1,
-            "wing_shift_2": 0.1
         }
         uav_dict.update(kwargs)
         return uav_dict
@@ -157,29 +162,29 @@ class Test(unittest.TestCase):
 
     def test_run_study(self):
 
-        uav_dict = self.uav_dict(cord_1 = 0.9, span_section_2 = 1.3)
+        uav_dict = self.uav_dict(cord_1 = 0.9, cord_2 = 0.4,span_section_2 = 1)
         plane, case, arrangement = self.create(uav_dict)
         avl, aero, case, mass = self.generate_files(plane, case, arrangement)
         results = self.analyse(avl, aero, case, mass)
-
+        print(arrangement.center_of_gravity)
         self.display_results("cruise", results)
 
         if self.plot:
             plt.figure(1)
             plot = plt.subplot(111)
-            plane.plot_xy(plot, "g_")
+            plane.plot_xy(plot, "g")
             arrangement.plot_xy(plot, True, "r-")
+            plt.gca().set_aspect('equal')
             plt.show()
 
 
     def _test_run_low_speed(self):
-        uav_dict = self.uav_dict(cord_1 = 0.9, span_section_2 = 1.3, aerofoil_2_camber = 0.1)
+        uav_dict = self.uav_dict(cord_1 = 0.9, cord_2 = 0.4,span_section_2 = 1)
         plane, case, arrangement = self.create(uav_dict)
         case["velocity"] = 9
         avl, aero, case, mass = self.generate_files(plane, case, arrangement)
-        print(aero)
         results = self.analyse(avl, aero, case, mass)
-
+        self.display_results("landing", results)
 
     def _test_run_very_low_speed(self):
         uav_dict = self.uav_dict(cord_1 = 0.9, span_section_2 = 1.3)

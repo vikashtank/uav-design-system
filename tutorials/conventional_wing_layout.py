@@ -7,7 +7,7 @@ from os import makedirs
 from shutil import rmtree
 this_directory = dirname(abspath(__file__))
 import sys
-sys.path.append(this_directory + "/../")  # so uggo thanks to atom runner
+sys.path.append(this_directory + "/../")
 import unittest
 from uav_design_system import layout, aerofoil, aerodynamics as aero
 from uav_design_system.aerodynamics import athena_vortex_lattice as avl
@@ -79,6 +79,7 @@ class Test(unittest.TestCase):
 
         # design tail
         tail_surface = avl.Surface("tail")
+        tail_surface.angle_bias = input_dict["tail_twist"]
         tail_surface.define_translation_bias(input_dict["elevator_distance"], 0, 0)
         tail_surface.define_mesh(10, 15, 1.0, 1.0)
         thickness = input_dict["tail_thickness"]
@@ -139,7 +140,7 @@ class Test(unittest.TestCase):
 
         # add some more weights and arrangement
         battery = layout.MassObject.from_mass(layout.Cuboid(0.19, 0.035, 0.07), 0.306)
-        battery.location = layout.Point(input_dict["battery_x_loc"] * main_cord1, -0.05, -0.05)
+        battery.location = layout.Point(input_dict['battery_loc'], -0.05, -0.05)
         battery2 = battery.clone(reflect_y = True)
 
         motor = layout.MassObject.from_mass(layout.Cuboid(0.092, 0.042, 0.042), 0.231)
@@ -151,11 +152,9 @@ class Test(unittest.TestCase):
         motor_controller.location = layout.Point(main_cord1, -0.05, -0.05)
 
         # add landing gear
-        landing_gear = layout.MassObject.from_mass(layout.Cuboid(0.105, 0.05, 0.065), 0.147)
-        landing_gear.location = layout.Point(0.6*main_cord1, input_dict["span_section_2"], -0.05)
+        landing_gear = layout.MassObject.from_mass(layout.Cuboid(0.105 + 0.238, 0.05, 0.065), 0.274)
+        landing_gear.location = layout.Point(0.8*main_cord1, input_dict["span_section_2"], -0.05)
         landing_gear2 = landing_gear.clone(reflect_y = True)
-        #oleo struts
-
 
         # add two hollow booms
         boom1 = layout.MassObject.from_mass(layout.HollowCylinder(0.012, 0.9, 0.005), 0.02727)
@@ -167,21 +166,36 @@ class Test(unittest.TestCase):
         boom2_ref = boom2.clone(reflect_y = True)
 
         # add horizontal booms
-        horizontal_boom1 = layout.MassObject.from_mass(layout.Cuboid( 1.2, 0.012, 0.012), 0.03636)
+        horizontal_boom1 = layout.MassObject.from_mass(layout.Cuboid( input_dict["elevator_distance"] + 0.5, 0.012, 0.012), 0.03636)
         horizontal_boom1.location = layout.Point(-0.5, 0.1, 0)
         horizontal_boom2 = horizontal_boom1.clone(reflect_y = True)
 
         # wing box
-        box = layout.MassObject.from_mass(layout.Cuboid( 0.42, 0.05, 0.05), 0.231)
+        box = layout.MassObject.from_mass(layout.Cuboid( 0.47, 0.1, 0.05), 0.284)
         box.location = layout.Point(0, input_dict["span_section_2"], 0)
         box2 = box.clone(reflect_y = True)
 
-        # fuselage box
-        fuselage = layout.MassObject.from_mass(layout.Cuboid(0.852, 0.15, 0.15), 0.171)
-        fuselage.location = layout.Point(-0.5, -0.15*0.5, 0)
+        # fuselage box top
+        length = input_dict['fuselage_length']
+        fuselage = layout.MassObject.from_mass(layout.Cuboid(length, 0.3, 0.09), length * 0.38727)
+        fuselage.location = layout.Point(0.4 - length, -0.3*0.5, -0.09)
 
+        fuselage_bottom = layout.MassObject.from_mass(layout.Cuboid(length, 0.3, 0.09), length * 0.54)
+        fuselage_bottom.location = layout.Point(0.4 - length, -0.3*0.5, -0.3)
 
-        #servos, wires, computer,
+        from_bulk_head = layout.MassObject.from_mass(layout.Cuboid(0.06, 0.24, 0.3), 0.161)
+        from_bulk_head.location = layout.Point(0.4 - length, -0.3*0.5, -0.3)
+
+        nose_cone = layout.MassObject.from_mass(layout.Cuboid(0.3, 0.3, 0.3), 0.221)
+        nose_cone.location = layout.Point(0.4 - length, -0.3*0.5, -0.3)
+
+        # ribs
+        rib_center = layout.MassObject.from_mass(layout.Cuboid(input_dict["cord_1"], 0.06, input_dict["aerofoil_2_thickness"]), 0.02)
+        rib_center.location = layout.Point(0, 0, 0)
+
+        rib_outer = layout.MassObject.from_mass(layout.Cuboid(input_dict["cord_2"], 0.03, input_dict["aerofoil_3_thickness"]), 0.01)
+        rib_outer.location = layout.Point(0, input_dict["span_section_2"], 0)
+        rib_outer_mirror = rib_outer.clone(reflect_y = True)
 
         arrangement = layout.Arrangement("plane arrangement", battery,
                                                               battery2,
@@ -190,15 +204,19 @@ class Test(unittest.TestCase):
                                                               boom1, boom1_ref,
                                                               boom2, boom2_ref,
                                                               box, box2,
-                                                              fuselage,
+                                                              fuselage, fuselage_bottom,
                                                               horizontal_boom1, horizontal_boom2,
+                                                              rib_center, rib_outer, rib_outer_mirror,
+                                                              from_bulk_head,
                                                               structural_model,
                                                               structural_clone,
+                                                              nose_cone,
                                                               tail_structural_model,
                                                               tail_structural_clone)
 
+
         # create case file -----------------------------------------------------
-        case = avl.TrimCase(surface.area * 2, velocity = 22,
+        case = avl.TrimCase(surface.area, velocity = input_dict['velocity'],
                             mass = arrangement.total_mass)
 
         plane = avl.Plane(name, surface, tail_surface)
@@ -214,7 +232,7 @@ class Test(unittest.TestCase):
             "span_section_2": 0.8,
             "elevator_size": 0.5,
             "battery_x_loc": 0,
-            "wall_thickness": 0.09,
+            "wall_thickness": 0.025,
             "aerofoil_1_thickness": 0.15,
             "aerofoil_1_camber": 0.02,
             "aerofoil_1_thickness_loc": 0.295,
@@ -228,9 +246,9 @@ class Test(unittest.TestCase):
             "twist_angle_3": 0,
             "wing_shift_1": 0,
             "wing_shift_2": 0,
-            "elevator_span": 0.1,
-            "boom_width": 0.2,
-            "elevator_distance": 0.7,
+            "elevator_span": 0.45,
+            "boom_width": 0.3,
+            "elevator_distance": 0.5,
             "tail_thickness": 0.12,
             "tail_thickness_loc": 0.12,
             "tail_camber": 0,
@@ -239,19 +257,100 @@ class Test(unittest.TestCase):
             "tail_cord_3": 0.1,
             "tail_wall_thickness": 0.05,
             "vtail_cord_1": 0.1,
-            "vtail_cord_2": 0.05,
+            "vtail_cord_2": 0.005,
             "vtail_height": 0.2,
+            "fuselage_length": 1.1,
+            "velocity": 22,
+            "tail_twist": 0,
+            "battery_loc": 0,
         }
         uav_dict.update(kwargs)
         return uav_dict
 
-    def analyse(self, avl_file, aero, case, mass):
-        avl_runner = avl.AVLRunner()
-        avl_runner.setup_analysis(avl_file,
-                                  mass,
-                                  case,
-                                  *aero)
-        return avl_runner.generate_results(self.results_dir)
+    def display_results(self, title, results):
+        print(title)
+        print("alpha ", results.alpha)
+        print("elevator deflection ", results.elevator_deflection)
+        print("cl ", results.cl)
+
+    def generate_avl_files(self, plane, case, arrangement):
+        run_file = join(self.results_dir, "run.avl")
+        case.to_file(run_file)
+        mass_file = join(self.results_dir, "mass.mass")
+        layout.create_mass_file(mass_file, arrangement, case)
+        avl_input, aerofoil_files = plane.dump_avl_files(self.results_dir)
+        return avl_input, aerofoil_files, run_file, mass_file
+
+    def _test_initial(self):
+        uav_dict = self.uav_dict(elevator_distance = 1.1)
+        plane, case, arrangement = self.create(uav_dict)
+        analysis_case = aero.AerodynamicAnalysis.run(plane, case, arrangement)
+        self.display_results("cruise", analysis_case.results.avl_results)
+        print("total mass ", arrangement.total_mass)
+        print("tot_drag ", analysis_case.total_drag_coefficient )
+        print("cl/cd ", analysis_case.results.avl_results.cl/ analysis_case.total_drag_coefficient)
+        print("ref area ", plane.main_surface.area)
+        print("COG ", arrangement.center_of_gravity.x)
+        print("neutral point ", analysis_case.results.avl_results.neutral_point)
+        print("")
+
+        self._plot(plane, case, arrangement)
+
+    def _test_longer_tail(self):
+        uav_dict = self.uav_dict(elevator_distance = 1.2)
+        plane, case, arrangement = self.create(uav_dict)
+        analysis_case = aero.AerodynamicAnalysis.run(plane, case, arrangement)
+        self.display_results("longer tail", analysis_case.results.avl_results)
+        print("total mass ", arrangement.total_mass)
+        print("Cd ", analysis_case.total_drag_coefficient )
+        print("cl/cd ", analysis_case.results.avl_results.cl/ analysis_case.total_drag_coefficient)
+        print("ref area ", plane.main_surface.area)
+        print("COG ", arrangement.center_of_gravity.x)
+        print("neutral point ", analysis_case.results.avl_results.neutral_point)
+        print("")
+        self._plot(plane, case, arrangement)
+
+    def _test_tail_larger(self):
+        uav_dict = self.uav_dict(elevator_distance = 1.2, tail_cord_1 = 0.2, tail_cord_2 = 0.2, tail_cord_3 = 0.2)
+        plane, case, arrangement = self.create(uav_dict)
+        analysis_case = aero.AerodynamicAnalysis.run(plane, case, arrangement)
+        self.display_results("longer tail", analysis_case.results.avl_results)
+        print("total mass ", arrangement.total_mass)
+        print("Cd ", analysis_case.total_drag_coefficient )
+        print("cl/cd ", analysis_case.results.avl_results.cl/ analysis_case.total_drag_coefficient)
+        print("ref area ", plane.main_surface.area)
+        print("COG ", arrangement.center_of_gravity.x)
+        print("neutral point ", analysis_case.results.avl_results.neutral_point)
+        print("")
+        self._plot(plane, case, arrangement)
+
+    def _test_tail_cog_backwards(self):
+        uav_dict = self.uav_dict(elevator_distance = 1.2, tail_cord_1 = 0.2, tail_cord_2 = 0.2, tail_cord_3 = 0.2, battery_loc = 0.19)
+        plane, case, arrangement = self.create(uav_dict)
+        analysis_case = aero.AerodynamicAnalysis.run(plane, case, arrangement)
+        self.display_results("longer tail", analysis_case.results.avl_results)
+        print("total mass ", arrangement.total_mass)
+        print("Cd ", analysis_case.total_drag_coefficient )
+        print("cl/cd ", analysis_case.results.avl_results.cl/ analysis_case.total_drag_coefficient)
+        print("ref area ", plane.main_surface.area)
+        print("COG ", arrangement.center_of_gravity.x)
+        print("neutral point ", analysis_case.results.avl_results.neutral_point)
+        print("")
+        self._plot(plane, case, arrangement)
+
+    def _test_tail_twist_down(self):
+        uav_dict = self.uav_dict(elevator_distance = 1.2, tail_cord_1 = 0.2, tail_cord_2 = 0.2, tail_cord_3 = 0.2, tail_twist = -2, battery_loc = 0.19)
+        plane, case, arrangement = self.create(uav_dict)
+        analysis_case = aero.AerodynamicAnalysis.run(plane, case, arrangement)
+        self.display_results("longer tail", analysis_case.results.avl_results)
+        print("total mass ", arrangement.total_mass)
+        print("Cd ", analysis_case.total_drag_coefficient )
+        print("cl/cd ", analysis_case.results.avl_results.cl/ analysis_case.total_drag_coefficient)
+        print("ref area ", plane.main_surface.area)
+        print("COG ", arrangement.center_of_gravity.x)
+        print("neutral point ", analysis_case.results.avl_results.neutral_point)
+        print("")
+        self._plot(plane, case, arrangement)
 
     def generate_files(self, plane, case, arrangement):
         case.to_file(self.run_file)
@@ -259,78 +358,45 @@ class Test(unittest.TestCase):
         avl_input, aerofoil_files = plane.dump_avl_files(self.test_folder)
         return avl_input, aerofoil_files, self.run_file, self.mass_file
 
-    def display_results(self, title, results):
-        print(title)
-        print("alpha ", results.alpha)
-        print("elevator deflection ", results.elevator_deflection)
-        print("cl ", results.cl*2)
-        print("cd ", results.cd*2)
-        print("stability ", results.neutral_point)
-
-    def _test_run_cruise(self):
-        uav_dict = self.uav_dict()
+    def test_tail_small_twist(self):
+        uav_dict = self.uav_dict(elevator_distance = 1.2, tail_twist = -2, battery_loc = 0.19)
         plane, case, arrangement = self.create(uav_dict)
-        analysis_case = aero.AerodynamicAnalysis.run(plane, case, arrangement)
-        self.display_results("cruise", analysis_case.results.avl_results)
-        print("total mass ", arrangement.total_mass)
-        print("tot_drag ", analysis_case.total_drag_coefficient )
-        print("ref area ", plane.main_surface.area)
-        print("")
-
-    def _test_longer_tail(self):
-        uav_dict = self.uav_dict(elevator_distance = 1.1)
-        plane, case, arrangement = self.create(uav_dict)
+        self.generate_files(plane, case, arrangement)
         analysis_case = aero.AerodynamicAnalysis.run(plane, case, arrangement)
         self.display_results("longer tail", analysis_case.results.avl_results)
         print("total mass ", arrangement.total_mass)
-        print("tot_drag ", analysis_case.total_drag_coefficient )
-        print("cl/cd ", analysis_case.results.avl_results.cl/ analysis_case.total_drag_coefficient.cd)
+        print("Cd ", analysis_case.total_drag_coefficient )
+        print("cl/cd ", analysis_case.results.avl_results.cl/ analysis_case.total_drag_coefficient)
         print("ref area ", plane.main_surface.area)
-        print("")
-
-    def _test_higherAr_tail(self):
-        uav_dict = self.uav_dict(elevator_distance = 1.1, elevator_span = 0.2)
-        plane, case, arrangement = self.create(uav_dict)
-        analysis_case = aero.AerodynamicAnalysis.run(plane, case, arrangement)
-        self.display_results("longer tail higher AR", analysis_case.results.avl_results)
-        print("total mass ", arrangement.total_mass)
-        print("tot_drag ", analysis_case.total_drag_coefficient )
-        print("ref area ", plane.main_surface.area)
-        print("")
-
-    def test_higherAr_tail(self):
-        uav_dict = self.uav_dict(elevator_distance = 1.3, elevator_span = 0.1, tail_cord_1 = 0.1, tail_cord_2 = 0.1, tail_cord_3 = 0.1)
-        plane, case, arrangement = self.create(uav_dict)
-        analysis_case = aero.AerodynamicAnalysis.run(plane, case, arrangement)
-        self.display_results("longer tail higher AR", analysis_case.results.avl_results)
-        print("total mass ", arrangement.total_mass)
-        print("cog ", arrangement.center_of_gravity)
-        print("tot_drag ", analysis_case.total_drag_coefficient )
-        print("cl/cd ", analysis_case.results.avl_results.cl*2/ analysis_case.total_drag_coefficient)
-        print("ref area ", plane.main_surface.area)
-        print("")
+        print("COG ", arrangement.center_of_gravity.x)
+        print("neutral point ", analysis_case.results.avl_results.neutral_point)
         self._plot(plane, case, arrangement)
-
 
     def _test_run_landing(self):
 
         uav_dict = self.uav_dict()
         plane, case, arrangement = self.create(uav_dict)
-        case["velocity"] = 9
+        case["velocity"] = 12
         analysis_case = aero.AerodynamicAnalysis.run(plane, case, arrangement)
+        self.generate_avl_files(plane, case, arrangement)
         self.display_results("landing", analysis_case.results.avl_results)
         print("tot_drag ", analysis_case.total_drag_coefficient )
         print("ref area ", plane.main_surface.area)
-        print(arrangement.total_mass)
+        print("total mass ", arrangement.total_mass)
+        print(analysis_case.results.avl_results._results_dict['total_forces'])
 
     def _plot(self, plane, case, arrangement):
         uav_dict = self.uav_dict()
 
         plt.figure(1)
         plot = plt.subplot(111)
-        plane.plot_xy(plot, "g_")
+        plane.plot_xy(plot, "g")
         arrangement.plot_xy(plot, True, "r-")
         plt.show()
+
+    def _test(self):
+        uav_dict = self.uav_dict()
+        plane, case, arrangement = self.create(uav_dict)
 
 
 if __name__ == "__main__":
