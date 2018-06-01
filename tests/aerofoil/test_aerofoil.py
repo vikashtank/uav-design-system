@@ -30,11 +30,14 @@ class TestAerofoil(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_title(self):
-        expected_string = "pressure surface: [[0.0, 0.0], [0.5, 0.0], [1.0, 0.0]], "\
-                          "suction surface: [[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]]"
-        self.assertEqual(self.aerofoil.file_title, expected_string)
+    def test_str_none(self):
+        expected_string = "Name: Not Specified"
+        self.assertEqual(str(self.aerofoil), expected_string)
 
+    def test_str(self):
+        self.aerofoil.name = "Aerofoil1"
+        expected_string = "Name: Aerofoil1"
+        self.assertEqual(str(self.aerofoil), expected_string)
 
     def test_get_top_bottom(self):
         """
