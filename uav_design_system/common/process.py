@@ -50,6 +50,9 @@ class Process():
         self.process.stdin.flush()
         return command
 
+    def __del__(self):
+        self.close()
+
     def close(self):
         self.process.stdout.close()
         self.process.stdin.close()
