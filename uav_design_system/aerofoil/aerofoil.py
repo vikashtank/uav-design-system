@@ -3,6 +3,7 @@
 import numpy as np
 import bezier
 import scipy.optimize as opt
+import matplotlib.pyplot as plt
 
 
 class Aerofoil():
@@ -10,12 +11,13 @@ class Aerofoil():
     Class that represents an Aerofoil
     """
 
-    def __init__(self, suction_surface: 'Surface', pressure_surface: 'Surface'):
+    def __init__(self, suction_surface: 'Surface', pressure_surface: 'Surface', name = None):
 
+        self.name = name
         self.suction_surface = suction_surface
         self.pressure_surface = pressure_surface
 
-    def plot(self, plot = None,num_points: int = 250, colour = "g"):
+    def plot(self, plot = None, num_points: int = 250, colour = "g"):
         """
         Plots both the suction and pressure surface of this aerofoil
 
@@ -70,7 +72,6 @@ class Aerofoil():
 
         return aerofoil
 
-
     def get_maxmin_y(self, x_target: float, **kwargs):
         """
         gets the top surface y coordinate and bottom surface y coordinate at a
@@ -82,23 +83,19 @@ class Aerofoil():
 
         return  y_pressure, y_suction
 
-    @property
-    def file_title(self):
+    def __str__(self):
         """
         returns a string that represents this class
         """
-        nodes1 = self.pressure_surface.nodes
-        nodes2 = self.suction_surface.nodes
-
-        node1_str = str([list(x) for x in nodes1])
-        node2_str = str([list(x) for x in nodes2])
-
-        return f"pressure surface: {node1_str}, suction surface: {node2_str}"
+        if self.name:
+            return f"Name: {self.name}"
+        else:
+            return "Name: Not Specified"
 
     def write(self, open_file, number_nodes: int = 100):
         """
         writes the suction and pressure surface x,y coordinates into a file with
-        a title line of the control nodes
+        a title line of the aerofoil name
 
         Inputs:
             open_file:  a file stream object
@@ -108,7 +105,7 @@ class Aerofoil():
             None
         """
 
-        open_file.write(self.file_title + "\n")
+        open_file.write(f'{self}\n')
 
         px, py = self.pressure_surface.get_xy_coords(number_nodes)
         sx, sy = self.suction_surface.get_xy_coords(number_nodes)
@@ -224,3 +221,9 @@ class Surface():
         new_nodes = self.nodes * value
 
         return Surface(new_nodes, self.degree)
+
+
+
+
+if __name__ == "__main__":
+    plot_aerofoil(0.1, -0.1, 0.1, 0.5, 0.1)
