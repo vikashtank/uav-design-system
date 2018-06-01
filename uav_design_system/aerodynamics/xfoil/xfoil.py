@@ -8,6 +8,7 @@ import time
 import tempfile
 import shutil
 from .results import AerofoilResults
+from pathlib import Path
 
 
 class XfoilRunner():
@@ -15,26 +16,23 @@ class XfoilRunner():
     class for running xfoil through python
     """
 
-    def __init__(self, file_path):
+    def __init__(self, xfoil_file_path):
         """
         inputs:
 
             file_path (str): path to xfoil executable (located in xfoil.app/ MacOS)
         """
-
-        # make a temp folder to run analysis in
         # temp folder located here because xfoil file path limit (64 chars)
-        home_directory = os.getenv("HOME")
-        self.temp_folder = os.path.join(home_directory, "temp")
-        os.makedirs(self.temp_folder)
+        self.temp_folder = Path.home() / "xfoil_temp"
+        self.temp_folder.mkdir()
         # create a variable for the path to the location of the xfoil executable
-        self.executable = file_path
+        self.executable = xfoil_file_path
 
     def __del__(self):
         """
         remove temporary folder with results
         """
-        shutil.rmtree(self.temp_folder)
+        shutil.rmtree(str(self.temp_folder))
 
     def setup_analysis(self, aerofoil_file_path, Re):
         """
@@ -48,8 +46,8 @@ class XfoilRunner():
         """
 
         base_name = os.path.basename(aerofoil_file_path)
-        shutil.copy(aerofoil_file_path, self.temp_folder)
-        aerofoil_file_path = os.path.join(self.temp_folder, base_name)
+        shutil.copy(aerofoil_file_path, str(self.temp_folder))
+        aerofoil_file_path = self.temp_folder / base_name
 
         self.reynolds_number = Re
         self.process = Process.initialise_process(self.executable)
@@ -66,7 +64,8 @@ class XfoilRunner():
         of attack of the aerofoil
 
         Inputs:
-
+            aerfoil_file_path: path to aerofoil file
+            reynolds_number: reynolds number of flow
             start (Int): start angle of attack
             stop (Int): ending angle of attack
             step (Int): setp size
@@ -74,7 +73,7 @@ class XfoilRunner():
             results_dir (Str): location to copy results to if kept
         """
 
-        temp_file = os.path.join(self.temp_folder, "aerofoil_results.txt")
+        temp_file = self.temp_folder / "aerofoil_results.txt"
         self.process.command("PACC")
         self.process.command("{0}".format(temp_file))
         self.process.command("")

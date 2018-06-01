@@ -7,6 +7,7 @@ import unittest
 from uav_design_system.aerodynamics.xfoil import XfoilRunner
 import shutil
 import json
+from pathlib import Path
 
 def get_resource_content(file_name):
     """
@@ -16,8 +17,7 @@ def get_resource_content(file_name):
     with open(join(resources_directory, file_name)) as open_file:
         return open_file.read()
 
-class Test(unittest.TestCase):
-
+class TestXfoilRunner(unittest.TestCase):
 
     def setUp(self):
         self.results_dir = os.path.join(this_directory, "results_dir")
@@ -39,6 +39,15 @@ class Test(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self.results_dir)
+
+    def test_temp_file_location(self):
+        temp_folder = Path.home() / "xfoil_temp"
+        self.assertTrue(temp_folder.exists())
+
+    def test_del(self):
+        file_location = self.xfoil_runner.temp_folder
+        del self.xfoil_runner
+        self.assertFalse(file_location.exists())
 
     def test_run_success(self):
 
