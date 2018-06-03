@@ -23,8 +23,7 @@ class XfoilRunner():
             file_path (str): path to xfoil executable (located in xfoil.app/ MacOS)
         """
         # temp folder located here because xfoil file path limit (64 chars)
-        self.temp_folder = Path.home() / 'xfoil_temp'
-        self.temp_folder.mkdir()
+        self.temp_folder = self._create_temp_folder()
         # create a variable for the path to the location of the xfoil executable
         self.executable = xfoil_file_path
 
@@ -34,7 +33,10 @@ class XfoilRunner():
         """
         shutil.rmtree(str(self.temp_folder))
 
-    # function to create temp folder
+    def _create_temp_folder(self):
+        temp_folder = Path.home() / 'xfoil_temp'
+        temp_folder.mkdir()
+        return temp_folder
 
     def _move_aerofile_to_temp(self, aerofoil_file_path):
         base_name = os.path.basename(aerofoil_file_path)
