@@ -34,6 +34,13 @@ class XfoilRunner():
         """
         shutil.rmtree(str(self.temp_folder))
 
+    # function to create temp folder
+
+    def _prepare_temp_folder(self, aerofoil_file_path):
+        base_name = os.path.basename(aerofoil_file_path)
+        shutil.copy(aerofoil_file_path, str(self.temp_folder))
+        return self.temp_folder / base_name
+
     def setup_analysis(self, aerofoil_file_path, Re):
         """
         runs commands to setup the aerofoil and reynolds number
@@ -44,10 +51,7 @@ class XfoilRunner():
         aerofoil (Str): naca aerofoil 4 or 5 series code
         re (Int): reynolds number
         """
-
-        base_name = os.path.basename(aerofoil_file_path)
-        shutil.copy(aerofoil_file_path, str(self.temp_folder))
-        aerofoil_file_path = self.temp_folder / base_name
+        aerofoil_file_path = self._prepare_temp_folder(aerofoil_file_path)
 
         self.reynolds_number = Re
         self.process = Process.initialise_process(self.executable)
