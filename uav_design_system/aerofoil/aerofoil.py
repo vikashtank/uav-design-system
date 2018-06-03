@@ -72,6 +72,17 @@ class Aerofoil():
 
         return aerofoil
 
+    @staticmethod
+    def from_nodes(suction_nodes, pressure_nodes):
+        suction_nodes = np.asfortranarray(suction_nodes)
+        pressure_nodes = np.asfortranarray(pressure_nodes)
+
+        s_surface = Surface(suction_nodes, 2)
+        p_surface = Surface(pressure_nodes, 2)
+        aerofoil = Aerofoil(s_surface, p_surface)
+
+        return aerofoil
+
     def get_maxmin_y(self, x_target: float, **kwargs):
         """
         gets the top surface y coordinate and bottom surface y coordinate at a
@@ -163,6 +174,10 @@ class Aerofoil():
         new_suction_surface = self.suction_surface * value
         return Aerofoil(new_suction_surface, new_pressure_surface)
 
+    def __eq__(self, aerofoil: 'Aerofoil'):
+        return self.suction_surface == aerofoil.suction_surface and \
+               self.pressure_surface == aerofoil.pressure_surface
+
 
 class Surface():
     """
@@ -221,6 +236,9 @@ class Surface():
         new_nodes = self.nodes * value
 
         return Surface(new_nodes, self.degree)
+
+    def __eq__(self, surface: 'Surface'):
+        return self.nodes.all() == surface.nodes.all()
 
 
 

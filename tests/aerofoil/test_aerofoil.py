@@ -121,6 +121,16 @@ class TestAerofoil(unittest.TestCase):
             for j in [0, 1]:
                 self.assertEqual(ss_nodes[i][j], self.nodes2[i][j] * 3)
 
+    def test_equal(self):
+        self.nodes1 = np.asfortranarray([[0, 0], [0.5, 0], [1, 0]])
+        self.nodes2 = np.asfortranarray([[0, 0], [0.5, 0.5], [1, 1]])
+
+        p_surface = aerofoil.Surface(self.nodes1, degree = 1)
+        s_surface = aerofoil.Surface(self.nodes2, degree = 1)
+        new_aerofoil = aerofoil.Aerofoil(s_surface, p_surface)
+
+        self.assertEqual(self.aerofoil, new_aerofoil)
+
 class TestAerofoilWrite(unittest.TestCase):
 
     def setUp(self):
@@ -195,7 +205,8 @@ class TestSurface(unittest.TestCase):
             for j in [0, 1]:
                 self.assertEqual(new_surface.nodes[i][j], expected_nodes[i][j])
 
-
+    def test_equal(self):
+        self.assertEqual(self.p_surface, aerofoil.Surface(np.asfortranarray([[0, 0], [0.5, 0], [1, 0]]), degree = 1))
 
 if __name__ == "__main__":
     unittest.main()
