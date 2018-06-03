@@ -41,7 +41,7 @@ class TestXfoilRunner(unittest.TestCase):
         self.assertFalse(file_location.exists())
 
 
-    def test_run_sucess_output_file(self):
+    def test_run_success_output_file(self):
         results_dir = os.path.join(this_directory, 'results_dir')
         os.makedirs(self.results_dir)
         results = self.xfoil_runner(self.aerofoil_file, 1e6, 0, 5, 0.5, self.results_dir)
@@ -56,7 +56,9 @@ class TestXfoilRunner(unittest.TestCase):
                          expected_content.replace(' ', ''),
                          'content in xfoil result is not correct')
 
-    def test_run_sucess_output(self):
+        shutil.rmtree(self.results_dir)
+
+    def test_run_success_output(self):
         comparison_json = os.path.join(this_directory, 'resources', 'expected_results.json')
         with open(comparison_json) as open_file:
             expected_json = json.load(open_file)
