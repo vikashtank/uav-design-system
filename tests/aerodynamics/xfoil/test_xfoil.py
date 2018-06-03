@@ -51,8 +51,7 @@ class TestXfoilRunner(unittest.TestCase):
 
     def test_run_success(self):
 
-        self.xfoil_runner.setup_analysis(self.aerofoil_file, 1e6)
-        results = self.xfoil_runner(0, 5, 0.5, True, self.results_dir)
+        results = self.xfoil_runner(self.aerofoil_file, 1e6, 0, 5, 0.5, True, self.results_dir)
 
         results_file = os.path.join(self.results_dir, 'aerofoil_results.txt')
         self.assertTrue(os.path.exists(results_file))
@@ -66,8 +65,7 @@ class TestXfoilRunner(unittest.TestCase):
 
     def test_correct_json(self):
 
-        self.xfoil_runner.setup_analysis(self.aerofoil_file, 1e6)
-        results = self.xfoil_runner(0, 5, 0.5, True, self.results_dir)
+        results = self.xfoil_runner(self.aerofoil_file, 1e6, 0, 5, 0.5, True, self.results_dir)
 
         results_file = os.path.join(self.results_dir, 'aerofoil_results.txt')
         self.assertTrue(os.path.exists(results_file))

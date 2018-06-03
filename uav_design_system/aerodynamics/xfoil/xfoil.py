@@ -46,7 +46,7 @@ class XfoilRunner():
         shutil.copy(aerofoil_file_path, str(self.temp_folder))
         return self.temp_folder / base_name
 
-    def setup_analysis(self, aerofoil_file_path, Re):
+    def _setup_analysis(self, aerofoil_file_path, Re):
         """
         runs commands to setup the aerofoil and reynolds number
         sets up polar plotting
@@ -67,7 +67,7 @@ class XfoilRunner():
         self.process.command(f'visc {self.reynolds_number}')
         self.process.command('SEQP')
 
-    def __call__(self, start, stop, step, keep_results = True, results_dir = ''):
+    def __call__(self, aerofoil_file, reynolds_number, start, stop, step, keep_results = True, results_dir = ''):
         """
         creates a results file and returns the results at a number of angles
         of attack of the aerofoil
@@ -81,6 +81,7 @@ class XfoilRunner():
             keep_results (Bool): whether to keep all results files
             results_dir (Str): location to copy results to if kept
         """
+        self._setup_analysis(aerofoil_file, reynolds_number)
 
         temp_file = self.temp_folder / 'aerofoil_results.txt'
         self.process.command('PACC')
