@@ -67,7 +67,7 @@ class XfoilRunner():
         self.process.command(f'visc {self.reynolds_number}')
         self.process.command('SEQP')
 
-    def __call__(self, aerofoil_file, reynolds_number, start, stop, step, keep_results = True, results_dir = ''):
+    def __call__(self, aerofoil_file, reynolds_number, start, stop, step, results_dir = None):
         """
         creates a results file and returns the results at a number of angles
         of attack of the aerofoil
@@ -92,7 +92,7 @@ class XfoilRunner():
 
         self.process.close()
 
-        if keep_results:
+        if results_dir:
             shutil.copy(temp_file, results_dir)
 
         return AerofoilResults(self._format_content(content))

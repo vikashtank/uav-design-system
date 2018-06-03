@@ -21,24 +21,15 @@ class TestXfoilRunner(unittest.TestCase):
 
     def setUp(self):
         self.results_dir = os.path.join(this_directory, 'results_dir')
-        try:
-            shutil.rmtree(self.results_dir)
-        except FileNotFoundError:
-            pass
 
         # read the results file that is expected to be produced
         self.aerofoil_file = os.path.join(this_directory, 'resources', 'test_aerofoil.txt')
-        self.expected_content = get_resource_content('aerofoil_results.txt')
-        comparison_json = os.path.join(this_directory, 'resources', 'expected_results.json')
-        with open(comparison_json) as open_file:
-            self.expected_json = json.load(open_file)
 
         file_path = '/Applications/Xfoil.app/Contents/Resources/xfoil'
-        os.makedirs(self.results_dir)
         self.xfoil_runner = XfoilRunner(file_path)
 
     def tearDown(self):
-        shutil.rmtree(self.results_dir)
+        pass
 
     def test_temp_file_location(self):
         temp_folder = Path.home() / 'xfoil_temp'
@@ -49,30 +40,34 @@ class TestXfoilRunner(unittest.TestCase):
         del self.xfoil_runner
         self.assertFalse(file_location.exists())
 
-    def test_run_success(self):
 
-        results = self.xfoil_runner(self.aerofoil_file, 1e6, 0, 5, 0.5, True, self.results_dir)
-
-        results_file = os.path.join(self.results_dir, 'aerofoil_results.txt')
-        self.assertTrue(os.path.exists(results_file))
+    def test_run_sucess_output_file(self):
+        results_dir = os.path.join(this_directory, 'results_dir')
+        os.makedirs(self.results_dir)
+        results = self.xfoil_runner(self.aerofoil_file, 1e6, 0, 5, 0.5, self.results_dir)
+        results_file = os.path.join(results_dir, 'aerofoil_results.txt')
 
         with open(results_file) as open_file:
             content = open_file.read()
+
         self.maxDiff = None
+        expected_content = get_resource_content('aerofoil_results.txt')
         self.assertEqual(content.replace(' ', ''),
-                         self.expected_content.replace(' ', ''),
+                         expected_content.replace(' ', ''),
                          'content in xfoil result is not correct')
 
-    def test_correct_json(self):
+    def test_run_sucess_output(self):
+        comparison_json = os.path.join(this_directory, 'resources', 'expected_results.json')
+        with open(comparison_json) as open_file:
+            expected_json = json.load(open_file)
+        results = self.xfoil_runner(self.aerofoil_file, 1e6, 0, 5, 0.5)
 
-        results = self.xfoil_runner(self.aerofoil_file, 1e6, 0, 5, 0.5, True, self.results_dir)
-
-        results_file = os.path.join(self.results_dir, 'aerofoil_results.txt')
-        self.assertTrue(os.path.exists(results_file))
-
-        xfoil_dict = self.expected_json['xfoil']
+        xfoil_dict = expected_json['xfoil']
         self.maxDiff = None
-        self.assertEqual(results._results_dict, self.expected_json )
+
+        comparison_json = os.path.join(this_directory, 'resources', 'expected_results.json')
+
+        self.assertEqual(results._results_dict, expected_json )
 
     def _test_(self):
         aerofoil_file = os.path.join(this_directory, 'resources', 'test_aerofoil2.txt')
