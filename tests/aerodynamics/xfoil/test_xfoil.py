@@ -40,7 +40,6 @@ class TestXfoilRunner(unittest.TestCase):
         del self.xfoil_runner
         self.assertFalse(file_location.exists())
 
-
     def test_run_success_output_file(self):
         results_dir = os.path.join(this_directory, 'results_dir')
         os.makedirs(self.results_dir)
@@ -66,15 +65,9 @@ class TestXfoilRunner(unittest.TestCase):
 
         xfoil_dict = expected_json['xfoil']
         self.maxDiff = None
-
         comparison_json = os.path.join(this_directory, 'resources', 'expected_results.json')
-
         self.assertEqual(results._results_dict, expected_json )
 
-    def _test_(self):
-        aerofoil_file = os.path.join(this_directory, 'resources', 'test_aerofoil2.txt')
-        self.xfoil_runner.setup_analysis(aerofoil_file, 67952)
-        results = self.xfoil_runner(-1, 1, 0.5, True, self.results_dir)
 
 if __name__ == "__main__":
     unittest.main()

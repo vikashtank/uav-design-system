@@ -78,8 +78,7 @@ class XfoilRunner():
             start (Int): start angle of attack
             stop (Int): ending angle of attack
             step (Int): setp size
-            keep_results (Bool): whether to keep all results files
-            results_dir (Str): location to copy results to if kept
+            results_dir (Str): location to copy results to if kept, default None
         """
         self._setup_analysis(aerofoil_file, reynolds_number)
 
