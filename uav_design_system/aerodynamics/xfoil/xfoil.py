@@ -36,7 +36,7 @@ class XfoilRunner():
 
     # function to create temp folder
 
-    def _prepare_temp_folder(self, aerofoil_file_path):
+    def _move_aerofile_to_temp(self, aerofoil_file_path):
         base_name = os.path.basename(aerofoil_file_path)
         shutil.copy(aerofoil_file_path, str(self.temp_folder))
         return self.temp_folder / base_name
@@ -51,7 +51,7 @@ class XfoilRunner():
         aerofoil (Str): naca aerofoil 4 or 5 series code
         re (Int): reynolds number
         """
-        aerofoil_file_path = self._prepare_temp_folder(aerofoil_file_path)
+        aerofoil_file_path = self._move_aerofile_to_temp(aerofoil_file_path)
 
         self.reynolds_number = Re
         self.process = Process.initialise_process(self.executable)
