@@ -31,12 +31,15 @@ class XfoilRunner():
         """
         remove temporary folder with results
         """
-        shutil.rmtree(str(self.temp_folder))
+        self._delete_temp_folder()
 
     def _create_temp_folder(self):
         temp_folder = Path.home() / 'xfoil_temp'
         temp_folder.mkdir()
         return temp_folder
+
+    def _delete_temp_folder(self):
+        shutil.rmtree(str(self.temp_folder))
 
     def _move_aerofile_to_temp(self, aerofoil_file_path):
         base_name = os.path.basename(aerofoil_file_path)
