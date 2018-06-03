@@ -60,11 +60,11 @@ class XfoilRunner():
 
         self.reynolds_number = Re
         self.process = Process.initialise_process(self.executable)
-        self.process.command('LOAD {0}'.format(aerofoil_file_path))
+        self.process.command(f'LOAD {aerofoil_file_path}')
         # this line deactivates the stupid X11 plot, which ruined my life.
         self.process.command('PLOP\nG\n')
         self.process.command('OPER')
-        self.process.command('visc {0}'.format(self.reynolds_number))
+        self.process.command(f'visc {self.reynolds_number}')
         self.process.command('SEQP')
 
     def __call__(self, start, stop, step, keep_results = True, results_dir = ''):
@@ -84,7 +84,7 @@ class XfoilRunner():
 
         temp_file = self.temp_folder / 'aerofoil_results.txt'
         self.process.command('PACC')
-        self.process.command('{0}'.format(temp_file))
+        self.process.command(str(temp_file))
         self.process.command('')
 
         content = self._get_results(start, stop, step, temp_file)
@@ -155,7 +155,7 @@ class XfoilRunner():
             content (str): content of results in temp_file
         """
 
-        self.process.command('ASEQ {0} {1} {2}'.format(start, stop, step))
+        self.process.command(f'ASEQ {start} {stop} {step}')
 
         # tune so that xfoil runs results within this time
 
