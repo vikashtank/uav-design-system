@@ -46,7 +46,7 @@ class XfoilRunner():
         shutil.copy(aerofoil_file_path, str(self.temp_folder))
         return self.temp_folder / base_name
 
-    def _setup_analysis(self, aerofoil_file_path, Re):
+    def _setup_analysis(self, aerofoil_file_path, reynolds_number):
         """
         runs commands to setup the aerofoil and reynolds number
         sets up polar plotting
@@ -59,13 +59,11 @@ class XfoilRunner():
 
         aerofoil_file_path = self._move_aerofile_to_temp(aerofoil_file_path)
 
-        self.reynolds_number = Re
-
         self.process.command(f'LOAD {aerofoil_file_path}')
         # this line deactivates the stupid X11 plot, which ruined my life.
         self.process.command('PLOP\nG\n')
         self.process.command('OPER')
-        self.process.command(f'visc {self.reynolds_number}')
+        self.process.command(f'visc {reynolds_number}')
         self.process.command('SEQP')
 
     def __call__(self, aerofoil_file, reynolds_number, start, stop, step, results_dir = None):
@@ -82,7 +80,7 @@ class XfoilRunner():
             results_dir (Str): location to copy results to if kept, default None
         """
         self.process = Process.initialise_process(self.executable)
-        
+
         self._setup_analysis(aerofoil_file, reynolds_number)
 
         temp_file = self.temp_folder / 'aerofoil_results.txt'
