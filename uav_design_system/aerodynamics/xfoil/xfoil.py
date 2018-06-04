@@ -56,10 +56,11 @@ class XfoilRunner():
         aerofoil (Str): naca aerofoil 4 or 5 series code
         re (Int): reynolds number
         """
+
         aerofoil_file_path = self._move_aerofile_to_temp(aerofoil_file_path)
 
         self.reynolds_number = Re
-        self.process = Process.initialise_process(self.executable)
+
         self.process.command(f'LOAD {aerofoil_file_path}')
         # this line deactivates the stupid X11 plot, which ruined my life.
         self.process.command('PLOP\nG\n')
@@ -80,6 +81,8 @@ class XfoilRunner():
             step (Int): setp size
             results_dir (Str): location to copy results to if kept, default None
         """
+        self.process = Process.initialise_process(self.executable)
+        
         self._setup_analysis(aerofoil_file, reynolds_number)
 
         temp_file = self.temp_folder / 'aerofoil_results.txt'
