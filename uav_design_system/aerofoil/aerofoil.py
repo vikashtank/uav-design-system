@@ -184,9 +184,13 @@ class Surface():
     Class that represents a Surface from a number of nodes and degree
     """
 
-    def __init__(self, nodes, degree: int = 2):
-        self.nodes = nodes
+    def __init__(self, *nodes, degree: int = 2):
+        self._nodes = np.asfortranarray(nodes)
         self.degree = degree
+
+    @property
+    def nodes(self):
+        return self._nodes.tolist()
 
     def get_xy_coords(self, num_points = 100):
         """
@@ -226,19 +230,19 @@ class Surface():
         """
         create a bezier curve class from the nodes
         """
-        return bezier.Curve(self.nodes, degree = self.degree)
+        return bezier.Curve(self._nodes, degree = self.degree)
 
     def __mul__(self, value: float):
         """
         scale the nodes of this surface class and return a new instance (x and y
         coordinates multiplied by value)
         """
-        new_nodes = self.nodes * value
+        new_nodes = self._nodes * value
 
-        return Surface(new_nodes, self.degree)
+        return Surface(*new_nodes, self.degree)
 
     def __eq__(self, surface: 'Surface'):
-        return self.nodes.all() == surface.nodes.all()
+        return self._nodes.all() == surface._nodes.all()
 
 
 

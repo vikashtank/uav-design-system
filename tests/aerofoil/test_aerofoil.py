@@ -17,7 +17,7 @@ def get_resource_content(file_name):
     with open(join(resources_directory, file_name)) as open_file:
         return open_file.read()
 
-class TestAerofoil(unittest.TestCase):
+class TestAerofoil():
 
     def setUp(self):
         self.nodes1 = np.asfortranarray([[0, 0], [0.5, 0], [1, 0]])
@@ -131,7 +131,8 @@ class TestAerofoil(unittest.TestCase):
 
         self.assertEqual(self.aerofoil, new_aerofoil)
 
-class TestAerofoilWrite(unittest.TestCase):
+
+class TestAerofoilWrite():
 
     def setUp(self):
         self.nodes1 = np.asfortranarray([[0, 0], [0, -0.1], [0.5, -0.1], [1, 0]])
@@ -162,11 +163,9 @@ class TestAerofoilWrite(unittest.TestCase):
 class TestSurface(unittest.TestCase):
 
     def setUp(self):
-        nodes1 = np.asfortranarray([[0, 0], [0.5, 0], [1, 0]])
-        nodes2 = np.asfortranarray([[0, 0], [0.5, 0.5], [1, 1]])
 
-        self.p_surface = aerofoil.Surface(nodes1, degree = 1)
-        self.s_surface = aerofoil.Surface(nodes2, degree = 1)
+        self.p_surface = aerofoil.Surface(*[[0, 0], [0.5, 0], [1, 0]], degree = 1)
+        self.s_surface = aerofoil.Surface(*[[0, 0], [0.5, 0.5], [1, 1]], degree = 1)
 
     def test_get_xy_coords_flat(self):
         """
@@ -191,7 +190,7 @@ class TestSurface(unittest.TestCase):
         test surface can be scaled by multiplication
         """
         new_surface = self.p_surface * 2
-        expected_nodes = np.asfortranarray([[0, 0], [1, 0], [2, 0]])
+        expected_nodes = [[0, 0], [1, 0], [2, 0]]
 
         for i in range(3):
             for j in [0, 1]:
@@ -199,14 +198,14 @@ class TestSurface(unittest.TestCase):
 
 
         new_surface = self.p_surface * 3
-        expected_nodes = np.asfortranarray([[0, 0], [1.5, 0], [3, 0]])
+        expected_nodes = [[0, 0], [1.5, 0], [3, 0]]
 
         for i in range(3):
             for j in [0, 1]:
                 self.assertEqual(new_surface.nodes[i][j], expected_nodes[i][j])
 
     def test_equal(self):
-        self.assertEqual(self.p_surface, aerofoil.Surface(np.asfortranarray([[0, 0], [0.5, 0], [1, 0]]), degree = 1))
+        self.assertEqual(self.p_surface, aerofoil.Surface(*[[0, 0], [0.5, 0], [1, 0]], degree = 1))
 
 if __name__ == "__main__":
     unittest.main()
