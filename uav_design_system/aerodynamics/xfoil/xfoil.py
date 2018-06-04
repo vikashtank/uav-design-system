@@ -74,10 +74,13 @@ class XfoilRunner():
         self.process.command('')
         return temp_file
 
-    def _modify_geometry(self):
-        pass
+    def _modify_geometry(self, x_location, y_location, deflection_down):
+        self.process.command('GDES')
+        self.process.command(f'flap {x_location} {y_location} {deflection_down}')
+        self.process.command('x')
+        self.process.command('')
 
-    def __call__(self, aerofoil_file, reynolds_number, start, stop, step, results_dir = None):
+    def __call__(self, aerofoil_file, reynolds_number, start, stop, step, results_dir = None, flap_info = None):
         """
         creates a results file and returns the results at a number of angles
         of attack of the aerofoil
@@ -93,7 +96,9 @@ class XfoilRunner():
         self.process = Process.initialise_process(self.executable)
         self._disable_x11_plot()
         self._prepare_aerofoil(aerofoil_file)
-        self._modify_geometry()
+        if flap_info: self._modify_geometry(flap_info[0],
+                                                flap_info[1],
+                                                flap_info[2])
         self._setup_analysis(reynolds_number) #TODO add mach number and turbulence params
 
         temp_file = self._prepare_output_file()

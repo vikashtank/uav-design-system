@@ -27,9 +27,11 @@ class TestXfoilRunner(unittest.TestCase):
 
         file_path = '/Applications/Xfoil.app/Contents/Resources/xfoil'
         self.xfoil_runner = XfoilRunner(file_path)
+        self.results_dir = os.path.join(this_directory, 'results_dir')
+        os.makedirs(self.results_dir)
 
     def tearDown(self):
-        pass
+        shutil.rmtree(self.results_dir)
 
     def test_temp_file_location(self):
         temp_folder = Path.home() / 'xfoil_temp'
@@ -41,10 +43,8 @@ class TestXfoilRunner(unittest.TestCase):
         self.assertFalse(file_location.exists())
 
     def test_run_success_output_file(self):
-        results_dir = os.path.join(this_directory, 'results_dir')
-        os.makedirs(self.results_dir)
         results = self.xfoil_runner(self.aerofoil_file, 1e6, 0, 5, 0.5, self.results_dir)
-        results_file = os.path.join(results_dir, 'aerofoil_results.txt')
+        results_file = os.path.join(self.results_dir, 'aerofoil_results.txt')
 
         with open(results_file) as open_file:
             content = open_file.read()
@@ -55,8 +55,6 @@ class TestXfoilRunner(unittest.TestCase):
                          expected_content.replace(' ', ''),
                          'content in xfoil result is not correct')
 
-        shutil.rmtree(self.results_dir)
-
     def test_run_success_output(self):
         comparison_json = os.path.join(this_directory, 'resources', 'expected_results.json')
         with open(comparison_json) as open_file:
@@ -66,7 +64,23 @@ class TestXfoilRunner(unittest.TestCase):
         xfoil_dict = expected_json['xfoil']
         self.maxDiff = None
         comparison_json = os.path.join(this_directory, 'resources', 'expected_results.json')
-        self.assertEqual(results._results_dict, expected_json )
+        self.assertEqual(results._results_dict, expected_json)
+
+    def test_run_sucess_flap(self):
+
+        results = self.xfoil_runner(self.aerofoil_file, 1e6, 0, 5, 0.5, self.results_dir, flap_info = [0.7, 0, 5])
+        results_file = os.path.join(self.results_dir, 'aerofoil_results.txt')
+
+        with open(results_file) as open_file:
+            content = open_file.read()
+
+        self.maxDiff = None
+        expected_content = get_resource_content('aerofoil_flap_results.txt')
+        self.assertEqual(content.replace(' ', ''),
+                         expected_content.replace(' ', ''),
+                         'content in xfoil result is not correct')
+
+
 
 
 if __name__ == "__main__":
