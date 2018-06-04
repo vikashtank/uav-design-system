@@ -28,15 +28,13 @@ class Aerofoil:
         Returns:
             (ax object): A matplotlib ax object with the aerofoil plotted
         """
-        suction_curve = self.suction_surface.bezier
-        pressure_curve = self.pressure_surface.bezier
 
         if plot is not None:
-            pl = suction_curve.plot(num_points, ax = plot, color = colour)
-            pressure_curve.plot(num_points, ax = plot, color = colour)
+            pl = self.suction_surface.plot(num_points, ax = plot, color = colour)
+            self.pressure_surface.plot(num_points, ax = plot, color = colour)
         else:
-            plot = suction_curve.plot(num_points, color = colour)
-            pressure_curve.plot(num_points, ax = plot, color = colour)
+            plot = self.suction_surface.plot(num_points, color = colour)
+            self.pressure_surface.plot(num_points, ax = plot, color = colour)
 
         return plot
 
