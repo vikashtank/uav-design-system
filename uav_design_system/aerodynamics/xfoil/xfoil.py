@@ -50,9 +50,10 @@ class XfoilRunner():
         self.process.command('PLOP\nG\n')
 
     def _prepare_aerofoil(self, aerofoil_file_path):
-        pass
+        aerofoil_file_path = self._move_aerofile_to_temp(aerofoil_file_path)
+        self.process.command(f'LOAD {aerofoil_file_path}')
 
-    def _setup_analysis(self, aerofoil_file_path, reynolds_number):
+    def _setup_analysis(self, reynolds_number):
         """
         runs commands to setup the aerofoil and reynolds number
         sets up polar plotting
@@ -62,14 +63,19 @@ class XfoilRunner():
         aerofoil (Str): naca aerofoil 4 or 5 series code
         re (Int): reynolds number
         """
-
-        aerofoil_file_path = self._move_aerofile_to_temp(aerofoil_file_path)
-
-        self.process.command(f'LOAD {aerofoil_file_path}')
-        self._disable_x11_plot()
         self.process.command('OPER')
         self.process.command(f'visc {reynolds_number}')
         self.process.command('SEQP')
+
+    def _prepare_output_file(self):
+        temp_file = self.temp_folder / 'aerofoil_results.txt'
+        self.process.command('PACC')
+        self.process.command(str(temp_file))
+        self.process.command('')
+        return temp_file
+
+    def _modify_geometry(self):
+        pass
 
     def __call__(self, aerofoil_file, reynolds_number, start, stop, step, results_dir = None):
         """
@@ -85,15 +91,14 @@ class XfoilRunner():
             results_dir (Str): location to copy results to if kept, default None
         """
         self.process = Process.initialise_process(self.executable)
+        self._disable_x11_plot()
+        self._prepare_aerofoil(aerofoil_file)
+        self._modify_geometry()
+        self._setup_analysis(reynolds_number) #TODO add mach number and turbulence params
 
-        self._setup_analysis(aerofoil_file, reynolds_number)
+        temp_file = self._prepare_output_file()
 
-        temp_file = self.temp_folder / 'aerofoil_results.txt'
-        self.process.command('PACC')
-        self.process.command(str(temp_file))
-        self.process.command('')
-
-        content = self._get_results(start, stop, step, temp_file)
+        content = self._run_analysis(start, stop, step, temp_file)
 
         self.process.close()
 
@@ -145,7 +150,7 @@ class XfoilRunner():
 
         return root
 
-    def _get_results(self, start, stop, step, temp_file):
+    def _run_analysis(self, start, stop, step, temp_file):
         """
         creates a results file and returns the results at a number of angles
         of attack of the aerofoil
