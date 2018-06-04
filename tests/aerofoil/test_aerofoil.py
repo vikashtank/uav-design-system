@@ -17,27 +17,22 @@ def get_resource_content(file_name):
     with open(join(resources_directory, file_name)) as open_file:
         return open_file.read()
 
-class TestAerofoil():
+class TestAerofoil(unittest.TestCase):
 
     def setUp(self):
-        self.nodes1 = np.asfortranarray([[0, 0], [0.5, 0], [1, 0]])
-        self.nodes2 = np.asfortranarray([[0, 0], [0.5, 0.5], [1, 1]])
-
-        p_surface = aerofoil.Surface(self.nodes1, degree = 1)
-        s_surface = aerofoil.Surface(self.nodes2, degree = 1)
-        self.aerofoil = aerofoil.Aerofoil(s_surface, p_surface)
+        self.p_surface = aerofoil.Surface(*[[0, 0], [0.5, 0], [1, 0]], degree = 1)
+        self.s_surface = aerofoil.Surface(*[[0, 0], [0.5, 0.5], [1, 1]], degree = 1)
+        self.aerofoil = aerofoil.Aerofoil(self.s_surface, self.p_surface)
 
     def tearDown(self):
         pass
 
     def test_str_none(self):
-        expected_string = "Name: Not Specified"
-        self.assertEqual(str(self.aerofoil), expected_string)
+        self.assertEqual(str(self.aerofoil), "Name: Not Specified")
 
     def test_str(self):
         self.aerofoil.name = "Aerofoil1"
-        expected_string = "Name: Aerofoil1"
-        self.assertEqual(str(self.aerofoil), expected_string)
+        self.assertEqual(str(self.aerofoil), "Name: Aerofoil1")
 
     def test_get_top_bottom(self):
         """
@@ -45,7 +40,6 @@ class TestAerofoil():
         x coordinate
         """
         y_pressure, y_suction = self.aerofoil.get_maxmin_y(0.5, x0 = np.float(0.2))
-
         self.assertEqual(y_pressure, 0)
         self.assertEqual(y_suction, 0.5)
 
@@ -115,31 +109,31 @@ class TestAerofoil():
 
         for i in range(3):
             for j in [0, 1]:
-                self.assertEqual(ps_nodes[i][j], self.nodes1[i][j] * 3)
+                self.assertEqual(ps_nodes[i][j], self.p_surface.nodes[i][j] * 3)
 
         for i in range(3):
             for j in [0, 1]:
-                self.assertEqual(ss_nodes[i][j], self.nodes2[i][j] * 3)
+                self.assertEqual(ss_nodes[i][j], self.s_surface.nodes[i][j] * 3)
 
     def test_equal(self):
-        self.nodes1 = np.asfortranarray([[0, 0], [0.5, 0], [1, 0]])
-        self.nodes2 = np.asfortranarray([[0, 0], [0.5, 0.5], [1, 1]])
+        self.nodes1 = [[0, 0], [0.5, 0], [1, 0]]
+        self.nodes2 = [[0, 0], [0.5, 0.5], [1, 1]]
 
-        p_surface = aerofoil.Surface(self.nodes1, degree = 1)
-        s_surface = aerofoil.Surface(self.nodes2, degree = 1)
+        p_surface = aerofoil.Surface(*self.nodes1, degree = 1)
+        s_surface = aerofoil.Surface(*self.nodes2, degree = 1)
         new_aerofoil = aerofoil.Aerofoil(s_surface, p_surface)
 
         self.assertEqual(self.aerofoil, new_aerofoil)
 
 
-class TestAerofoilWrite():
+class TestAerofoilWrite(unittest.TestCase):
 
     def setUp(self):
-        self.nodes1 = np.asfortranarray([[0, 0], [0, -0.1], [0.5, -0.1], [1, 0]])
-        self.nodes2 = np.asfortranarray([[0, 0], [0, 0.1], [0.5, 0.1], [1, 0]])
+        self.nodes1 = [[0, 0], [0, -0.1], [0.5, -0.1], [1, 0]]
+        self.nodes2 = [[0, 0], [0, 0.1], [0.5, 0.1], [1, 0]]
 
-        p_surface = aerofoil.Surface(self.nodes1, degree = 1)
-        s_surface = aerofoil.Surface(self.nodes2, degree = 1)
+        p_surface = aerofoil.Surface(*self.nodes1, degree = 1)
+        s_surface = aerofoil.Surface(*self.nodes2, degree = 1)
         self.aerofoil = aerofoil.Aerofoil(s_surface, p_surface)
         self.test_file = join(this_directory, "test_file.txt")
 

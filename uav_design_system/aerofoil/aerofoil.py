@@ -6,7 +6,7 @@ import scipy.optimize as opt
 import matplotlib.pyplot as plt
 
 
-class Aerofoil():
+class Aerofoil:
     """
     Class that represents an Aerofoil
     """
@@ -42,7 +42,7 @@ class Aerofoil():
 
     @staticmethod
     def develop_aerofoil(le_top: float, le_bottom: float, thickness: float,
-                         camber_x: float, camber_y: float):
+                         camber_x: float, camber_y: float, degree = 2):
         """
         generates an aerofoil from the parameters provided from 6 control points:
             1 control point at the leading edge
@@ -63,22 +63,17 @@ class Aerofoil():
         mid_top = [camber_x, camber_y + thickness*0.5]
         mid_bottom = [camber_x, camber_y - thickness*0.5]
 
-        nodes1 = np.asfortranarray([[0, 0], [0, le_top], mid_top, [1, 0]])
-        nodes2 = np.asfortranarray([[0, 0], [0, le_bottom], mid_bottom, [1, 0]])
-
-        s_surface = Surface(nodes1, 2)
-        p_surface = Surface(nodes2, 2)
+        s_surface = Surface(*[[0, 0], [0, le_top], mid_top, [1, 0]], degree = degree)
+        p_surface = Surface(*[[0, 0], [0, le_bottom], mid_bottom, [1, 0]], degree = degree)
         aerofoil = Aerofoil(s_surface, p_surface)
 
         return aerofoil
 
     @staticmethod
-    def from_nodes(suction_nodes, pressure_nodes):
-        suction_nodes = np.asfortranarray(suction_nodes)
-        pressure_nodes = np.asfortranarray(pressure_nodes)
+    def from_nodes(suction_nodes, pressure_nodes, degree = 2):
 
-        s_surface = Surface(suction_nodes, 2)
-        p_surface = Surface(pressure_nodes, 2)
+        s_surface = Surface(suction_nodes, degree)
+        p_surface = Surface(pressure_nodes, degree)
         aerofoil = Aerofoil(s_surface, p_surface)
 
         return aerofoil
@@ -103,14 +98,14 @@ class Aerofoil():
         else:
             return "Name: Not Specified"
 
-    def write(self, open_file, number_nodes: int = 100):
+    def write(self, open_file, num_points: int = 100):
         """
         writes the suction and pressure surface x,y coordinates into a file with
         a title line of the aerofoil name
 
         Inputs:
             open_file:  a file stream object
-            number_nodes:  The number of points for each surface to be written
+            num_points:  The number of points for each surface to be written
 
         Returns:
             None
@@ -118,13 +113,13 @@ class Aerofoil():
 
         open_file.write(f'{self}\n')
 
-        px, py = self.pressure_surface.get_xy_coords(number_nodes)
-        sx, sy = self.suction_surface.get_xy_coords(number_nodes)
+        px, py = self.pressure_surface.get_xy_coords(num_points)
+        sx, sy = self.suction_surface.get_xy_coords(num_points)
 
         x = sx[::-1] + px
         y = sy[::-1] + py
 
-        for i in range(number_nodes * 2):
+        for i in range(num_points * 2):
             open_file.write(f"{x[i]} {y[i]}\n")
 
     def check_fits(self, shape: "TwoDimentional"):
@@ -179,13 +174,13 @@ class Aerofoil():
                self.pressure_surface == aerofoil.pressure_surface
 
 
-class Surface():
+class Surface:
     """
     Class that represents a Surface from a number of nodes and degree
     """
 
     def __init__(self, *nodes, degree: int = 2):
-        self._nodes = np.asfortranarray(nodes)
+        self._nodes = np.asfortranarray(list(nodes))
         self.degree = degree
 
     @property
@@ -244,8 +239,5 @@ class Surface():
     def __eq__(self, surface: 'Surface'):
         return self._nodes.all() == surface._nodes.all()
 
-
-
-
-if __name__ == "__main__":
-    plot_aerofoil(0.1, -0.1, 0.1, 0.5, 0.1)
+    def plot(num_points, **kwargs):
+        return self.bezier.plot(num_points, **kwargs)
