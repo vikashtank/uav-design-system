@@ -46,6 +46,12 @@ class XfoilRunner():
         shutil.copy(aerofoil_file_path, str(self.temp_folder))
         return self.temp_folder / base_name
 
+    def _disable_x11_plot(self):
+        self.process.command('PLOP\nG\n')
+
+    def _prepare_aerofoil(self, aerofoil_file_path):
+        pass
+
     def _setup_analysis(self, aerofoil_file_path, reynolds_number):
         """
         runs commands to setup the aerofoil and reynolds number
@@ -60,8 +66,7 @@ class XfoilRunner():
         aerofoil_file_path = self._move_aerofile_to_temp(aerofoil_file_path)
 
         self.process.command(f'LOAD {aerofoil_file_path}')
-        # this line deactivates the stupid X11 plot, which ruined my life.
-        self.process.command('PLOP\nG\n')
+        self._disable_x11_plot()
         self.process.command('OPER')
         self.process.command(f'visc {reynolds_number}')
         self.process.command('SEQP')
