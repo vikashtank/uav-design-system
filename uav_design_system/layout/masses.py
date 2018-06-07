@@ -22,7 +22,6 @@ class Arrangement(IsArrangeable):
         else:
             self.objects = []
 
-
         self._location = Point(0, 0, 0)
 
     @property
@@ -92,9 +91,8 @@ class Arrangement(IsArrangeable):
         return string_list
 
     @property
-    def total_mass(self):
+    def mass(self):
         return sum(mass.mass for mass in self.all_mass_objects)
-
 
     @property
     def center_of_gravity(self):
@@ -108,9 +106,9 @@ class Arrangement(IsArrangeable):
         mom_y = sum(mass.mass * mass.center_of_gravity_global.y for mass in flat)
         mom_z = sum(mass.mass * mass.center_of_gravity_global.z for mass in flat)
 
-        return Point(mom_x/self.total_mass,
-                     mom_y/self.total_mass,
-                     mom_z/self.total_mass)
+        return Point(mom_x/self.mass,
+                     mom_y/self.mass,
+                     mom_z/self.mass)
 
     def clone(self, reflect_y = False):
         """
@@ -159,7 +157,6 @@ class Arrangement(IsArrangeable):
         subplot.plot(x, y, "o")
 
         return subplot
-
 
 
 class MassObject(IsArrangeable):
@@ -251,8 +248,6 @@ class MassObject(IsArrangeable):
     def from_mass(geometry: 'ThreeDimentional', mass: float, name = ""):
         density = mass/geometry.volume
         return MassObject(geometry, density, name)
-
-
 
 
 if __name__  == "__main__":

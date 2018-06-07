@@ -154,7 +154,7 @@ class TestArrangement(unittest.TestCase):
 
     def test_total_mass(self):
         arrangement = layout.Arrangement("arrangement1", *self.mass_list)
-        self.assertEqual(arrangement.total_mass, 60)
+        self.assertEqual(arrangement.mass, 60)
 
     def test_total_mass_nested(self):
         arrangement = layout.Arrangement("arrangement1", *self.mass_list[0:2])
@@ -163,7 +163,7 @@ class TestArrangement(unittest.TestCase):
                                                           arrangement2,
                                                           self.mass_list[0])
 
-        self.assertEqual(arrangement3.total_mass, 66)
+        self.assertEqual(arrangement3.mass, 66)
 
     def test_clone(self):
         """
