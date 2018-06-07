@@ -3,8 +3,7 @@ results from xfoil post processor
 """
 
 
-
-class AerofoilResults():
+class XfoilResults():
 
     def __init__(self, xfoil_results_dict):
         self._results_dict = xfoil_results_dict
@@ -13,20 +12,20 @@ class AerofoilResults():
     def _results_list(self):
         return self._results_dict["xfoil"]["analysis"]["results"]
 
-    def _get_value(self, parameter_name, value):
+    def get_closest_value(self, parameter_name, value):
         return min(self._results_list, key = lambda x: abs(x[parameter_name] - value))
 
-    def _get_min(self, parameter_name):
+    def get_min(self, parameter_name):
         return min(self._results_list, key = lambda x: x[parameter_name])
 
-    def _get_max(self, parameter_name):
+    def get_max(self, parameter_name):
         return max(self._results_list, key = lambda x: x[parameter_name])
 
-    def get_alpha(self, alpha: float):
-        return self._get_value("alpha", alpha)
+    def get_closest_alpha(self, alpha: float):
+        return self.get_closest_value("alpha", alpha)
 
-    def get_cl(self, value: float):
-        return self._get_value("cl", value)
+    def get_closest_cl(self, value: float):
+        return self.get_closest_value("cl", value)
 
     @property
     def lift_slope(self):
@@ -39,4 +38,4 @@ class AerofoilResults():
 
     @property
     def cd0(self):
-        return self._get_value("cl", 0)["cd"]
+        return self.get_closest_value("cl", 0)["cd"]

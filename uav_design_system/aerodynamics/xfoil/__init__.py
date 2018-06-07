@@ -1,2 +1,2 @@
 from .xfoil import XfoilRunner
-from .results import AerofoilResults
+from .results import XfoilResults

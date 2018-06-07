@@ -7,7 +7,7 @@ from ...common import Process, Runner
 import time
 import tempfile
 import shutil
-from .results import AerofoilResults
+from .results import XfoilResults
 from pathlib import Path
 
 
@@ -110,7 +110,7 @@ class XfoilRunner():
         if results_dir:
             shutil.copy(temp_file, results_dir)
 
-        return AerofoilResults(self._format_content(content))
+        return XfoilResults(self._format_content(content))
 
     def _format_content(self, content):
         """
