@@ -1,6 +1,7 @@
 """
 results from xfoil post processor
 """
+from scipy.interpolate import interp1d as interpolate
 
 
 class XfoilResults():
@@ -26,6 +27,18 @@ class XfoilResults():
 
     def get_closest_cl(self, value: float):
         return self.get_closest_value("cl", value)
+
+
+    def get_value_list(self, parameter_name):
+        return [x[parameter_name] for x in self._results_list]
+
+    def get_interpolation(self, parameter_name_x, parameter_name_y, **kwargs):
+        return interpolate(self.get_value_list(parameter_name_x),
+                           self.get_value_list(parameter_name_y),
+                           **kwargs)
+
+    def get_lift_alpha_curve(self, **kwargs):
+        return self.get_interpolation('alpha', 'cl')
 
     @property
     def lift_slope(self):

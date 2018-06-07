@@ -44,7 +44,17 @@ class TestCase(unittest.TestCase):
     def test_lift_slope(self):
         self.assertEqual(self.aerofoil_results.lift_slope, 0.0828)
 
+    def test_get_value_list(self):
+        actual_list = self.aerofoil_results.get_value_list('alpha')
+        self.assertEqual(actual_list, [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5])
 
+    def test_interpolation(self):
+        interpolation = self.aerofoil_results.get_interpolation('alpha', 'cl', kind = 'cubic')
+        self.assertEqual(interpolation(2.5), 0.2108)
+
+    def test_lift_alpha_curve(self):
+        interpolation = self.aerofoil_results.get_lift_alpha_curve( kind = 'cubic')
+        self.assertEqual(interpolation(2.5), 0.2108)
 
 
 
