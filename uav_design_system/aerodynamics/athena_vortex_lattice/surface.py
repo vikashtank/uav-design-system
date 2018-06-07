@@ -123,12 +123,13 @@ class Surface():
         self.y = y
         self.z = z
 
-    def add_section(self, *sections: List['Section']):
+    def add_section(self, *args, **kwargs):
         """
         add a section to the surface
         """
-        for section in sections:
-            self.sections.append(section)
+        section = Section(*args, **kwargs)
+        self.sections.append(section)
+        return section
 
     def __iter__(self):
         for i in self.sections:

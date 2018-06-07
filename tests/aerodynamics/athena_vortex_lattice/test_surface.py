@@ -31,10 +31,9 @@ class TestSurface(unittest.TestCase):
                             avl.ControlDeflectionType.SYMMETRIC)
 
         for i in range(5):
-            section = avl.Section(2)
+            section = self.surface.add_section(2)
             section.aerofoil = self.aerofoil
             section.translation_bias(0, i, 0)
-            self.surface.add_section(section)
 
     def tearDown(self):
         pass
@@ -144,15 +143,13 @@ class TestSurfaceWrite(unittest.TestCase):
         self.surface = avl.Surface("surface1")
         self.surface.define_mesh(20, 30, 1.0, 1.0)
 
-        section1 = avl.Section(10)
+        section1 = self.surface.add_section(10)
         section1.aerofoil = self.aerofoil
 
-        section2 = avl.Section(2)
+        section2 = self.surface.add_section(2)
         section2.aerofoil = self.aerofoil
 
         section2.translation_bias(0, 10, 0)
-
-        self.surface.add_section(section1, section2)
 
         self.control_surface = avl.ControlSurface("elevator",
                                                   0.8,
