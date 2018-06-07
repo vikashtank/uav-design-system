@@ -24,19 +24,28 @@ class TestPlane(unittest.TestCase):
 
         # create wing with aerofoil
         self.aerofoil = aerofoil.Aerofoil.develop_aerofoil(0.2, 0.2, 0.2, 0.2, 0.2)
-        self.surface = avl.Surface("surface1")
+        self.plane = avl.Plane("plane1")
+        self.surface = self.plane.add_surface("surface1")
         self.surface.define_mesh(20, 30, 1.0, 1.0)
-        section1 = avl.Section(10)
+        section1 = self.surface.add_section(10)
         section1.aerofoil = self.aerofoil
-        section2 = avl.Section(2)
+        section2 = self.surface.add_section(2)
         section2.aerofoil = self.aerofoil
         section2.translation_bias(0, 10, 0)
-        self.surface.add_section(section1, section2)
-
-        self.plane = avl.Plane("plane1", self.surface)
 
     def test_main_surface_property(self):
-        self.assertEqual(self.plane.main_surface, self.surface)
+        self.assertEqual(self.plane.reference_surface, self.surface)
+
+    def test_reference_area(self):
+        self.assertEqual(self.plane.reference_area, self.surface.area)
+
+    def test_reference_cord(self):
+        self.assertEqual(self.plane.reference_cord, self.surface.cord)
+
+    def test_reference_span(self):
+        self.assertEqual(self.plane.reference_span, self.surface.span)
+
+
 
     def test_reference_string(self):
         expected_string = get_resource_content("ref_string.txt")
@@ -51,28 +60,23 @@ class TestSurfaceDump(unittest.TestCase):
         self.temp_dir = join(this_directory, "temp")
         makedirs(self.temp_dir)
 
-        # create wing with aerofoil
-        self.aerofoil = aerofoil.Aerofoil.develop_aerofoil(0.2, 0.2, 0.2, 0.2, 0.2)
-        self.surface = avl.Surface("surface1")
+        self.plane = avl.Plane("plane1")
+        self.surface = self.plane.add_surface('surface1')
         self.surface.define_mesh(20, 30, 1.0, 1.0)
 
-        section1 = avl.Section(10)
+        self.aerofoil = aerofoil.Aerofoil.develop_aerofoil(0.2, 0.2, 0.2, 0.2, 0.2)
+
+        section1 = self.surface.add_section(10)
         section1.aerofoil = self.aerofoil
 
-        section2 = avl.Section(2)
+        section2 = self.surface.add_section(2)
         section2.aerofoil = self.aerofoil
-
         section2.translation_bias(0, 10, 0)
-
-        self.surface.add_section(section1, section2)
-
-        self.plane = avl.Plane("plane1", self.surface)
 
         self.control_surface = avl.ControlSurface("elevator",
                                                   0.8,
                                                   [0, 1, 0],
                                                   avl.ControlDeflectionType.SYMMETRIC)
-
 
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
@@ -125,14 +129,11 @@ class TestSurfaceDump(unittest.TestCase):
                          expected_string.strip())
 
     def test_mulitple_surfaces(self):
-        # create and add second surface
-        tail_surface = avl.Surface("tail")
-        section1 = avl.Section(1)
-        section2 = avl.Section(1)
+        tail_surface = self.plane.add_surface('tail')
+        section1 = tail_surface.add_section(1)
+        section2 = tail_surface.add_section(1)
         section2.translation_bias(0, 5, 0)
-        tail_surface.add_section(section1, section2)
         tail_surface.define_translation_bias(10, 0, 0)
-        self.plane.append(tail_surface)
         expected_string = get_resource_content("surface_multiple.txt")
         self.assertEqual(self.plane._to_avl_string.strip(),
                          expected_string.strip())

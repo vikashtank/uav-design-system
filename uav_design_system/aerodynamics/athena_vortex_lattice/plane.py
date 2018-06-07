@@ -9,9 +9,9 @@ class MainWingError(AttributeError):
 
 class Plane():
 
-    def __init__(self, name: str, *surfaces: List[Surface]):
+    def __init__(self, name: str):
         self.name = name
-        self.surfaces = list(surfaces)
+        self.surfaces = []
         self.x_ref = 0
         self.y_ref = 0
         self.z_ref = 0
@@ -20,8 +20,10 @@ class Plane():
         for i in self.surfaces:
             yield i
 
-    def append(self, value: Surface):
-        self.surfaces.append(value)
+    def add_surface(self, *args, **kwargs):
+        surface = Surface(*args, **kwargs)
+        self.surfaces.append(surface)
+        return surface
 
     @property
     def _ref_string(self):
@@ -75,20 +77,20 @@ class Plane():
         return file_path
 
     @property
-    def main_surface(self):
+    def reference_surface(self):
         return self.surfaces[0]
 
     @property
     def reference_area(self):
-        return self.main_surface.area
+        return self.reference_surface.area
 
     @property
     def reference_cord(self):
-        return self.main_surface.cord
+        return self.reference_surface.cord
 
     @property
     def reference_span(self):
-        return self.main_surface.span
+        return self.reference_surface.span
 
 
     def plot_xy(self, subplot = None, marker = "g_"):
