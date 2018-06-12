@@ -18,9 +18,9 @@ class TestCreateFoamWing(unittest.TestCase):
 
         # add five square sections side by side to form a rectangular surface
         for i in range(5):
-            section = avl.Section(1)
+            section = self.surface.add_section(1)
             section.translation_bias(0, i, 0)
-            self.surface.add_section(section)
+
 
         self.foam_factory = layout.StructureFactory(layout.StructuralModelType.HOLLOWFOAM)
         self.structural_model = self.foam_factory(self.surface, wall_thickness = 1)
@@ -51,7 +51,7 @@ class TestCreateFoamWing(unittest.TestCase):
         density = 36
         thickness = 1
         number_of_sections = 4
-        self.assertEqual(self.structural_model.total_mass, density * 2 *
+        self.assertEqual(self.structural_model.mass, density * 2 *
                          thickness * number_of_sections)
 
 
