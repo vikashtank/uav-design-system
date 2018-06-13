@@ -59,12 +59,12 @@ class TestRun(unittest.TestCase, CustomAssertions):
         """
         uses files in resources to test if avl is generating the correct files
         """
-        self.assertPathExists(self.results_dir / 'ft.txt')
-        self.assertPathExists(self.results_dir / 'hm.txt')
-        self.assertPathExists(self.results_dir / 'st.txt')
-        self.assertPathExists(self.results_dir / 'fn.txt')
-        self.assertPathExists(self.results_dir / 'fs.txt')
-        self.assertPathExists(self.results_dir / 'vm.txt')
+        self.assertPathExists(self.results_dir / 'total_forces.txt')
+        self.assertPathExists(self.results_dir / 'hinge_moments.txt')
+        self.assertPathExists(self.results_dir / 'stability_derivatives.txt')
+        self.assertPathExists(self.results_dir / 'surface_forces.txt')
+        self.assertPathExists(self.results_dir / 'strip_forces.txt')
+        self.assertPathExists(self.results_dir / 'structural_forces.txt')
 
     def test_run_correct_file_content(self):
         """
@@ -77,9 +77,9 @@ class TestRun(unittest.TestCase, CustomAssertions):
         expected_st = resources_folder / 'st.txt'
 
         # get actual files
-        actual_ft = self.results_dir / 'ft.txt'
-        actual_hm = self.results_dir / 'hm.txt'
-        actual_st = self.results_dir / 'st.txt'
+        actual_ft = self.results_dir / 'total_forces.txt'
+        actual_hm = self.results_dir / 'hinge_moments.txt'
+        actual_st = self.results_dir / 'stability_derivatives.txt'
 
         # check files are the same
         self.assertFilesSame(expected_ft, actual_ft)
@@ -89,9 +89,9 @@ class TestRun(unittest.TestCase, CustomAssertions):
     def test_run_correct_output(self):
 
         # get actual files
-        actual_ft = self.results_dir / 'ft.txt'
-        actual_hm = self.results_dir / 'hm.txt'
-        actual_st = self.results_dir / 'st.txt'
+        actual_ft = self.results_dir / 'total_forces.txt'
+        actual_hm = self.results_dir / 'hinge_moments.txt'
+        actual_st = self.results_dir / 'stability_derivatives.txt'
 
         self.assertTrue(isinstance(self.results, AVLResults))
         self.assertEqual(self.read_file(actual_ft), self.results._total_forces)

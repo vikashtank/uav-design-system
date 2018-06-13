@@ -73,7 +73,7 @@ class AVLRunner(Runner):
 
         for analysis_command, analysis_name in AVLRunner.result_aliases.items():
 
-            temp_file = os.path.join(self.temp_folder, analysis_command + '.txt')
+            temp_file = os.path.join(self.temp_folder, analysis_name + '.txt')
             content = self._get_results(analysis_command, temp_file)
 
             results_dict[analysis_name] = content
