@@ -1,64 +1,68 @@
 from os.path import join, exists, dirname, abspath
 from os import makedirs
-this_directory = dirname(abspath(__file__))
+from pathlib import Path
+this_directory = Path(dirname(abspath(__file__)))
 import sys
-sys.path.append(this_directory + "/../../../")  # so uggo thanks to atom runner
+sys.path.append(str(this_directory) + "/../../../")  # so uggo thanks to atom runner
 import unittest
 from uav_design_system.aerodynamics.athena_vortex_lattice import AVLRunner, AVLResults
 import shutil
 
+resources_folder = this_directory / 'resources' / 'run_resources'
+
 class CustomAssertions():
 
-    def _read_file(self, file):
-        with open(file) as open_file:
+    def read_file(self, file):
+        with open(str(file)) as open_file:
             return open_file.read()
 
-    def assertFilesSame(self, file1: str, file2: str):
+    def assertFilesSame(self, file1, file2):
         """
         tests that the content of two files are the same
         """
-        file1_content = self._read_file(file1)
-        file2_content = self._read_file(file2)
+        file1_content = self.read_file(file1)
+        file2_content = self.read_file(file2)
 
         if file1_content != file2_content:
             raise AssertionError("{0} is not the same as {1}".format(file1,
                                                                      file2))
 
+    def assertPathExists(self, path_object):
+        self.assertTrue(path_object.exists())
+
 class TestRun(unittest.TestCase, CustomAssertions):
 
     def setUp(self):
-        self.results_dir = join(this_directory, "results_dir")
+        self.results_dir = this_directory / 'results_dir'
         try:
             shutil.rmtree(self.results_dir)
         except FileNotFoundError:
             pass
         makedirs(self.results_dir)
 
-        self.resources_folder = join(this_directory, "resources")
-        self.geom_file = join(self.resources_folder, "allegro.avl")
-        self.mass_file = join(self.resources_folder, "allegro.mass")
-        self.config_file = join(self.resources_folder, "bd2.run")
+        self.geom_file = resources_folder / 'allegro.avl'
+        self.mass_file = resources_folder / 'allegro.mass'
+        self.config_file = resources_folder / 'bd2.run'
 
         avl_runner = AVLRunner()
-        avl_runner.setup_analysis(self.geom_file,
-                                  self.mass_file,
-                                  self.config_file)
-        self.results = avl_runner.generate_results(self.results_dir)
+        avl_runner.setup_analysis(str(self.geom_file),
+                                  str(self.mass_file),
+                                  str(self.config_file))
+        self.results = avl_runner.generate_results(str(self.results_dir))
 
     def tearDown(self):
-        shutil.rmtree(self.results_dir)
+        shutil.rmtree(str(self.results_dir))
 
     def test_run_create_files(self):
         """
         uses files in resources to test if avl is generating the correct files
         """
-
-        self.assertTrue(exists(join(self.results_dir, "ft.txt")))
-        self.assertTrue(exists(join(self.results_dir, "hm.txt")))
-        self.assertTrue(exists(join(self.results_dir, "st.txt")))
-        self.assertTrue(exists(join(self.results_dir, "fn.txt")))
-        self.assertTrue(exists(join(self.results_dir, "fs.txt")))
-        self.assertTrue(exists(join(self.results_dir, "vm.txt")))
+        self.assertPathExists(self.results_dir / 'ft.txt')
+        self.assertPathExists(self.results_dir / 'hm.txt')
+        self.assertPathExists(self.results_dir / 'st.txt')
+        self.assertPathExists(self.results_dir / 'fn.txt')
+        self.assertPathExists(self.results_dir / 'fs.txt')
+        self.assertPathExists(self.results_dir / 'vm.txt')
 
     def test_run_correct_file_content(self):
         """
@@ -66,14 +70,14 @@ class TestRun(unittest.TestCase, CustomAssertions):
         when compared to the manual runs
         """
         # get expected files
-        expected_ft = join(self.resources_folder, "ft.txt")
-        expected_hm = join(self.resources_folder, "hm.txt")
-        expected_st = join(self.resources_folder, "st.txt")
+        expected_ft = resources_folder / 'ft.txt'
+        expected_hm = resources_folder / 'hm.txt'
+        expected_st = resources_folder / 'st.txt'
 
         # get actual files
-        actual_ft = join(self.results_dir, "ft.txt")
-        actual_hm = join(self.results_dir, "hm.txt")
-        actual_st = join(self.results_dir, "st.txt")
+        actual_ft = self.results_dir / 'ft.txt'
+        actual_hm = self.results_dir / 'hm.txt'
+        actual_st = self.results_dir / 'st.txt'
 
         # check files are the same
         self.assertFilesSame(expected_ft, actual_ft)
@@ -83,17 +87,17 @@ class TestRun(unittest.TestCase, CustomAssertions):
     def test_run_correct_output(self):
 
         # get actual files
-        actual_ft = join(self.results_dir, "ft.txt")
-        actual_hm = join(self.results_dir, "hm.txt")
-        actual_st = join(self.results_dir, "st.txt")
+        actual_ft = self.results_dir / 'ft.txt'
+        actual_hm = self.results_dir / 'hm.txt'
+        actual_st = self.results_dir / 'st.txt'
 
         self.assertTrue(isinstance(self.results, AVLResults))
-        self.assertEqual(self._read_file(actual_ft), self.results._total_forces)
-        self.assertEqual(self._read_file(actual_hm), self.results._hinge_forces)
-        self.assertEqual(self._read_file(actual_st), self.results._stability_forces)
+        self.assertEqual(self.read_file(actual_ft), self.results._total_forces)
+        self.assertEqual(self.read_file(actual_hm), self.results._hinge_forces)
+        self.assertEqual(self.read_file(actual_st), self.results._stability_forces)
 
-
-
+    def test_run_failure(self):
+        pass
 
 if __name__ == "__main__":
     unittest.main()

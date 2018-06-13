@@ -99,7 +99,6 @@ class AVLRunner(Runner):
 
         while not os.path.exists(file_name):
             time.sleep(0.1)
-
         with open(file_name) as open_file:
             content = open_file.read()
 
