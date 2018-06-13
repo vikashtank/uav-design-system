@@ -1,26 +1,29 @@
 import sys
 import os
-sys.path.append(os.path.dirname(__file__) + "/../../common")
+from pathlib import Path
 import subprocess
 import tempfile
 from typing import List
 import shutil
 import time
+
+this_directory = Path(os.path.dirname(__file__))
+sys.path.append(str(this_directory) + '/../../common')
 from process import Process, Runner
 from .results import AVLResults
 
-
 class AVLRunner(Runner):
 
-    result_aliases = {"st" : "stability_derivatives",
-                      "ft" : "total_forces",
-                      "hm" : "hinge_moments",
-                      "fn" : "surface_forces",
-                      "fs" : "strip_forces",
-                      "vm" : "structural_forces"}
+    result_aliases = {'st' : 'stability_derivatives',
+                      'ft' : 'total_forces',
+                      'hm' : 'hinge_moments',
+                      'fn' : 'surface_forces',
+                      'fs' : 'strip_forces',
+                      'vm' : 'structural_forces'}
 
     def __init__(self):
-        super().__init__(os.path.join(os.path.dirname(__file__), "avl3.35"))
+        avl_path_object = this_directory / 'avl3.35'
+        super().__init__(str(avl_path_object))
 
     def setup_analysis(self, geom_file: str, mass_file: str, config_file: str,
                        *required_files: str):
@@ -43,13 +46,13 @@ class AVLRunner(Runner):
         # begin avl executable
         self.process = Process.initialise_process(self.executable, cwd = self.run_time_directory)
 
-        self.process.command("LOAD " + self.geom_file)
-        self.process.command("CASE " + self.config_file)
-        self.process.command("MASS " + self.mass_file)
-        self.process.command("MSET 0")
+        self.process.command('LOAD ' + self.geom_file)
+        self.process.command('CASE ' + self.config_file)
+        self.process.command('MASS ' + self.mass_file)
+        self.process.command('MSET 0')
 
 
-    def generate_results(self, results_dir: str = ""):
+    def generate_results(self, results_dir: str = ''):
         """
         create a file for each result and return a dictionary with the files
         content.
@@ -63,24 +66,23 @@ class AVLRunner(Runner):
             format
         """
         results_dict = {}
-        self.process.command("OPER")
-        self.process.command("c1")
-        self.process.command("")
-        self.process.command("X")
+        self.process.command('OPER')
+        self.process.command('c1')
+        self.process.command('')
+        self.process.command('X')
 
-        for analysis_name in AVLRunner.result_aliases.keys():
+        for analysis_command, analysis_name in AVLRunner.result_aliases.items():
 
-            temp_file = os.path.join(self.temp_folder, analysis_name + ".txt")
-            content = self._get_results(analysis_name, temp_file)
+            temp_file = os.path.join(self.temp_folder, analysis_command + '.txt')
+            content = self._get_results(analysis_command, temp_file)
 
-            analysis_alias = AVLRunner.result_aliases[analysis_name]
-            results_dict[analysis_alias] = content
+            results_dict[analysis_name] = content
             shutil.copy(temp_file, results_dir)
 
         return AVLResults(results_dict)
 
 
-    def _get_results(self, analysis_name: str, file_name: str) -> str:
+    def _get_results(self, analysis_command: str, file_name: str) -> str:
         """
         runs an analysis process and generates a temporary file
 
@@ -91,7 +93,7 @@ class AVLRunner(Runner):
         Returns:
             content: The content of the file
         """
-        command = analysis_name + " {0}".format(file_name)
+        command = analysis_command + f' {file_name}'
         self.process.command(command)
 
         # BUG: when the print_it is performed here the values of xref and zref
@@ -99,14 +101,15 @@ class AVLRunner(Runner):
 
         while not os.path.exists(file_name):
             time.sleep(0.1)
+
         with open(file_name) as open_file:
             content = open_file.read()
 
         return content
 
     def __del__(self):
-        self.process.command("")
-        self.process.command("quit")
+        self.process.command('')
+        self.process.command('quit')
         super().__del__()
 
 

@@ -1,12 +1,14 @@
 from os.path import join, exists, dirname, abspath
 from os import makedirs
 from pathlib import Path
-this_directory = Path(dirname(abspath(__file__)))
 import sys
-sys.path.append(str(this_directory) + "/../../../")  # so uggo thanks to atom runner
 import unittest
-from uav_design_system.aerodynamics.athena_vortex_lattice import AVLRunner, AVLResults
 import shutil
+
+this_directory = Path(dirname(abspath(__file__)))
+sys.path.append(str(this_directory) + '/../../../')  # so uggo thanks to atom runner
+from uav_design_system.aerodynamics.athena_vortex_lattice import AVLRunner, AVLResults
+
 
 resources_folder = this_directory / 'resources' / 'run_resources'
 
@@ -24,7 +26,7 @@ class CustomAssertions():
         file2_content = self.read_file(file2)
 
         if file1_content != file2_content:
-            raise AssertionError("{0} is not the same as {1}".format(file1,
+            raise AssertionError('{0} is not the same as {1}'.format(file1,
                                                                      file2))
 
     def assertPathExists(self, path_object):
