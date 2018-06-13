@@ -4,6 +4,7 @@ class to wrap the Popen class from the subprocess library
 import subprocess
 import os
 import shutil
+from pathlib import Path
 
 
 class Runner():
@@ -18,26 +19,29 @@ class Runner():
 
         # make a temp folder to run analysis in
         # temp folder located here because xfoil file path limit (64 chars)
-        home_directory = os.getenv("HOME")
-        self.temp_folder = os.path.join(home_directory, "temp")
-        os.makedirs(self.temp_folder)
+        home_directory = Path(os.getenv('HOME'))
+        self._temp_folder = home_directory / 'temp'
+
+        if self._temp_folder.exists():
+            shutil.rmtree(str(self._temp_folder))
+
+        os.makedirs(self._temp_folder)
 
         # create a variable for the path to the location of the xfoil executable
         self.executable = file_path
 
     @property
     def run_time_directory(self):
-        return self.temp_folder
+        return str(self._temp_folder)
 
 
-    def _move_to_runtime(self, file_path):
-
-        shutil.copy(file_path, self.temp_folder)
-
-        return os.path.join(self.temp_folder, os.path.basename(file_path))
+    def move_to_runtime(self, file_path):
+        file_path = Path(file_path)
+        shutil.copy(file_path, self._temp_folder)
+        return str(self._temp_folder / file_path.name )
 
     def __del__(self):
-        shutil.rmtree(self.temp_folder)
+        shutil.rmtree(str(self._temp_folder))
 
 
 class Process():
