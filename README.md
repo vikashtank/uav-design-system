@@ -1,5 +1,9 @@
 # UAV DESIGN SYSTEM
 
+## Notes
+
+This repo is alright, needs improvement, sys.path should not be used to run modules ect. 
+
 ## Dependencies
 - Python 3
 - [Bezier Library](https://github.com/dhermes/bezier)
